@@ -186,9 +186,9 @@ enter_jenkins_test()
     echo "Test server site: $site."
     echo "Build number: $xb_build_number."
     echo -n "Repository: "
-    (cd "$thisdir" && hg paths)
+    (cd "$thisdir" && git remote -v)
     echo -n "Changeset: "
-    (cd "$thisdir" && hg id)
+    (cd "$thisdir" && git rev-parse HEAD)
 
     clean_jenkins
 }
