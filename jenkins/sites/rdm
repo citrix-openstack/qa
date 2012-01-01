@@ -1,0 +1,12 @@
+BUILD_RESULT_URL=http://openstack-jenkins-rdm.eng.hq.xensource.com
+TEST_XENSERVER=rdmtst8.ad.xensource.com
+TEST_XENSERVER_1=rdmtst8.ad.xensource.com
+TEST_XENSERVER_2=rdmtst9.ad.xensource.com
+TEST_XENSERVER_3=rdmtst11.ad.xensource.com
+TEST_XENSERVER_4=rdmtst13.ad.xensource.com
+TEST_XENSERVER_M_NET="OpenStack - Management"
+TEST_XENSERVER_P_NET="OpenStack - Public"
+TEST_MAIL_SERVER=sjcmail.citrite.net
+GUEST_NETWORK="--fixed_range_v4=10.0.0.0/24 --label private"
+FLOATING_IP_RANGE="10.102.125.36/31"
+MASTER_BOOT_OPTIONS="geppetto_master=true geppetto_default_networking=true"

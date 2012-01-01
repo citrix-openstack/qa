@@ -1,0 +1,3 @@
+# m h dom mon dow user  command
+*/1 * * * * jenkins cd /var/lib/jenkins && ./get-xs-build-status.py >/dev/null 2>&1
+*/1 * * * * jenkins cd /var/lib/jenkins && ./all-xs-build-status.py >/dev/null 2>&1

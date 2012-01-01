@@ -1,0 +1,131 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description>Run the Geppetto test suite on a private build (i.e. one that you&apos;ve built yourself).  &#xd;
+Can also be used to test a central build, for comparison purposes.&#xd;
+</description>
+  <logRotator>
+    <daysToKeep>-1</daysToKeep>
+    <numToKeep>5</numToKeep>
+    <artifactDaysToKeep>-1</artifactDaysToKeep>
+    <artifactNumToKeep>-1</artifactNumToKeep>
+  </logRotator>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.RunParameterDefinition>
+          <name>Build</name>
+          <description>A central build, if you don&apos;t want to use PrivateBuildURL below.</description>
+          <projectName>os-vpx-build-sc</projectName>
+        </hudson.model.RunParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>PrivateBuildURL</name>
+          <description>The URL that the VPX and associated scripts can be downloaded from.  Should be the subdirectory that contains os-vpx.xva or os-vpx-devel.xva, install-os-vpx.sh, etc.&#xd;
+&#xd;
+If you want to use a central build instead, use Build above.</description>
+          <defaultValue></defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <org.jvnet.jenkins.plugins.nodelabelparameter.LabelParameterDefinition>
+          <name>SiteLabel</name>
+          <description>One of &quot;cambourne&quot;, &quot;cambridge&quot;, &quot;santa-clara&quot;, or &quot;redmond&quot;.&#xd;
+&#xd;
+Make sure that this matches the PrivateBuildURL parameter above!  If you get this wrong, then you will end up streaming VM images from one site to another, and the build will time out.&#xd;
+</description>
+          <defaultValue></defaultValue>
+        </org.jvnet.jenkins.plugins.nodelabelparameter.LabelParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>Server</name>
+          <description>This will &lt;b&gt;completely wipe&lt;/b&gt; the specified machine!  Leave blank to use the default test machine on the specified site.&#xd;
+Use ssh-upload-jenkins-keys from root@openstack-jenkins.uk.xensource.com to allow remote login.</description>
+          <defaultValue></defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>Password</name>
+          <description>The XenServer root password.  Leave blank to use the default site password.</description>
+          <defaultValue></defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>Master_memory</name>
+          <description></description>
+          <defaultValue>700</defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.BooleanParameterDefinition>
+          <name>Devel</name>
+          <description>Whether to use the os-vpx-devel build, as opposed to the release build.</description>
+          <defaultValue>true</defaultValue>
+        </hudson.model.BooleanParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>XSManagementNIC</name>
+          <description>The XenServer NIC on which to create the Single-Server Private Network.</description>
+          <defaultValue>eth1</defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>ManagementNetwork</name>
+          <description>The network or bridge to use for management traffic (i.e. eth1 in the VPX).</description>
+          <defaultValue></defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>PublicNetwork</name>
+          <description>The network or bridge to use for public traffic (i.e. eth2 in the VPX).</description>
+          <defaultValue></defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>NetworkingMode</name>
+          <description>Network manager to employ. Adding the &quot;-ha&quot; suffix to the manager specifies HA networking configuration.</description>
+          <defaultValue>flat</defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>GuestNetworkBridge</name>
+          <description>The host bridge to be used for instance networking.</description>
+          <defaultValue>xapi0</defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>MasterBootOptions</name>
+          <description>Boot options (aka kernel arguments) to be passed to the master VPX. It defaults to MASTER_BOOT_OPTIONS var set by site files.</description>
+          <defaultValue>geppetto_master=true geppetto_default_networking=true</defaultValue>
+        </hudson.model.StringParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
+  <scm class="hudson.plugins.mercurial.MercurialSCM">
+    <source>http://openstack-hg:81/openstack/trunk/forest.hg</source>
+    <modules></modules>
+    <clean>true</clean>
+    <forest>false</forest>
+    <browser class="hudson.plugins.mercurial.browser.HgWeb">
+      <url>http://openstack-jenkins.uk.xensource.com:81/openstack/trunk/forest.hg/</url>
+    </browser>
+  </scm>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>true</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers class="vector"/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>qa.hg/jenkins/run-geppetto-test.sh</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers>
+    <hudson.tasks.ArtifactArchiver>
+      <artifacts>qa.hg/jenkins/*.png</artifacts>
+      <latestOnly>false</latestOnly>
+    </hudson.tasks.ArtifactArchiver>
+  </publishers>
+  <buildWrappers>
+    <hudson.plugins.build__timeout.BuildTimeoutWrapper>
+      <timeoutMinutes>90</timeoutMinutes>
+      <failBuild>true</failBuild>
+    </hudson.plugins.build__timeout.BuildTimeoutWrapper>
+    <hudson.plugins.timestamper.TimestamperBuildWrapper/>
+    <hudson.plugins.dumpinfo.DumpInfoBuildWrapper>
+      <dumpComputers>true</dumpComputers>
+      <dumpJdks>false</dumpJdks>
+      <dumpPlugins>true</dumpPlugins>
+      <dumpSystemProperties>true</dumpSystemProperties>
+      <dumpEnvironmentVariables>true</dumpEnvironmentVariables>
+    </hudson.plugins.dumpinfo.DumpInfoBuildWrapper>
+  </buildWrappers>
+</project>

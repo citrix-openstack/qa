@@ -1,0 +1,30 @@
+#!/usr/bin/env python
+
+import common
+import sys
+import xmlrpclib
+
+
+url = '%s/openstack/geppetto/v1' % sys.argv[1]
+expected_count = int(sys.argv[2])
+
+
+def check_node_count(proxy, expected_count):
+    node_fqdns = proxy.Node.get_all()
+    node_count = len(node_fqdns)
+
+    if node_count != expected_count:
+        print >>sys.stderr, \
+              ("Expected %(expected_count)d nodes, got %(node_count)d." %
+               locals())
+        print >>sys.stderr, node_fqdns
+        raise Exception('check_node_count')
+    else:
+        print >>sys.stderr, \
+              "Found expected %(expected_count)d nodes." % locals()
+        print >>sys.stderr, node_fqdns
+
+
+proxy = common.retry(lambda: xmlrpclib.ServerProxy(url), 'Connecting to Geppetto')
+
+common.retry(lambda: check_node_count(proxy, expected_count), 'Counting nodes')

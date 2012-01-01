@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<hudson.plugins.emailext.ExtendedEmailPublisherDescriptor>
+  <hudsonUrl>http://10.80.238.227:8080/</hudsonUrl>
+  <adminAddress>address not configured yet &lt;nobody&gt;</adminAddress>
+  <useSsl>false</useSsl>
+  <defaultContentType>text/plain</defaultContentType>
+  <defaultSubject>$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS!</defaultSubject>
+  <defaultBody>$PROJECT_NAME - Build # $BUILD_NUMBER - $BUILD_STATUS:&#xd;
+&#xd;
+Check console output at $BUILD_URL to view the results.</defaultBody>
+  <overrideGlobalSettings>false</overrideGlobalSettings>
+</hudson.plugins.emailext.ExtendedEmailPublisherDescriptor>

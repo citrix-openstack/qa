@@ -1,0 +1,67 @@
+#!/usr/bin/env python
+
+import os
+import os.path
+import sys
+import urllib
+
+
+def get(get_url):
+    url = urllib.urlopen(get_url)
+    try:
+        return url.read()
+    finally:
+        url.close()
+
+
+def find_upstream_details(params):
+    if 'actions' in params:
+        actions = params['actions']
+        for action in actions:
+            if 'causes' in action:
+                causes = action['causes']
+                for cause in causes:
+                    if 'upstreamUrl' in cause:
+                        return (cause['upstreamUrl'],
+                                cause['upstreamBuild'])
+    return None, None
+
+
+def get_bn_from_build(build_url):
+    params = eval(get('%(build_url)sapi/python' % locals()))
+    return params['fullDisplayName'].split(' ', 2)[1]
+
+
+JENKINS_URL = os.getenv('JENKINS_URL')
+JOB_NAME = os.getenv('JOB_NAME')
+BUILD_NUMBER = os.getenv('BUILD_NUMBER')
+thisdir = os.path.abspath(os.path.dirname(sys.argv[0]))
+
+
+params = eval(get(
+    '%(JENKINS_URL)sjob/%(JOB_NAME)s/%(BUILD_NUMBER)s/api/python' % locals()))
+
+upstream_url, upstream_build = find_upstream_details(params)
+if upstream_url:
+    build_url = \
+        ('%(JENKINS_URL)s%(upstream_url)s%(upstream_build)s/' %
+         locals())
+    print get_bn_from_build(build_url)
+    exit(0)
+
+
+build_url = os.getenv('Build')
+if build_url is not None:
+    print get_bn_from_build(build_url)
+    exit(0)
+
+
+# Go from workspace/qa.hg/jenkins/build/ to workspace/BUILD_NUMBER.
+bn_file = "%s/../../../BUILD_NUMBER" % thisdir
+if os.path.exists(bn_file):
+    with file(bn_file) as f:
+        print f.readline().strip()
+    exit(0)
+
+
+exit(1)

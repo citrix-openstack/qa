@@ -1,0 +1,10 @@
+BUILD_RESULT_URL=http://bethany.eng.citrite.net
+TEST_XENSERVER_M_NET=xenbr1
+TEST_XENSERVER_P_NET="OpenStack - Public"
+TEST_XENSERVER=cosmos.eng.citrite.net
+TEST_MAIL_SERVER=lonmail.citrite.net
+TEST_MAIL_ACCOUNT=armando.migliaccio@citrix.com
+GUEST_NETWORK="--fixed_range_v4=10.0.0.0/24 --label private"
+FLOATING_IP_RANGE="10.102.125.36/31"
+TEST_XENSERVER_2=daucus.eng.citrite.net
+MASTER_BOOT_OPTIONS="geppetto_master=true geppetto_default_networking=true"

@@ -1,0 +1,26 @@
+#!/usr/bin/env python
+
+import common
+import sys
+import xmlrpclib
+
+
+def set_overrides(proxy, worker, overrides):
+    for key, value_pair in overrides.iteritems():
+        override = value_pair.split(':')
+        onetime = len(override) == 2 and override[1].lower() == 'true'
+        value = len(override) == 2 and override[0] or value_pair
+        proxy.Config.add_node_override(worker, key.strip(), value, onetime)
+        
+
+url = '%s/openstack/geppetto/v1' % sys.argv[1]
+worker = sys.argv[2]
+# a comma-separated list of key=value pairs
+# to specify a onetime override do:
+# key1=value1:True,key2=value2:False,key3=value3,... etc 
+configs = common.parse(sys.argv[3])
+
+proxy = common.retry(lambda: xmlrpclib.ServerProxy(url), 'Connecting to Geppetto')
+
+print 'Settings overrides for worker %s' % worker
+set_overrides(proxy, worker, configs)

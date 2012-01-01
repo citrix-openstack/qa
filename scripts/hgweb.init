@@ -1,0 +1,78 @@
+#! /bin/sh
+
+### BEGIN INIT INFO
+# Provides:
+# Required-Start: $all
+# Required-Stop:  $all
+# Default-Start:  2 3 4 5
+# Default-Stop:   0 1 6
+# Short-Description: starts FastCGI for HGWEB
+# Description: starts FastCGI for Mercurial Web Gateway over NGINX
+### END INIT INFO
+
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+NAME=hgweb
+PID=/var/run/${NAME}.pid
+FCGIAPP=/etc/mercurial/${NAME}.fcgi
+DAEMON=/usr/bin/spawn-fcgi
+SOCKET=/var/run/${NAME}dir.sock
+DAEMON_OPTS="-u www-data -s $SOCKET -P $PID -- $FCGIAPP"
+
+test -x $DAEMON || exit 0
+
+start()
+{
+    echo -n "Starting $NAME: "
+    $DAEMON $DAEMON_OPTS > /dev/null
+    echo "done."
+}
+
+stop()
+{
+    echo -n "Stopping $NAME: "
+    kill -15 `cat $PID`
+    rm -f $PID
+    rm -f $SOCKET
+    echo "done."
+}
+
+status()
+{
+    if [ -f $PID ] && kill -0 `cat $PID` 2>/dev/null
+    then
+       echo "$NAME is running"
+       return 0
+    else
+       echo "$NAME is stopped"
+       return 1
+    fi
+}
+
+case "$1" in
+  start)
+    status && exit 0
+    $1
+    ;;
+ stop)
+    status || exit 0
+    echo -n "Stopping $NAME: "
+    kill -15 `cat $PID`
+    rm -f $PID
+    echo "done."
+    ;;
+ status)
+    $1
+    ;;
+ restart)
+    stop
+    start
+    ;;
+ *)
+    echo "Usage: /etc/init.d/$NAME {start|stop|status|restart}" >&2
+    exit 1
+    ;;
+esac
+
+exit 0
+

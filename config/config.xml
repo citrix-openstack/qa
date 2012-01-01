@@ -1,0 +1,351 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<hudson>
+  <disabledAdministrativeMonitors>
+    <string>hudson.node_monitors.MonitorMarkedNodeOffline</string>
+  </disabledAdministrativeMonitors>
+  <version>1.418</version>
+  <numExecutors>4</numExecutors>
+  <mode>NORMAL</mode>
+  <useSecurity>true</useSecurity>
+  <authorizationStrategy class="hudson.security.AuthorizationStrategy$Unsecured"/>
+  <securityRealm class="hudson.security.PAMSecurityRealm">
+    <serviceName>sshd</serviceName>
+  </securityRealm>
+  <systemMessage>&lt;p style=&quot;text-align: center; margin-right: 50px&quot;&gt;&lt;img src=&quot;/static-images/citrix-openstack-cambridge-500.png&quot; /&gt;&lt;/p&gt;</systemMessage>
+  <markupFormatter class="hudson.markup.RawHtmlMarkupFormatter"/>
+  <jdks/>
+  <viewsTabBar class="hudson.views.DefaultViewsTabBar"/>
+  <myViewsTabBar class="hudson.views.DefaultMyViewsTabBar"/>
+  <clouds/>
+  <slaves>
+    <slave>
+      <name>copper</name>
+      <description></description>
+      <remoteFS>/opt/jenkins</remoteFS>
+      <numExecutors>4</numExecutors>
+      <mode>NORMAL</mode>
+      <retentionStrategy class="hudson.slaves.RetentionStrategy$Always"/>
+      <launcher class="hudson.slaves.JNLPLauncher"/>
+      <label>santa-clara</label>
+      <nodeProperties>
+        <hudson.slaves.EnvironmentVariablesNodeProperty>
+          <envVars serialization="custom">
+            <unserializable-parents/>
+            <tree-map>
+              <default>
+                <comparator class="hudson.util.CaseInsensitiveComparator"/>
+              </default>
+              <int>2</int>
+              <string>PIP_DOWNLOAD_CACHE</string>
+              <string>/opt/jenkins/pip_download_cache</string>
+              <string>SITE</string>
+              <string>sc</string>
+            </tree-map>
+          </envVars>
+        </hudson.slaves.EnvironmentVariablesNodeProperty>
+        <hudson.tools.ToolLocationNodeProperty>
+          <locations/>
+        </hudson.tools.ToolLocationNodeProperty>
+      </nodeProperties>
+    </slave>
+    <slave>
+      <name>rdm</name>
+      <description></description>
+      <remoteFS>/opt/jenkins</remoteFS>
+      <numExecutors>4</numExecutors>
+      <mode>NORMAL</mode>
+      <retentionStrategy class="hudson.slaves.RetentionStrategy$Always"/>
+      <launcher class="hudson.slaves.JNLPLauncher"/>
+      <label>redmond</label>
+      <nodeProperties>
+        <hudson.slaves.EnvironmentVariablesNodeProperty>
+          <envVars serialization="custom">
+            <unserializable-parents/>
+            <tree-map>
+              <default>
+                <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../../../../../slave/nodeProperties/hudson.slaves.EnvironmentVariablesNodeProperty/envVars/tree-map/default/comparator"/>
+              </default>
+              <int>3</int>
+              <string>PIP_DOWNLOAD_CACHE</string>
+              <string>/opt/jenkins/pip_download_cache</string>
+              <string>SITE</string>
+              <string>rdm</string>
+              <string>XS_ROOT_PASSWORD</string>
+          <string></string>
+            </tree-map>
+          </envVars>
+        </hudson.slaves.EnvironmentVariablesNodeProperty>
+      </nodeProperties>
+    </slave>
+    <slave>
+      <name>blr</name>
+      <description></description>
+      <remoteFS>/var/lib/jenkins</remoteFS>
+      <numExecutors>4</numExecutors>
+      <mode>NORMAL</mode>
+      <retentionStrategy class="hudson.slaves.RetentionStrategy$Always"/>
+      <launcher class="hudson.slaves.JNLPLauncher"/>
+      <label>bengaluru</label>
+      <nodeProperties>
+        <hudson.slaves.EnvironmentVariablesNodeProperty>
+          <envVars serialization="custom">
+            <unserializable-parents/>
+            <tree-map>
+              <default>
+                <comparator class="hudson.util.CaseInsensitiveComparator"/>
+              </default>
+              <int>3</int>
+              <string>PIP_DOWNLOAD_CACHE</string>
+              <string>/var/cache/pip_download_cache</string>
+              <string>SITE</string>
+              <string>blr</string>
+              <string>XS_ROOT_PASSWORD</string>
+          <string></string>
+            </tree-map>
+          </envVars>
+        </hudson.slaves.EnvironmentVariablesNodeProperty>
+      </nodeProperties>
+    </slave>
+    <slave>
+      <name>bethany</name>
+      <description></description>
+      <remoteFS>/home/jenkins</remoteFS>
+      <numExecutors>4</numExecutors>
+      <mode>NORMAL</mode>
+      <retentionStrategy class="hudson.slaves.RetentionStrategy$Always"/>
+      <launcher class="hudson.slaves.JNLPLauncher"/>
+      <label>cambourne</label>
+      <nodeProperties>
+        <hudson.slaves.EnvironmentVariablesNodeProperty>
+          <envVars serialization="custom">
+            <unserializable-parents/>
+            <tree-map>
+              <default>
+                <comparator class="hudson.util.CaseInsensitiveComparator"/>
+              </default>
+              <int>2</int>
+              <string>PIP_DOWNLOAD_CACHE</string>
+              <string>/var/cache/pip_download_cache</string>
+              <string>SITE</string>
+              <string>cmb</string>
+            </tree-map>
+          </envVars>
+        </hudson.slaves.EnvironmentVariablesNodeProperty>
+        <hudson.tools.ToolLocationNodeProperty>
+          <locations/>
+        </hudson.tools.ToolLocationNodeProperty>
+      </nodeProperties>
+    </slave>
+  </slaves>
+  <quietPeriod>5</quietPeriod>
+  <scmCheckoutRetryCount>0</scmCheckoutRetryCount>
+  <views>
+    <hudson.model.AllView>
+      <owner class="hudson" reference="../../.."/>
+      <name>All</name>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>false</filterQueue>
+    </hudson.model.AllView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>OpenStack central</name>
+      <description>&lt;p style=&quot;text-align: center; margin-right: 50px&quot;&gt;&lt;img src=&quot;/static-images/citrix-openstack-cambridge-500.png&quot; /&gt;&lt;/p&gt;</description>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>false</filterQueue>
+      <properties class="hudson.model.View$PropertyList"/>
+      <jobNames class="tree-set">
+        <comparator class="hudson.util.CaseInsensitiveComparator"/>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.BuildButtonColumn/>
+        <hudson.plugins.favorite.column.FavoriteColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.plugins.column.console.LastSuccessfulBuildColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.plugins.column.console.LastFailedBuildColumn/>
+      </columns>
+      <includeRegex>unit-.*|func-.*|os-vpx-.*</includeRegex>
+    </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>Favourites</name>
+      <description>&lt;p style=&quot;text-align: center; margin-right: 50px&quot;&gt;&lt;img src=&quot;/static-images/citrix-openstack-cambridge-500.png&quot; /&gt;&lt;/p&gt;</description>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>false</filterQueue>
+      <properties class="hudson.model.View$PropertyList"/>
+      <jobNames class="tree-set">
+        <comparator class="hudson.util.CaseInsensitiveComparator"/>
+        <string>os-vpx-test-all</string>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.BuildButtonColumn/>
+        <hudson.plugins.favorite.column.FavoriteColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.plugins.column.console.LastSuccessfulBuildColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.plugins.column.console.LastFailedBuildColumn/>
+      </columns>
+    </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>OpenStack all</name>
+      <description>&lt;p style=&quot;text-align: center; margin-right: 50px&quot;&gt;&lt;img src=&quot;/static-images/citrix-openstack-cambridge-500.png&quot; /&gt;&lt;/p&gt;</description>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>false</filterQueue>
+      <properties class="hudson.model.View$PropertyList"/>
+      <jobNames class="tree-set">
+        <comparator class="hudson.util.CaseInsensitiveComparator"/>
+        <string>os-vpx-build-cmb</string>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.BuildButtonColumn/>
+        <hudson.plugins.favorite.column.FavoriteColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.plugins.column.console.LastSuccessfulBuildColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.plugins.column.console.LastFailedBuildColumn/>
+      </columns>
+      <includeRegex>(?!(XenAPI|build-).*).*</includeRegex>
+    </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>Private Jobs</name>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>false</filterQueue>
+      <properties class="hudson.model.View$PropertyList"/>
+      <jobNames class="tree-set">
+        <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../../slaves/slave[4]/nodeProperties/hudson.slaves.EnvironmentVariablesNodeProperty/envVars/tree-map/default/comparator"/>
+        <string>private-netsuite-cloudsetup</string>
+        <string>private-netsuite-guest-networking</string>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+        <hudson.views.BuildButtonColumn/>
+        <de.fspengler.hudson.pview.ConsoleViewColumn/>
+        <hudson.plugins.favorite.column.FavoriteColumn/>
+        <hudson.plugins.column.console.LastBuildColumn/>
+        <hudson.plugins.column.console.LastFailedBuildColumn/>
+        <hudson.plugins.column.console.LastStableBuildColumn/>
+        <hudson.plugins.column.console.LastSuccessfulBuildColumn/>
+        <hudson.plugins.column.console.LastUnstableBuildColumn/>
+        <hudson.plugins.column.console.LastUnsuccessfulBuildColumn/>
+        <hudson.plugins.projectstats.column.NumBuildsColumn/>
+      </columns>
+      <includeRegex>private-.*</includeRegex>
+    </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>Dasara</name>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>false</filterQueue>
+      <properties class="hudson.model.View$PropertyList"/>
+      <jobNames class="tree-set">
+        <comparator class="hudson.util.CaseInsensitiveComparator"/>
+        <string>dasara-func-geppetto-cmb</string>
+        <string>dasara-func-multihost-suite-sc</string>
+        <string>dasara-func-singlehost-suite-sc</string>
+        <string>os-vpx-build</string>
+        <string>os-vpx-test-all</string>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+        <hudson.views.BuildButtonColumn/>
+        <de.fspengler.hudson.pview.ConsoleViewColumn/>
+        <hudson.plugins.favorite.column.FavoriteColumn/>
+        <hudson.plugins.column.console.LastBuildColumn/>
+        <hudson.plugins.column.console.LastFailedBuildColumn/>
+        <hudson.plugins.column.console.LastStableBuildColumn/>
+        <hudson.plugins.column.console.LastSuccessfulBuildColumn/>
+        <hudson.plugins.column.console.LastUnstableBuildColumn/>
+        <hudson.plugins.column.console.LastUnsuccessfulBuildColumn/>
+        <hudson.plugins.projectstats.column.NumBuildsColumn/>
+      </columns>
+    </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>Infrastructure</name>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>false</filterQueue>
+      <properties class="hudson.model.View$PropertyList"/>
+      <jobNames class="tree-set">
+        <comparator class="hudson.util.CaseInsensitiveComparator"/>
+        <string>cache-git-update-cmb</string>
+        <string>os-vpx-build-blr</string>
+        <string>os-vpx-build-cmb</string>
+        <string>os-vpx-build-manifest</string>
+        <string>os-vpx-build-sc</string>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+        <hudson.views.BuildButtonColumn/>
+        <de.fspengler.hudson.pview.ConsoleViewColumn/>
+        <hudson.plugins.favorite.column.FavoriteColumn/>
+        <hudson.plugins.column.console.LastBuildColumn/>
+        <hudson.plugins.column.console.LastFailedBuildColumn/>
+        <hudson.plugins.column.console.LastStableBuildColumn/>
+        <hudson.plugins.column.console.LastSuccessfulBuildColumn/>
+        <hudson.plugins.column.console.LastUnstableBuildColumn/>
+        <hudson.plugins.column.console.LastUnsuccessfulBuildColumn/>
+        <hudson.plugins.projectstats.column.NumBuildsColumn/>
+      </columns>
+      <includeRegex>(build|cache)-.*</includeRegex>
+    </listView>
+  </views>
+  <primaryView>All</primaryView>
+  <slaveAgentPort>0</slaveAgentPort>
+  <label>cambridge</label>
+  <nodeProperties/>
+  <globalNodeProperties>
+    <hudson.slaves.EnvironmentVariablesNodeProperty>
+      <envVars serialization="custom">
+        <unserializable-parents/>
+        <tree-map>
+          <default>
+            <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../../../../views/listView[3]/jobNames/comparator"/>
+          </default>
+          <int>5</int>
+          <string>PIP_DEFAULT_TIMEOUT</string>
+          <string>120</string>
+          <string>PIP_DOWNLOAD_CACHE</string>
+          <string>/var/lib/jenkins/pip_download_cache</string>
+          <string>PIP_USE_MIRRORS</string>
+          <string>true</string>
+          <string>SITE</string>
+          <string>cam</string>
+          <string>XS_ROOT_PASSWORD</string>
+          <string></string>
+        </tree-map>
+      </envVars>
+    </hudson.slaves.EnvironmentVariablesNodeProperty>
+  </globalNodeProperties>
+</hudson>

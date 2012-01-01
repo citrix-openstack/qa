@@ -1,0 +1,25 @@
+BUILD_RESULT_URL=http://gold.eng.hq.xensource.com
+BUILD_RESULT_DIR=/usr/groups/build
+BUILD_UPDATE_ACCOUNT=gold-root
+TEST_XENSERVER=magrathea.eng.hq.xensource.com
+TEST_XENSERVER_1=nano.eng.hq.xensource.com
+TEST_XENSERVER_2=stug.eng.hq.xensource.com
+TEST_XENSERVER_3=traal.eng.hq.xensource.com
+TEST_XENSERVER_4=xaxis.eng.hq.xensource.com
+TEST_XENSERVER_NETSUITE_1=epun.eng.hq.xensource.com
+TEST_XENSERVER_NETSUITE_2=ysdllodins.eng.hq.xensource.com
+TEST_XENSERVER_NETSUITE_3=rickmansworth.eng.hq.xensource.com
+TEST_XENSERVER_NETSUITE_4=sesefras.eng.hq.xensource.com
+TEST_XENSERVER_M_NET=xenbr1
+TEST_XENSERVER_P_NET=xenbr0
+TEST_ESX_SINGLE_TEST_SERVER=nowwhat.eng.hq.xensource.com
+TEST_ESX_SINGLE_TEST_PASSWORD=xenroot
+TEST_ESX_SINGLE_TEST_TENANT_PUBLIC_BRIDGE=xenbr0
+TEST_ESX_SINGLE_TEST_NUMPORTS=60
+TEST_ESX_SINGLE_TEST_P_NET=xenbr0
+TEST_MAIL_SERVER=sjcmail.citrite.net
+TEST_MAIL_ACCOUNT=armando.migliaccio@citrix.com
+GUEST_NETWORK="--fixed_range_v4=10.0.0.0/24 --label private"
+FLOATING_IP_RANGE="10.102.125.36/31"
+ESX_TENANT_NETWORK="--fixed_range v4=10.0.0.0/24 --label private --bridge <common_name_here>"
+MASTER_BOOT_OPTIONS="geppetto_master=true geppetto_default_networking=true"

@@ -1,0 +1,13 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<hudson.plugins.jira.JiraProjectProperty_-DescriptorImpl>
+  <sites>
+    <hudson.plugins.jira.JiraSite>
+      <url>http://jira.uk.xensource.com/</url>
+      <userName>integration-user</userName>
+      <password>1ntegrat10n</password>
+      <supportsWikiStyleComment>true</supportsWikiStyleComment>
+      <recordScmChanges>false</recordScmChanges>
+      <updateJiraIssueForAllStatus>true</updateJiraIssueForAllStatus>
+    </hudson.plugins.jira.JiraSite>
+  </sites>
+</hudson.plugins.jira.JiraProjectProperty_-DescriptorImpl>

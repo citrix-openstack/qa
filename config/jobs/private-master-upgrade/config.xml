@@ -1,0 +1,87 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description>Test the upgrade of a Master VPX to a version dictated from a private build (i.e. one that you&apos;ve built yourself).  Can also be used to test a central build, for comparison purposes. &#xd;
+&#xd;
+To successfully execute this job you need a pre-deployed cloud.&#xd;
+</description>
+  <logRotator>
+    <daysToKeep>-1</daysToKeep>
+    <numToKeep>5</numToKeep>
+    <artifactDaysToKeep>-1</artifactDaysToKeep>
+    <artifactNumToKeep>-1</artifactNumToKeep>
+  </logRotator>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.StringParameterDefinition>
+          <name>PrivateBuildURL</name>
+          <description>The URL that the VPX and associated scripts can be downloaded from.  Should be the subdirectory that contains os-vpx.xva or os-vpx-devel.xva, install-os-vpx.sh, etc.
+
+If you want to use a central build instead, use Build below.</description>
+          <defaultValue></defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.RunParameterDefinition>
+          <name>Build</name>
+          <description>A central build, if you don&apos;t want to use PrivateBuildURL above. This is the build to which the Master VPX will be upgraded to.</description>
+          <projectName>os-vpx-build</projectName>
+        </hudson.model.RunParameterDefinition>
+        <org.jvnet.jenkins.plugins.nodelabelparameter.LabelParameterDefinition>
+          <name>SiteLabel</name>
+          <description>One of &quot;cambourne&quot;, &quot;cambridge&quot;, &quot;santa-clara&quot;, or &quot;redmond&quot;.
+
+Make sure that this matches the PrivateBuildURL parameter above!  If you get this wrong, then you will end up streaming VM images from one site to another, and the build will time out.
+</description>
+          <defaultValue></defaultValue>
+        </org.jvnet.jenkins.plugins.nodelabelparameter.LabelParameterDefinition>
+        <hudson.model.StringParameterDefinition>
+          <name>Server</name>
+          <description>This will &lt;b&gt;completely wipe&lt;/b&gt; the specified machine!  Leave blank to use the default test machine on the specified site.
+Use ssh-upload-jenkins-keys from root@openstack-jenkins.uk.xensource.com to allow remote login.</description>
+          <defaultValue></defaultValue>
+        </hudson.model.StringParameterDefinition>
+        <hudson.model.BooleanParameterDefinition>
+          <name>Devel</name>
+          <description>Whether to use the os-vpx-devel build, as opposed to the release build.</description>
+          <defaultValue>true</defaultValue>
+        </hudson.model.BooleanParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
+  <scm class="hudson.plugins.mercurial.MercurialSCM">
+    <source>http://openstack-hg:81/openstack/trunk/forest.hg</source>
+    <modules></modules>
+    <clean>true</clean>
+    <forest>false</forest>
+    <browser class="hudson.plugins.mercurial.browser.HgWeb">
+      <url>http://openstack-jenkins.uk.xensource.com:81/openstack/trunk/forest.hg/</url>
+    </browser>
+  </scm>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>true</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers class="vector"/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>qa.hg/jenkins/run-master-upgrade-test.sh</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers/>
+  <buildWrappers>
+    <hudson.plugins.build__timeout.BuildTimeoutWrapper>
+      <timeoutMinutes>90</timeoutMinutes>
+      <failBuild>true</failBuild>
+    </hudson.plugins.build__timeout.BuildTimeoutWrapper>
+    <hudson.plugins.timestamper.TimestamperBuildWrapper/>
+    <hudson.plugins.dumpinfo.DumpInfoBuildWrapper>
+      <dumpComputers>true</dumpComputers>
+      <dumpJdks>false</dumpJdks>
+      <dumpPlugins>true</dumpPlugins>
+      <dumpSystemProperties>true</dumpSystemProperties>
+      <dumpEnvironmentVariables>true</dumpEnvironmentVariables>
+    </hudson.plugins.dumpinfo.DumpInfoBuildWrapper>
+  </buildWrappers>
+</project>

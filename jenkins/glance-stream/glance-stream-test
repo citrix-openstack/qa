@@ -1,0 +1,104 @@
+#!/usr/bin/env python
+
+import sys
+import thread
+from urlparse import urlparse
+
+import glance.client
+
+
+# We test two sizes -- one above the chunking limit for uploads to Swift (5
+# GiB) and one below.  This way we cover both the chunked and non-chunked
+# uploads.
+BIG_SIZE = (5 << 30) + (1 << 20)
+LITTLE_SIZE = 4 << 20
+
+
+class Generator(object):
+    def __init__(self, total):
+        self.total = total
+        self.pos = 0
+
+
+    def read(self, n):
+        if self.pos + n >= self.total:
+            i = self.total - self.pos
+            self.pos += i
+            return 'A' * i
+        else:
+            self.pos += n
+            return 'A' * n
+
+
+def upload(client, image_meta):
+    print 'Creating new image %(image_meta)s...' % locals()
+    image_id = client.add_image(image_meta,
+                                Generator(image_meta['size']))['id']
+    print 'Created new image %(image_id)s' % locals()
+    while True:
+        try:
+            image_status = client.get_image_meta(image_id).get('status')
+            if image_status == 'active':
+                print 'Image %(image_id)s is active.' % locals()
+                return image_id
+            elif image_status == 'killed':
+                print >>sys.stderr, 'Glance upload killed!'
+                sys.exit(1)
+            elif image_status in ['saving', 'queued']:
+                pass
+            else:
+                print >>sys.stderr, \
+                      'Image has unknown status %(image_status)s' % locals()
+                sys.exit(1)
+        except Exception, exc:
+            print exc
+            sys.exit(1)
+
+
+def validate(image_id, expected_size):
+    print 'Validating image %(image_id)s...' % locals()
+    (_, chunks) = client.get_image(image_id)
+    n = 0
+    try:
+        for chunk in chunks:
+            for byte in chunk:
+                if byte != 'A':
+                    print >>sys.stderr, 'Data are corrupt!  Chunk follows.'
+                    print >>sys.stderr, '%s' % chunk
+                    print 'Validation failed on image %(image_id)s.' % locals()
+                    sys.exit(1)
+                n += 1
+        assert n == expected_size, \
+               'n (%d) != expected_size (%d)' % (n, expected_size)
+        print 'Image is valid.'
+    except Exception, exc:
+        print exc
+        print 'Validation of image %(image_id)s raised exception.' % locals()
+        sys.exit(1)
+
+
+def do_test(client, size):
+    image_metadata = {"is_public": True,
+                      "disk_format": "raw",
+                      "container_format": "bare",
+                      "type": "raw",
+                      "size": size,
+                      "properties": {}}
+
+    image_id = upload(client, image_metadata)
+    validate(image_id, size)
+
+
+urlbits = urlparse(sys.argv[1])
+
+creds = {'strategy': 'keystone',
+         'username': None,
+         'tenant': None}
+
+client = glance.client.Client(urlbits.netloc.split(':')[0],
+                              urlbits.port,
+                              auth_tok="999888777666",
+                              creds=creds)
+
+do_test(client, LITTLE_SIZE)
+#do_test(client, BIG_SIZE)

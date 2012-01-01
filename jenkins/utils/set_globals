@@ -1,0 +1,19 @@
+#!/usr/bin/env python
+
+import common
+import sys
+import xmlrpclib
+
+
+def set_globals(proxy, globals):
+    for key, value in globals.iteritems():
+        proxy.Config.set(key.strip(), value)
+
+
+url = '%s/openstack/geppetto/v1' % sys.argv[1]
+configs = common.parse(sys.argv[2])
+
+proxy = common.retry(lambda: xmlrpclib.ServerProxy(url), 'Connecting to Geppetto')
+
+print 'Settings global configs'
+set_globals(proxy, configs)

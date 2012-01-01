@@ -1,0 +1,28 @@
+QA is the repo for OpenStack and Olympus CI infrastructure
+
+You will find the following directories:
+
+- config: this backups the configuration for the CI Jenkins infrastructure. To
+  back up use backup-configs.sh as jenkins@openstack-jenkins.uk.xensource.com,
+  then unpack the resulting tarball into qa.hg/config, and commit your changes.
+ 
+- scripts: this stores utility scripts that run on the CI Jenkins workers. If
+  you make a change on any of these files on the field, please remember to 
+  commit your changes otherwise they will be lost if a worker gets wiped out.
+
+- jenkins: here's where the real deal is. You'll find several shell scripts
+  named like run-*-test.sh. Those are  runner scripts for Jenkins jobs. You 
+  should see one per job and you should see a 'mapping' directory with other
+  files to make the test work.
+  You'll find also:
+  - sites: to update the configuration of our sites. Currently we have:
+    - cambridge
+    - cambourne
+    - santa-clara
+    - redmond
+    - bengaluru
+    If you want variables to be exposed into Jenkins tests, this should be a 
+    good place where to put them.
+  - build: don't touch this, unless you know what you're doing. 
+  - utils: for utility scripts and functions.
+
