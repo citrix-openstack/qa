@@ -45,16 +45,12 @@ class OSDashboardTestCase(common.SeleniumTestCase):
 
     def _create_keypair(self):
         sel = self.selenium
-        sel.click("link=Keypairs")
-        self.wait_for_page_to_load()
-
-        sel.click("id=keypairs_create_link")
-        self.wait_for_page_to_load()
-
-        sel.type("id_name", key_pair_name)
-        sel.click("css=input.large-rounded")
+        sel.open("/nova/access_and_security/keypairs/create/")
+        sel.type("id=id_name", "keyname")
+        sel.click("//input[@value='Create Keypair']")
         time.sleep(5)
-        sel.click("link=<< Return to keypairs list")
+
+        sel.click("link=Access & Security")
         self.wait_for_page_to_load()
 
     def _allocate_floating_ip(self):
@@ -106,23 +102,22 @@ class OSDashboardTestCase(common.SeleniumTestCase):
 
     def _create_instance(self, image_id):
         sel = self.selenium
-        sel.click("link=Images")
+
+        sel.click("link=Project")
+        self.wait_for_page_to_load()
+        sel.click("link=Images & Snapshots")
         self.wait_for_page_to_load()
 
-        image_link = "launch_%s" % image_id
-        try:
-            self.failUnless(sel.is_element_present(image_link))
-        except AssertionError, e:
-            self.verificationErrors.append(str(e))
-        sel.click(image_link)
-        self.wait_for_page_to_load()
+#        image_link = "launch_%s" % image_id
+#        try:
+#            self.failUnless(sel.is_element_present(image_link))
+#        except AssertionError, e:
+#            self.verificationErrors.append(str(e))
+#        sel.click(image_link)
 
-        sel.open("/dash/1234/images/")
-        sel.click(image_link)
-        self.wait_for_page_to_load()
-
-        sel.type("id_name", "test_server")
-        sel.select("id_key_name", "value=%s" % key_pair_name)
+        sel.click("link=Launch")
+        sel.type("id=id_name", "test_server")
+        #sel.select("id_key_name", "value=%s" % key_pair_name)
         sel.click("//input[@value='Launch Instance']")
         self.wait_for_page_to_load()
 
