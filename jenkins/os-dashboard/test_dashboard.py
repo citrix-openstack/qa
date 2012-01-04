@@ -18,30 +18,11 @@ key_pair_name = "dummy_name"
 class OSDashboardTestCase(common.SeleniumTestCase):
     def setUp(self):
         self.set_up_selenium(selenium_url, selenium_port)
-        self._login()
+        common.login_to_horizon(self)
 
     def tearDown(self):
-        self._logout()
+        common.logout_of_horizon(self)
         self.stop_selenium()
-
-    @common.retry(Exception, tries=4)
-    def _login(self):
-        sel = self.selenium
-        sel.open("/")
-        self.wait_for_page_to_load()
-        sel.type("id_username", "root")
-        sel.type("id_password", "citrix")
-        sel.click("home_login_btn")
-        self.wait_for_page_to_load()
-
-    @common.retry(Exception, tries=4)
-    def _logout(self):
-        sel = self.selenium
-        sel.open("/")
-        self.wait_for_page_to_load()
-        sel.click("drop_btn")
-        sel.click("link=Sign Out")
-        self.wait_for_page_to_load()
 
     def _create_keypair(self):
         sel = self.selenium

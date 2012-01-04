@@ -14,20 +14,20 @@ screenshot_dir = "/tmp"
 def conditional_skip():
     """ Decorator for skipping a test according to preferences set by the
     user on the command line when the test run was launched
-    """    
+    """
     def deco_conditional_skip(f):
-        def f_conditional_skip(*args,**kwargs):
+        def f_conditional_skip(*args, **kwargs):
             testObject = args[0] # self in the test
             if hasattr(testObject, 'skip_list') and testObject.skip_list:
-                match=re.match("^test_([0-9][0-9]).*$",testObject._testMethodName)
-                if len(match.groups())>0:
+                match = re.match("^test_([0-9][0-9]).*$", testObject._testMethodName)
+                if len(match.groups()) > 0:
                     idx = match.group(1)
                     if idx in testObject.skip_list:
                         testObject.skipTest("Skipped by user")
                         return
             return f(*args, **kwargs)
         return f_conditional_skip
-        
+
     return deco_conditional_skip
 
 def retry(ExceptionToCheck, tries=4, delay=3, backoff=2):
@@ -106,3 +106,20 @@ def snapshot_on_error(test):
             raise
     return inner
 
+@retry(Exception, tries=4)
+def login_to_horizon(test):
+    sel = test.selenium
+    sel.open("/")
+    test.wait_for_page_to_load()
+    sel.type("id_username", "root")
+    sel.type("id_password", "citrix")
+    sel.click("home_login_btn")
+    test.wait_for_page_to_load()
+
+@retry(Exception, tries=4)
+def logout_of_horizon(test):
+    sel = test.selenium
+    sel.open("/home/")
+    test.wait_for_page_to_load()
+    sel.click("link=Sign Out")
+    test.wait_for_page_to_load()
