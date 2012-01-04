@@ -27,12 +27,15 @@ then
   establish_tunnel "$master" 8080 "$master_vpx_host" tunnel_port
   master_url="http://localhost:$tunnel_port"
   
-  dashboard_host="$master_vpx_host"
+  dashboard_host=$(get_os_svc_property "$master_url" \
+                                       "openstack-dashboard" \
+                                       "host_fqdn")
   dashboard_addr=$(get_os_svc_property "$master_url" \
                                        "openstack-dashboard" \
                                        "hostnetwork_ip")
-
-  compute_host="$master_vpx_host"
+  compute_host=$(get_os_svc_property "$master_url" \
+                                     "openstack-nova-compute" \
+                                     "host_fqdn")
 elif [ "$#" -eq 4 ]
 then
   dashboard_host="$1"
