@@ -27,7 +27,7 @@ class OSDashboardTestCase(common.SeleniumTestCase):
     def _create_keypair(self):
         sel = self.selenium
         sel.open("/nova/access_and_security/keypairs/create/")
-        sel.type("id=id_name", "keyname")
+        sel.type("id=id_name", key_pair_name)
         sel.click("//input[@value='Create Keypair']")
         time.sleep(5)
 
