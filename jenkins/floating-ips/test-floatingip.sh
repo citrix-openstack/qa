@@ -135,7 +135,7 @@ then
                     "Member,0 netadmin,0 projectmanager,0 sysadmin,0"
 fi
 
-os-vpx-rc "$USER" "$PASS"
+os-vpx-rc "$USER" "$PASS" "$PROJECT"
 . novarc
 
 # Check if mykey is already present

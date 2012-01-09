@@ -224,7 +224,7 @@ then
     os-vpx-add-user "$tenant" "$user" "$pass" \
                     "Member,0 netadmin,0 projectmanager,0 sysadmin,0"
 fi
-os-vpx-rc "$user" "$pass"
+os-vpx-rc "$user" "$pass" "$tenant"
 . novarc
 
 
