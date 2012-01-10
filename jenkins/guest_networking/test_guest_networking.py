@@ -147,7 +147,7 @@ def delete_private_network(tenant_id):
             %octet
     (_, _, code) = execute(command)            
     command="nova-manage network delete "\
-            "--network 10.0.%s.0/24 "\
+            "--fixed_range 10.0.%s.0/24 "\
             %octet
     (_, _, code) = execute(command)
     return code

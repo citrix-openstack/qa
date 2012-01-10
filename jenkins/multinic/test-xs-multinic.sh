@@ -190,9 +190,9 @@ os-vpx-rc "$MULTINIC_USER" "$MULTINIC_PASS" "$MULTINIC_PROJECT"
 . novarc
 
 nova-manage network create --label public-test --fixed_range_v4 10.1.0.0/24 --num_networks=1 --network_size=8 --bridge=$TENANT_BRIDGE
-add_on_exit "nova-manage network delete --network=10.1.0.0/29"
+add_on_exit "nova-manage network delete --fixed_range=10.1.0.0/24"
 nova-manage network create --label private-test --fixed_range_v4 10.2.0.0/24 --num_networks=1 --network_size=8 --bridge=$TENANT_BRIDGE
-add_on_exit "nova-manage network delete --network=10.2.0.0/29"
+add_on_exit "nova-manage network delete --fixed_range=10.2.0.0/24"
 
 # Check if mykey is already present
 key=$(euca-describe-keypairs | grep "mykey" | awk {'print $2'} || true)
