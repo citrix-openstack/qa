@@ -18,7 +18,7 @@ def _do_request(method, path, body=''):
             content = json.loads(content)
         return content
     else:
-        raise Exception('%s %s failed' % (method, path), resp, content)
+        raise Exception('%s %s failed' % (method, url), body, resp, content)
 
 
 def create_instance(server_name, image_ref, flavor_id):
