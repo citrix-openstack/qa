@@ -12,6 +12,7 @@ master_vpx_host="${Server-$TEST_XENSERVER}"
 no_of_instances="${NumberOfInstances-5}"
 img_id="${ImageId-}"
 flavor_id="${FlavorId-1}"
+tunnel_port=
 
 if [ $no_of_instances -lt 2 ]
 then
