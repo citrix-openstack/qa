@@ -13,7 +13,7 @@
     <hudson.model.ParametersDefinitionProperty>
       <parameterDefinitions>
         <hudson.model.RunParameterDefinition>
-          <name></name>
+          <name>Build</name>
           <description></description>
           <projectName>os-vpx-build-manifest</projectName>
         </hudson.model.RunParameterDefinition>
@@ -72,6 +72,11 @@
         <color>BLUE</color>
       </threshold>
     </hudson.tasks.BuildTrigger>
+    <hudson.tasks.Mailer>
+      <recipients>#openstack-commit@citrite.net</recipients>
+      <dontNotifyEveryUnstableBuild>false</dontNotifyEveryUnstableBuild>
+      <sendToIndividuals>false</sendToIndividuals>
+    </hudson.tasks.Mailer>
   </publishers>
   <buildWrappers>
     <hudson.plugins.build__timeout.BuildTimeoutWrapper>
