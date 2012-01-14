@@ -95,12 +95,7 @@ Make sure that this matches the Server parameter above!  If you get this wrong, 
       <command>qa.hg/jenkins/run-programmatic-geppetto-install.sh</command>
     </hudson.tasks.Shell>
   </builders>
-  <publishers>
-    <hudson.tasks.ArtifactArchiver>
-      <artifacts>qa.hg/jenkins/*.png</artifacts>
-      <latestOnly>false</latestOnly>
-    </hudson.tasks.ArtifactArchiver>
-  </publishers>
+  <publishers/>
   <buildWrappers>
     <hudson.plugins.build__timeout.BuildTimeoutWrapper>
       <timeoutMinutes>90</timeoutMinutes>

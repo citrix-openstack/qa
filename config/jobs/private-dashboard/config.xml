@@ -15,15 +15,15 @@
       <parameterDefinitions>
         <org.jvnet.jenkins.plugins.nodelabelparameter.LabelParameterDefinition>
           <name>SiteLabel</name>
-          <description>One of &quot;cambourne&quot;, &quot;cambridge&quot;, &quot;santa-clara&quot;, or &quot;redmond&quot;.&#xd;
-&#xd;
-Make sure that this matches the PrivateBuildURL parameter above!  If you get this wrong, then you will end up streaming VM images from one site to another, and the build will time out.&#xd;
+          <description>One of &quot;cambourne&quot;, &quot;cambridge&quot;, &quot;santa-clara&quot;, or &quot;redmond&quot;.
+
+Make sure that this matches the PrivateBuildURL parameter above!  If you get this wrong, then you will end up streaming VM images from one site to another, and the build will time out.
 </description>
           <defaultValue>cambourne</defaultValue>
         </org.jvnet.jenkins.plugins.nodelabelparameter.LabelParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>Server</name>
-          <description>It assumes single host deployment, and connects to that&#xd;
+          <description>It assumes single host deployment, and connects to that
 Use ssh-upload-jenkins-keys from root@openstack-jenkins.uk.xensource.com to allow remote login.</description>
           <defaultValue>daucus.eng.citrite.net</defaultValue>
         </hudson.model.StringParameterDefinition>
@@ -55,14 +55,36 @@ Use ssh-upload-jenkins-keys from root@openstack-jenkins.uk.xensource.com to allo
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
-  <scm class="hudson.plugins.mercurial.MercurialSCM">
-    <source>http://openstack-hg:81/openstack/trunk/forest.hg</source>
-    <modules></modules>
-    <clean>true</clean>
-    <forest>false</forest>
-    <browser class="hudson.plugins.mercurial.browser.HgWeb">
-      <url>http://openstack-jenkins.uk.xensource.com:81/openstack/trunk/forest.hg/</url>
-    </browser>
+  <scm class="hudson.plugins.git.GitSCM">
+    <configVersion>2</configVersion>
+    <userRemoteConfigs>
+      <hudson.plugins.git.UserRemoteConfig>
+        <name>origin</name>
+        <refspec>+refs/heads/*:refs/remotes/origin/*</refspec>
+        <url>http://github.com/citrix-openstack/qa</url>
+      </hudson.plugins.git.UserRemoteConfig>
+    </userRemoteConfigs>
+    <branches>
+      <hudson.plugins.git.BranchSpec>
+        <name>everett</name>
+      </hudson.plugins.git.BranchSpec>
+    </branches>
+    <recursiveSubmodules>false</recursiveSubmodules>
+    <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+    <authorOrCommitter>false</authorOrCommitter>
+    <clean>false</clean>
+    <wipeOutWorkspace>false</wipeOutWorkspace>
+    <pruneBranches>false</pruneBranches>
+    <buildChooser class="hudson.plugins.git.util.DefaultBuildChooser"/>
+    <gitTool>Default</gitTool>
+    <submoduleCfg class="list"/>
+    <relativeTargetDir></relativeTargetDir>
+    <excludedRegions></excludedRegions>
+    <excludedUsers></excludedUsers>
+    <gitConfigName></gitConfigName>
+    <gitConfigEmail></gitConfigEmail>
+    <skipTag>false</skipTag>
+    <scmName></scmName>
   </scm>
   <canRoam>true</canRoam>
   <disabled>false</disabled>
@@ -72,12 +94,12 @@ Use ssh-upload-jenkins-keys from root@openstack-jenkins.uk.xensource.com to allo
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>qa.hg/jenkins/run-dashboard-test.sh</command>
+      <command>jenkins/run-dashboard-test.sh</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers>
     <hudson.tasks.ArtifactArchiver>
-      <artifacts>qa.hg/jenkins/*.png</artifacts>
+      <artifacts>jenkins/*.png</artifacts>
       <latestOnly>false</latestOnly>
     </hudson.tasks.ArtifactArchiver>
   </publishers>
