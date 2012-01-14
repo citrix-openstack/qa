@@ -23,14 +23,36 @@ This adds a new VPX, migrates the old compute node to the new VPX, then runs a d
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
-  <scm class="hudson.plugins.mercurial.MercurialSCM">
-    <source>http://openstack-hg:81/openstack/trunk/forest.hg</source>
-    <modules></modules>
+  <scm class="hudson.plugins.git.GitSCM">
+    <configVersion>2</configVersion>
+    <userRemoteConfigs>
+      <hudson.plugins.git.UserRemoteConfig>
+        <name></name>
+        <refspec></refspec>
+        <url>http://github.com/citrix-openstack/qa</url>
+      </hudson.plugins.git.UserRemoteConfig>
+    </userRemoteConfigs>
+    <branches>
+      <hudson.plugins.git.BranchSpec>
+        <name>everett</name>
+      </hudson.plugins.git.BranchSpec>
+    </branches>
+    <recursiveSubmodules>false</recursiveSubmodules>
+    <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+    <authorOrCommitter>false</authorOrCommitter>
     <clean>true</clean>
-    <forest>false</forest>
-    <browser class="hudson.plugins.mercurial.browser.HgWeb">
-      <url>http://openstack-jenkins.uk.xensource.com:81/openstack/trunk/forest.hg/</url>
-    </browser>
+    <wipeOutWorkspace>false</wipeOutWorkspace>
+    <pruneBranches>false</pruneBranches>
+    <buildChooser class="hudson.plugins.git.util.DefaultBuildChooser"/>
+    <gitTool>Default</gitTool>
+    <submoduleCfg class="list"/>
+    <relativeTargetDir></relativeTargetDir>
+    <excludedRegions></excludedRegions>
+    <excludedUsers></excludedUsers>
+    <gitConfigName></gitConfigName>
+    <gitConfigEmail></gitConfigEmail>
+    <skipTag>false</skipTag>
+    <scmName></scmName>
   </scm>
   <assignedNode>cambourne</assignedNode>
   <canRoam>false</canRoam>
@@ -41,12 +63,12 @@ This adds a new VPX, migrates the old compute node to the new VPX, then runs a d
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>qa.hg/jenkins/run-role-migration-test.sh</command>
+      <command>jenkins/run-role-migration-test.sh</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers>
     <hudson.tasks.ArtifactArchiver>
-      <artifacts>qa.hg/jenkins/*.png</artifacts>
+      <artifacts>jenkins/*.png</artifacts>
       <latestOnly>false</latestOnly>
     </hudson.tasks.ArtifactArchiver>
     <hudson.tasks.BuildTrigger>

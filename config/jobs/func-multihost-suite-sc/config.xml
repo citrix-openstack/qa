@@ -12,18 +12,18 @@
   <properties>
     <hudson.model.ParametersDefinitionProperty>
       <parameterDefinitions>
+        <hudson.model.RunParameterDefinition>
+          <name>Build</name>
+          <description>A central build.</description>
+          <projectName>os-vpx-build-sc</projectName>
+        </hudson.model.RunParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>PrivateBuildURL</name>
-          <description>The URL that the VPX and associated scripts can be downloaded from.  Should be the subdirectory that contains os-vpx.xva or os-vpx-devel.xva, install-os-vpx.sh, etc.
-
+          <description>The URL that the VPX and associated scripts can be downloaded from.  Should be the subdirectory that contains os-vpx.xva or os-vpx-devel.xva, install-os-vpx.sh, etc.&#xd;
+&#xd;
 If you want to use a central build instead, use Build below.</description>
           <defaultValue></defaultValue>
         </hudson.model.StringParameterDefinition>
-        <hudson.model.RunParameterDefinition>
-          <name>Build</name>
-          <description>A central build, if you don&apos;t want to use PrivateBuildURL above.</description>
-          <projectName>os-vpx-build-sc</projectName>
-        </hudson.model.RunParameterDefinition>
         <org.jvnet.jenkins.plugins.nodelabelparameter.LabelParameterDefinition>
           <name>SiteLabel</name>
           <description>One of &quot;santa-clara&quot; or &quot;redmond&quot;.  This will &lt;b&gt;completely wipe&lt;/b&gt; the nominated multihost machines on this site!</description>
@@ -37,14 +37,36 @@ If you want to use a central build instead, use Build below.</description>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
-  <scm class="hudson.plugins.mercurial.MercurialSCM">
-    <source>http://openstack-hg:81/openstack/trunk/forest.hg</source>
-    <modules></modules>
+  <scm class="hudson.plugins.git.GitSCM">
+    <configVersion>2</configVersion>
+    <userRemoteConfigs>
+      <hudson.plugins.git.UserRemoteConfig>
+        <name></name>
+        <refspec></refspec>
+        <url>http://github.com/citrix-openstack/qa</url>
+      </hudson.plugins.git.UserRemoteConfig>
+    </userRemoteConfigs>
+    <branches>
+      <hudson.plugins.git.BranchSpec>
+        <name>everett</name>
+      </hudson.plugins.git.BranchSpec>
+    </branches>
+    <recursiveSubmodules>false</recursiveSubmodules>
+    <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+    <authorOrCommitter>false</authorOrCommitter>
     <clean>true</clean>
-    <forest>false</forest>
-    <browser class="hudson.plugins.mercurial.browser.HgWeb">
-      <url>http://gold.eng.hq.xensource.com:81/openstack/trunk/forest.hg/</url>
-    </browser>
+    <wipeOutWorkspace>false</wipeOutWorkspace>
+    <pruneBranches>false</pruneBranches>
+    <buildChooser class="hudson.plugins.git.util.DefaultBuildChooser"/>
+    <gitTool>Default</gitTool>
+    <submoduleCfg class="list"/>
+    <relativeTargetDir></relativeTargetDir>
+    <excludedRegions></excludedRegions>
+    <excludedUsers></excludedUsers>
+    <gitConfigName></gitConfigName>
+    <gitConfigEmail></gitConfigEmail>
+    <skipTag>false</skipTag>
+    <scmName></scmName>
   </scm>
   <canRoam>true</canRoam>
   <disabled>false</disabled>
@@ -55,12 +77,12 @@ If you want to use a central build instead, use Build below.</description>
   <builders>
     <org.jvnet.hudson.plugins.exclusion.CriticalBlockStart/>
     <hudson.tasks.Shell>
-      <command>qa.hg/jenkins/run-multi-host-suite.sh</command>
+      <command>jenkins/run-multi-host-suite.sh</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers>
     <hudson.tasks.ArtifactArchiver>
-      <artifacts>qa.hg/jenkins/*.png</artifacts>
+      <artifacts>jenkins/*.png</artifacts>
       <latestOnly>false</latestOnly>
     </hudson.tasks.ArtifactArchiver>
     <hudson.plugins.claim.ClaimPublisher/>
