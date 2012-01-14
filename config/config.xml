@@ -35,7 +35,9 @@
               <default>
                 <comparator class="hudson.util.CaseInsensitiveComparator"/>
               </default>
-              <int>2</int>
+              <int>3</int>
+              <string>GIT_PROTOCOL</string>
+              <string>true</string>
               <string>PIP_DOWNLOAD_CACHE</string>
               <string>/opt/jenkins/pip_download_cache</string>
               <string>SITE</string>
@@ -63,7 +65,7 @@
             <unserializable-parents/>
             <tree-map>
               <default>
-                <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../../../../../slave/nodeProperties/hudson.slaves.EnvironmentVariablesNodeProperty/envVars/tree-map/default/comparator"/>
+                <comparator class="hudson.util.CaseInsensitiveComparator"/>
               </default>
               <int>3</int>
               <string>PIP_DOWNLOAD_CACHE</string>
@@ -92,9 +94,11 @@
             <unserializable-parents/>
             <tree-map>
               <default>
-                <comparator class="hudson.util.CaseInsensitiveComparator"/>
+                <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../../../../../slave/nodeProperties/hudson.slaves.EnvironmentVariablesNodeProperty/envVars/tree-map/default/comparator"/>
               </default>
-              <int>3</int>
+              <int>4</int>
+              <string>GIT_PROTOCOL</string>
+              <string>true</string>
               <string>PIP_DOWNLOAD_CACHE</string>
               <string>/var/cache/pip_download_cache</string>
               <string>SITE</string>
@@ -168,7 +172,7 @@
         <hudson.views.LastFailureColumn/>
         <hudson.plugins.column.console.LastFailedBuildColumn/>
       </columns>
-      <includeRegex>unit-.*|func-.*|os-vpx-.*</includeRegex>
+      <includeRegex>unit-.*|func-(?!netsuite.*).*|os-vpx-.*</includeRegex>
     </listView>
     <listView>
       <owner class="hudson" reference="../../.."/>
