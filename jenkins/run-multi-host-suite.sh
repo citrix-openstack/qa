@@ -50,6 +50,14 @@ glance_addr=$(get_os_svc_property "$master_url" \
 "$thisdir/run-glance-stream-test.sh" "$glance_host" "$glance_addr" "$port"
 
 echo "Testing XenServer Fast Cloning"
+keystone_host=$(get_os_svc_property "$master_url" \
+                                    "openstack-keystone-auth" \
+                                    "host_fqdn")
+
+keystone_addr=$(get_os_svc_property "$master_url" \
+                                    "openstack-keystone-auth" \
+                                    "hostnetwork_ip")
+
 nova_host=$(get_os_svc_property "$master_url" \
                                 "openstack-nova-api" \
                                 "host_fqdn")
@@ -58,7 +66,8 @@ nova_addr=$(get_os_svc_property "$master_url" \
                                 "openstack-nova-api" \
                                 "hostnetwork_ip")
 
-"$thisdir/run-fast-cloning.sh" "$nova_host" "$nova_addr" "$port"
+"$thisdir/run-fast-cloning.sh" "$keystone_host" "$keystone_port" \
+                               "$nova_host" "$nova_addr" "$port"
 
 
 echo "Testing OpenStack Dashboard"

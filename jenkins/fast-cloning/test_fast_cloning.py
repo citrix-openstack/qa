@@ -21,6 +21,24 @@ def _do_request(method, path, body=''):
         raise Exception('%s %s failed' % (method, url), body, resp, content)
 
 
+def keystone_login():
+    conn = httplib2.Http(".cache")
+    url = '%s/v2.0/tokens' % (keystone_auth_url)
+    body = json.dumps({'auth':
+                        {'tenantName': 'Administrator',
+                         'passwordCredentials': {'username': 'root',
+                                                 'password': 'citrix'}}})
+    resp, content = conn.request(url, 'POST', body,
+                                 headers={"Content-Type": "application/json"})
+    if resp['status'] == '200' and content:
+        content = json.loads(content)
+        return (content['access']['token']['tenant']['id'],
+                content['access']['token']['id'])
+    else:
+        raise Exception('Keystone login POST %s failed' % url, body, resp,
+                        content)
+
+
 def create_instance(server_name, image_ref, flavor_id):
     body = ('{"server": {"name": "%s", "imageRef": "%s", "flavorRef": "%d"}}'
         % (server_name, image_ref, flavor_id))
@@ -64,16 +82,16 @@ if __name__ == '__main__':
                       " Exiting from the Fast cloning Test")
         sys.exit(1)
 
-    nova_api_url = sys.argv[1] + "/v1.1/"
-    number_of_instances = int(sys.argv[2])
-    image_ref = sys.argv[3]
-    flavor_id = int(sys.argv[4])
+    keystone_auth_url = sys.argv[1]
+    nova_api_url = sys.argv[2] + "/v1.1/"
+    number_of_instances = int(sys.argv[3])
+    image_ref = sys.argv[4]
+    flavor_id = int(sys.argv[5])
     timeout = 5
     instance_id_list = []
     total_launch_time = 0
 
-    tenant_id="Administrator"
-    auth_token="999888777666"
+    tenant_id, auth_token = keystone_login()
 
     if image_ref == '':
         # Need to determine the image_ref for ourselves.  Just take the
