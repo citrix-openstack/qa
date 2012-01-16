@@ -66,7 +66,7 @@ nova_addr=$(get_os_svc_property "$master_url" \
                                 "openstack-nova-api" \
                                 "hostnetwork_ip")
 
-"$thisdir/run-fast-cloning.sh" "$keystone_host" "$keystone_port" \
+"$thisdir/run-fast-cloning.sh" "$keystone_host" "$keystone_addr" \
                                "$nova_host" "$nova_addr" "$port"
 
 
