@@ -72,8 +72,9 @@ def is_instance_deleted(server_id):
 def find_image(): 
     content = _do_request('GET', 'images')
     for image in content['images']:
-        return image['id']
-    raise Exception('Cannot find any images')
+        if image['name'] == 'ubuntu':
+            return image['id']
+    raise Exception('Cannot find ubuntu image')
 
 
 if __name__ == '__main__':
