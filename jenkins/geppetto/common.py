@@ -72,7 +72,6 @@ class SeleniumTestCase(unittest.TestCase):
     def wait_for_page_to_load(self, seconds=20):
         self.selenium.wait_for_page_to_load(seconds * 1000)
 
-    @retry(Exception, tries=12)
     def wait_for_text(self, status, iterations=30, secs=20):
         for _ in xrange(iterations):
             try:
