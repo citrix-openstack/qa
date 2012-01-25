@@ -2,9 +2,9 @@
 
 set -eux
 
-basedir=$(dirname $(dirname $(readlink -f "$0")))
+thisdir=$(dirname $(readlink -f "$0"))
 
-. "$basedir/common.sh"
+. "$thisdir/common.sh"
 
 server=brontitall.eng.hq.xensource.com
 stackdir="/tmp/stack"
@@ -36,4 +36,4 @@ scp -r devstack root@$server:~/
 mv /tmp/stage $stackdir/devstack/tools/xen
 
 remote_execute "root@$server" \
-    "$basedir/devstack/on-host.sh"
+    "$thisdir/devstack/on-host.sh"
