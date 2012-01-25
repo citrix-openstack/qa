@@ -27,11 +27,11 @@ add_on_exit()
 add_on_exit "rm -rf /root/devstack"
 
 # compute service
-NOVA_REPO=git@github.com:renuka-apte/devstack.git
+NOVA_REPO=git://github.com/openstack/nova.git
 NOVA_BRANCH=master
 
 cd /root/devstack/tools/xen
-TOP_DIR=$(cd $(dirname "$0") && pwd)
+TOP_DIR=$(pwd)
 
 # Make sure we have git
 if ! which git; then
