@@ -8,4 +8,4 @@ thisdir=$(dirname $(readlink -f "$0"))
 
 enter_jenkins_test
 
-sudo su -c "$thisdir/jenkins_build_vpx.sh" root
+sudo su -c "$thisdir/run-devstack-helper.sh" root
