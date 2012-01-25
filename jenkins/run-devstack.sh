@@ -12,10 +12,10 @@ sudo su -c "$thisdir/run-devstack-helper.sh" root
 
 stackdir=/tmp/stack
 cd $stackdir/devstack/tools/xen
-mv stage /tmp
+sudo mv stage /tmp
 cd ../../../
-scp -r devstack root@$server:~/
-mv /tmp/stage $stackdir/devstack/tools/xen
+sudo scp -r devstack root@$server:~/
+sudo mv /tmp/stage $stackdir/devstack/tools/xen
 
 remote_execute "root@$server" \
         "$thisdir/devstack/on-host.sh"
