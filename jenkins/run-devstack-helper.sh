@@ -30,10 +30,3 @@ fi
 cd tools/xen
 ./build_xva.sh
 
-mv stage /tmp/
-cd ../../../
-scp -r devstack root@$server:~/
-mv /tmp/stage $stackdir/devstack/tools/xen
-
-remote_execute "root@$server" \
-    "$thisdir/devstack/on-host.sh"
