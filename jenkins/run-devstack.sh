@@ -8,9 +8,19 @@ thisdir=$(dirname $(readlink -f "$0"))
 
 enter_jenkins_test
 
+stackdir="/tmp/stack"
+
+mkdir -p $stackdir
+
+cd $stackdir
+
+if [ ! -d $stackdir/devstack ]
+then
+    git clone git@github.com:renuka-apte/devstack.git
+fi
+
 sudo su -c "$thisdir/run-devstack-helper.sh" root
 
-stackdir=/tmp/stack
 cd $stackdir/devstack/tools/xen
 sudo mv stage /tmp
 cd ../../../

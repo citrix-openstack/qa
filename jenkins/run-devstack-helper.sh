@@ -9,14 +9,7 @@ thisdir=$(dirname $(readlink -f "$0"))
 server=brontitall.eng.hq.xensource.com
 stackdir="/tmp/stack"
 
-mkdir -p $stackdir
-
 cd $stackdir
-
-if [ ! -d $stackdir/devstack ]
-then
-    git clone git@github.com:renuka-apte/devstack.git
-fi
 
 cd devstack
 git checkout xenservermodif
