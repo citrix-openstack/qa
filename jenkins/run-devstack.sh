@@ -11,25 +11,31 @@ thisdir=$(dirname $(readlink -f "$0"))
 server=brontitall.eng.hq.xensource.com
 stackdir="/tmp/stack"
 
-mkdir $stackdir
-
-add_on_exit "rm -rf ${stackdir}"
+mkdir -p $stackdir
 
 cd $stackdir
 
-git clone git@github.com:renuka-apte/devstack.git
+if [ ! -d $stackdir/devstack ]
+then
+    git clone git@github.com:renuka-apte/devstack.git
+fi
+
 cd devstack
 git checkout xenservermodif
 
 cd $stackdir/devstack
-wget http://gold.eng.hq.xensource.com/localrc
+if [ ! -f localrc ]
+then
+    wget http://gold.eng.hq.xensource.com/localrc
+fi
 
 cd tools/xen
 ./build_xva.sh
 
-rm -rf stage
+mv stage /tmp/
 cd ../../../
 scp -r devstack root@$server:~/
+mv /tmp/stage $stackdir/devstack/tools/xen
 
 remote_execute "root@$server" \
                    "$thisdir/devstack/on-host.sh"

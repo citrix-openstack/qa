@@ -24,6 +24,12 @@ add_on_exit()
     fi
 }
 
+add_on_exit "rm -rf /root/devstack"
+
+# compute service
+NOVA_REPO=https://github.com/openstack/nova.git
+NOVA_BRANCH=master
+
 cd /root/devstack/tools/xen
 TOP_DIR=$(cd $(dirname "$0") && pwd)
 
