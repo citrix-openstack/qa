@@ -25,7 +25,7 @@ sudo su -c "$thisdir/run-devstack-helper.sh" root
 cd $stackdir/devstack/tools/xen
 sudo mv stage /tmp
 cd ../../../
-sudo scp -r devstack root@$server:~/
+scp -r devstack root@$server:~/
 sudo mv /tmp/stage $stackdir/devstack/tools/xen
 
 remote_execute "root@$server" \
