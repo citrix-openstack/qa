@@ -8,7 +8,7 @@ thisdir=$(dirname $(readlink -f "$0"))
 
 enter_jenkins_test
 
-server=brontitall.eng.hq.xensource.com
+server="${Server-$TEST_XENSERVER}"
 stackdir="/tmp/stack"
 
 mkdir -p $stackdir

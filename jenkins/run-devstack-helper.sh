@@ -15,9 +15,11 @@ cd devstack
 git checkout xenservermodif
 
 cd $stackdir/devstack
+defaultlocalrc="http://gold.eng.hq.xensource.com/localrc"
+lrcurl="${localrcURL-$defaultlocalrc}"
 if [ ! -f localrc ]
 then
-    wget http://gold.eng.hq.xensource.com/localrc
+    wget $lrcurl
 fi
 
 cd tools/xen
