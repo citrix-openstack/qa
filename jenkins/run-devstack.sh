@@ -26,7 +26,7 @@ then
 else
     scaptproxy=no
 fi
-sudo su -c "$thisdir/run-devstack-helper.sh server=$server scaptproxy=$scaptproxy stackdir=$stackdir" root
+sudo su -c "server=$server scaptproxy=$scaptproxy stackdir=$stackdir $thisdir/run-devstack-helper.sh" root
 
 cd $stackdir/devstack/tools/xen
 sudo mv stage /tmp

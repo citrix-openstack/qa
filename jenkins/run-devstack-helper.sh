@@ -20,5 +20,5 @@ then
 fi
 
 cd tools/xen
-./build_xva.sh SCAPTPROXY=$scaptproxy
+SCAPTPROXY=$scaptproxy ./build_xva.sh
 
