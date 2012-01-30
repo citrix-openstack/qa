@@ -54,6 +54,12 @@ then
     wget $lrcurl
 fi
 
+if $AptProxy
+then
+    scaptproxy=yes
+else
+    scaptproxy=no
+fi
 cd tools/xen
-./build_xva.sh
+./build_xva.sh SCAPTPROXY=$scaptproxy
 
