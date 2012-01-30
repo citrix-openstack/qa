@@ -20,7 +20,13 @@ then
     git clone git@github.com:renuka-apte/devstack.git
 fi
 
-sudo su -c "$thisdir/run-devstack-helper.sh" root
+if $AptProxy
+then
+    scaptproxy=yes
+else
+    scaptproxy=no
+fi
+sudo su -c "$thisdir/run-devstack-helper.sh server=$server scaptproxy=$scaptproxy stackdir=$stackdir" root
 
 cd $stackdir/devstack/tools/xen
 sudo mv stage /tmp

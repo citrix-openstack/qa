@@ -6,9 +6,6 @@ thisdir=$(dirname $(readlink -f "$0"))
 
 . "$thisdir/common.sh"
 
-server="${Server-$TEST_XENSERVER}"
-stackdir="/tmp/stack"
-
 # Install basics for vi and git
 yum -y  --enablerepo=base install gcc make vim-enhanced zlib-devel openssl-devel
 
@@ -54,12 +51,6 @@ then
     wget $lrcurl
 fi
 
-if $AptProxy
-then
-    scaptproxy=yes
-else
-    scaptproxy=no
-fi
 cd tools/xen
 ./build_xva.sh SCAPTPROXY=$scaptproxy
 
