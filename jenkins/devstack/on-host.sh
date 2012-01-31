@@ -2,27 +2,9 @@
 
 set -eux
 
-declare -a on_exit_hooks
-
 thisdir=$(dirname "$0")
-
-on_exit()
-{
-    for i in "${on_exit_hooks[@]}"
-    do
-        eval $i
-    done
-}
-
-add_on_exit()
-{
-    local n=${#on_exit_hooks[*]}
-    on_exit_hooks[$n]="$*"
-    if [[ $n -eq 0 ]]
-    then
-        trap on_exit EXIT
-    fi
-}
+. "$thisdir/common.sh"
+. "$thisdir/common-ssh.sh"
 
 add_on_exit "rm -rf /root/devstack"
 
@@ -63,4 +45,15 @@ yum --enablerepo=base install -y parted
 mkdir -p /boot/guest
 
 cd $TOP_DIR
+guest=${GUEST_NAME:-ALLINONE}
 ./build_domU.sh
+guestnode=$(xe vm-list --minimal name-label=$guest params=networks |  sed -ne 's,^.*3/ip: \([0-9.]*\).*$,\1,p')
+keyfile=~/.ssh/id_rsa
+password="citrix"
+if [ ! -f $keyfile ]
+then
+    gen_key
+fi
+upload_key $guestnode $password $keyfile stack
+scp_no_hosts "$thisdir/verify.sh" "stack@$guestnode:~/"
+ssh_no_hosts  "stack@$guestnode" \ "~/verify.sh"
