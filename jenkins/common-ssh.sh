@@ -38,14 +38,24 @@ upload_key()
     host="$1"
     password="$2"
     keyfile="$3"
+    user=${4:-"root"}
+    if [ $user == "root" ]
+    then
+        homedir="/root"
+    elif [ $user == "stack" ]
+    then
+        homedir="/opt/stack"
+    else
+        homedir="/home/$user"
+    fi
     key=$(cat "$keyfile.pub")
     expect >/dev/null <<EOF -
 set timeout -1
 spawn ssh -o StrictHostKeyChecking=no \
           -o UserKnownHostsFile=/dev/null \
           -o LogLevel=ERROR \
-          root@$host \
-          mkdir -p /root/.ssh\; echo $key >>/root/.ssh/authorized_keys
+          $user@$host \
+          mkdir -p $homedir/.ssh\; echo $key >>$homedir/.ssh/authorized_keys
 match_max 100000
 expect {
     "*?assword:*" {
