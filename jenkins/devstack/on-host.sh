@@ -2,9 +2,9 @@
 
 set -eux
 
-thisdir=$(dirname "$0")
-. "$thisdir/common.sh"
-. "$thisdir/common-ssh.sh"
+basedir="/root"
+. "$basedir/common.sh"
+. "$basedir/common-ssh.sh"
 
 add_on_exit "rm -rf /root/devstack"
 
@@ -55,5 +55,5 @@ then
     gen_key
 fi
 upload_key $guestnode $password $keyfile stack
-scp_no_hosts "$thisdir/verify.sh" "stack@$guestnode:~/"
+scp_no_hosts "$basedir/verify.sh" "stack@$guestnode:~/"
 ssh_no_hosts  "stack@$guestnode" \ "~/verify.sh"
