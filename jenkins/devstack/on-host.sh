@@ -33,6 +33,9 @@ NOVA_BRANCH=master
 cd /root/devstack/tools/xen
 TOP_DIR=$(pwd)
 
+# Install basics for vi and git
+yum -y  --enablerepo=base install gcc make vim-enhanced zlib-devel openssl-devel
+
 # Make sure we have git
 if ! which git; then
     GITDIR=/tmp/git-1.7.7
