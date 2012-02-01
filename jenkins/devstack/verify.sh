@@ -10,7 +10,9 @@ do
     then
         sleep 60
     else
-        exit
+        echo "verify done with success"
+        exit 0
     fi
 done
+echo "verify failed"
 exit 1
