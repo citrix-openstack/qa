@@ -48,7 +48,7 @@ cd $TOP_DIR
 guest=${GUEST_NAME:-ALLINONE}
 ./build_domU.sh
 # this sleep allows the password to be changed to the right one (prepare_guest.sh on vpx)
-sleep 10
+sleep 60
 guestnode=$(xe vm-list --minimal name-label=$guest params=networks |  sed -ne 's,^.*3/ip: \([0-9.]*\).*$,\1,p')
 keyfile=~/.ssh/id_rsa
 password="citrix"
