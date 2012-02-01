@@ -82,10 +82,11 @@ compute_host=$(get_os_svc_property "$master_url" \
 dashboard_addr=$(get_os_svc_property "$master_url" \
                                      "openstack-dashboard" \
                                      "hostnetwork_ip")
-"$thisdir/run-dashboard-test.sh" "$dashboard_host" \
-                                 "$dashboard_addr" \
-                                 "$port" \
-                                 "$compute_host"
+# Disable this for now
+#"$thisdir/run-dashboard-test.sh" "$dashboard_host" \
+#                                 "$dashboard_addr" \
+#                                 "$port" \
+#                                 "$compute_host"
 
 echo "Testing if Master VPX backup/restore is working on: $server1."
 "$thisdir/run-master-upgrade-test.sh" $server1
