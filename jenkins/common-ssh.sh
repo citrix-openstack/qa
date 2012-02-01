@@ -49,7 +49,7 @@ upload_key()
         homedir="/home/$user"
     fi
     key=$(cat "$keyfile.pub")
-    expect >/dev/null <<EOF -
+    expect -d <<EOF -
 set timeout -1
 spawn ssh -o StrictHostKeyChecking=no \
           -o UserKnownHostsFile=/dev/null \
