@@ -14,10 +14,7 @@ git checkout xenservermodif
 cd $stackdir/devstack
 defaultlocalrc="http://gold.eng.hq.xensource.com/localrc"
 lrcurl="${localrcURL-$defaultlocalrc}"
-if [ ! -f localrc ]
-then
-    wget $lrcurl
-fi
+wget -N $lrcurl
 
 cd tools/xen
 SCAPTPROXY=$scaptproxy ./build_xva.sh
