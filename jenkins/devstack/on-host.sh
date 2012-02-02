@@ -57,6 +57,11 @@ then
     gen_key
 fi
 upload_key $guestnode $password $keyfile stack
+
 scp_no_hosts "$basedir/verify.sh" "stack@$guestnode:~/"
 ssh_no_hosts  "stack@$guestnode" \ "~/verify.sh"
+
+scp_no_hosts "$basedir/run-excercise.sh" "stack@$guestnode:~/"
+ssh_no_hosts  "stack@$guestnode" \ "~/run-excercise.sh"
+
 echo "on-host exiting"

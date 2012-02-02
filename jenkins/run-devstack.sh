@@ -38,6 +38,7 @@ scp $thisdir/common.sh root@$server:~/
 scp $thisdir/common-xe.sh root@$server:~/
 scp $thisdir/common-ssh.sh root@$server:~/
 scp $thisdir/devstack/verify.sh root@$server:~/
+scp $thisdir/devstack/run-excercise.sh root@$server:~/
 remote_execute "root@$server" \
         "$thisdir/devstack/on-host.sh"
 echo "devstack exiting"
