@@ -4,12 +4,14 @@ set -eux
 
 # tidy up the scripts we copied over on exit
 SCRIPT_TMP_DIR=/tmp/jenkins_test
-add_on_exit "rm -rf $SCRIPT_TMP_DIR"
 cd $SCRIPT_TMP_DIR
 
 # import the common utils
 . "$SCRIPT_TMP_DIR/common.sh"
 . "$SCRIPT_TMP_DIR/common-ssh.sh"
+
+# clean up after we are done
+add_on_exit "rm -rf $SCRIPT_TMP_DIR"
 
 #
 # Make sure we have git and other bits we need

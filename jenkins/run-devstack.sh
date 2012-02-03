@@ -9,6 +9,10 @@ enter_jenkins_test
 server="${Server-$TEST_XENSERVER}"
 
 stackdir="/tmp/stack"
+if $CleanStackDir
+then
+    rm -rf $stackdir
+fi
 mkdir -p $stackdir
 cd $stackdir
 
