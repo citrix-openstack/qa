@@ -22,9 +22,9 @@ cd $stackdir
 if [ ! -d $stackdir/devstack ]
 then
     git clone git@github.com:renuka-apte/devstack.git
-    git checkout xenservermodif
 fi
 cd $stackdir/devstack
+git checkout xenservermodif
 git pull
 
 #
