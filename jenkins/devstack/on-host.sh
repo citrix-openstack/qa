@@ -2,24 +2,23 @@
 
 set -eux
 
-basedir="/root"
-. "$basedir/common.sh"
-. "$basedir/common-ssh.sh"
+# tidy up the scripts we copied over on exit
+SCRIPT_TMP_DIR=/tmp/jenkins_test
+add_on_exit "rm -rf $SCRIPT_TMP_DIR"
+cd $SCRIPT_TMP_DIR
 
-add_on_exit "rm -rf /root/devstack"
+# import the common utils
+. "$SCRIPT_TMP_DIR/common.sh"
+. "$SCRIPT_TMP_DIR/common-ssh.sh"
 
-# compute service
-NOVA_REPO=git://github.com/openstack/nova.git
-NOVA_BRANCH=master
-
-cd /root/devstack/tools/xen
-TOP_DIR=$(pwd)
-
-# Install basics for vi and git
-yum -y  --enablerepo=base install gcc make vim-enhanced zlib-devel openssl-devel
-
-# Make sure we have git
+#
+# Make sure we have git and other bits we need
+#
 if ! which git; then
+    # Install basics for vi and git
+    yum -y  --enablerepo=base install gcc make vim-enhanced zlib-devel openssl-devel
+    yum --enablerepo=base install -y parted
+
     GITDIR=/tmp/git-1.7.7
     cd /tmp
     rm -rf $GITDIR*
@@ -31,23 +30,35 @@ if ! which git; then
     cd $TOP_DIR
 fi
 
-# Checkout nova
-if [ ! -d $TOP_DIR/nova ]; then
-    git clone $NOVA_REPO
-    cd $TOP_DIR/nova
-    git checkout $NOVA_BRANCH
-fi
+#
+# Checkout nova, to get xapi plugins
+#
+cd $SCRIPT_TMP_DIR/devstack/tools/xen
+TOP_DIR=$(pwd)
 
+NOVA_REPO=git://github.com/openstack/nova.git
+NOVA_BRANCH=master
+git clone $NOVA_REPO
+cd nova
+git checkout $NOVA_BRANCH
+
+#
 # Install plugins
+#
 cp -pr $TOP_DIR/nova/plugins/xenserver/xenapi/etc/xapi.d /etc/
 chmod a+x /etc/xapi.d/plugins/*
-yum --enablerepo=base install -y parted
-mkdir -p /boot/guest
 
+#
+# Install DomU devstack VM
+#
+mkdir -p /boot/guest
 cd $TOP_DIR
 guest=${GUEST_NAME:-ALLINONE}
 ./build_domU.sh
-# this sleep allows the password to be changed to the right one (prepare_guest.sh on vpx)
+
+#
+# Upload the key to DomU devstack VM (like in prepare_guest.sh)
+#
 sleep 60
 guestnode=$(xe vm-list --minimal name-label=$guest params=networks |  sed -ne 's,^.*3/ip: \([0-9.]*\).*$,\1,p')
 keyfile=~/.ssh/id_rsa
@@ -58,10 +69,16 @@ then
 fi
 upload_key $guestnode $password $keyfile stack
 
-scp_no_hosts "$basedir/verify.sh" "stack@$guestnode:~/"
+#
+# Check that dev stack has completed
+#
+scp_no_hosts "$SCRIPT_TMP_DIR/verify.sh" "stack@$guestnode:~/"
 ssh_no_hosts  "stack@$guestnode" \ "~/verify.sh"
 
-scp_no_hosts "$basedir/run-excercise.sh" "stack@$guestnode:~/"
+#
+# Run some tests to make sure everything is working
+#
+scp_no_hosts "$SCRIPT_TMP_DIR/run-excercise.sh" "stack@$guestnode:~/"
 ssh_no_hosts  "stack@$guestnode" \ "~/run-excercise.sh"
 
 echo "on-host exiting"
