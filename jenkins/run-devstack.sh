@@ -11,20 +11,21 @@ server="${Server-$TEST_XENSERVER}"
 stackdir="/tmp/stack"
 if $CleanStackDir
 then
-    rm -rf $stackdir
+    sudo rm -rf $stackdir
 fi
 
 #
-# Get devstack
+# Get latest devstack
 #
 mkdir -p $stackdir
 cd $stackdir
 if [ ! -d $stackdir/devstack ]
 then
     git clone git@github.com:renuka-apte/devstack.git
+    git checkout xenservermodif
 fi
 cd $stackdir/devstack
-git checkout xenservermodif
+git pull
 
 #
 # Get localrc
