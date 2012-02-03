@@ -27,7 +27,7 @@ cd $SCRIPT_TMP_DIR/devstack/tools/xen
 TOP_DIR=$(pwd)
 
 wget https://github.com/openstack/nova/zipball/master --no-check-certificate
-unzip master -d ./nova
+unzip -o master -d ./nova
 cp -pr ./nova/*/plugins/xenserver/xenapi/etc/xapi.d /etc/
 chmod a+x /etc/xapi.d/plugins/*
 
