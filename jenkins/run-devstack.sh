@@ -57,10 +57,10 @@ SCRIPT_TMP_DIR=/tmp/jenkins_test
 cd $stackdir/devstack/tools/xen
 mkdir -p $stackdir/devstack/tools/xen/stage
 sudo mv stage /tmp
-add_on_exit "mv /tmp/stage $stackdir/devstack/tools/xen"
+add_on_exit "sudo mv /tmp/stage $stackdir/devstack/tools/xen"
 cd ../../../
 ssh "$server" "mkdir -p $SCRIPT_TMP_DIR/devstack"
-scp -r devstack root@$server:$SCRIPT_TMP_DIR/devstack
+scp -r devstack root@$server:$SCRIPT_TMP_DIR
 
 scp $thisdir/common.sh root@$server:$SCRIPT_TMP_DIR
 scp $thisdir/common-xe.sh root@$server:$SCRIPT_TMP_DIR
