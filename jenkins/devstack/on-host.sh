@@ -14,22 +14,10 @@ cd $SCRIPT_TMP_DIR
 add_on_exit "rm -rf $SCRIPT_TMP_DIR"
 
 #
-# Make sure we have git and other bits we need
+# Make sure have the software we need on Dom0
 #
-if ! which git; then
-    # Install basics for vi and git
-    yum -y  --enablerepo=base install gcc make vim-enhanced zlib-devel openssl-devel
+if ! which parted; then
     yum --enablerepo=base install -y parted
-
-    GITDIR=/tmp/git-1.7.7
-    cd /tmp
-    rm -rf $GITDIR*
-    wget http://git-core.googlecode.com/files/git-1.7.7.tar.gz
-    tar xfv git-1.7.7.tar.gz
-    cd $GITDIR
-    ./configure
-    make install
-    cd $TOP_DIR
 fi
 
 #
