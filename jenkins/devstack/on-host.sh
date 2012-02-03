@@ -11,7 +11,7 @@ cd $SCRIPT_TMP_DIR
 . "$SCRIPT_TMP_DIR/common-ssh.sh"
 
 # clean up after we are done
-#add_on_exit "rm -rf $SCRIPT_TMP_DIR"
+add_on_exit "rm -rf $SCRIPT_TMP_DIR"
 
 #
 # Make sure we have git and other bits we need
@@ -33,21 +33,14 @@ if ! which git; then
 fi
 
 #
-# Checkout nova, to get xapi plugins
+# Install latest XAPI plugins
 #
 cd $SCRIPT_TMP_DIR/devstack/tools/xen
 TOP_DIR=$(pwd)
 
-NOVA_REPO=git://github.com/openstack/nova.git
-NOVA_BRANCH=master
-git clone $NOVA_REPO
-cd nova
-git checkout $NOVA_BRANCH
-
-#
-# Install plugins
-#
-cp -pr $TOP_DIR/nova/plugins/xenserver/xenapi/etc/xapi.d /etc/
+wget https://github.com/openstack/nova/zipball/master
+unzip master -d ./nova
+cp -pr ./nova/*/plugins/xenserver/xenapi/etc/xapi.d /etc/
 chmod a+x /etc/xapi.d/plugins/*
 
 #

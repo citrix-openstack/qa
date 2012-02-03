@@ -1,4 +1,6 @@
 #!/bin/bash
 set -eux
 
-/opt/stack/devstack/exercises/floating_ips.sh
+cd /opt/stack/devstack/exercises
+./floating_ips.sh
+./aggregates.sh
