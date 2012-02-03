@@ -11,7 +11,7 @@ cd $SCRIPT_TMP_DIR
 . "$SCRIPT_TMP_DIR/common-ssh.sh"
 
 # clean up after we are done
-# TODO - temp to help debugging # add_on_exit "rm -rf $SCRIPT_TMP_DIR"
+add_on_exit "rm -rf $SCRIPT_TMP_DIR"
 
 #
 # Make sure we have git and other bits we need
