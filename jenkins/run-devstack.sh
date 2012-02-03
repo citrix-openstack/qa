@@ -13,18 +13,28 @@ if $CleanStackDir
 then
     rm -rf $stackdir
 fi
+
+#
+# Get devstack
+#
 mkdir -p $stackdir
 cd $stackdir
-
 if [ ! -d $stackdir/devstack ]
 then
     git clone git@github.com:renuka-apte/devstack.git
 fi
+cd $stackdir/devstack
+git checkout xenservermodif
 
 #
-# Get latest devstack
-# And build the XVA
-# **as root**
+# Get localrc
+#
+defaultlocalrc="http://gold.eng.hq.xensource.com/localrc"
+lrcurl="${localrcURL-$defaultlocalrc}"
+wget -N $lrcurl
+
+#
+# Build the XVA **as root**
 #
 if $AptProxy
 then
@@ -32,7 +42,12 @@ then
 else
     scaptproxy=no
 fi
-sudo su -c "server=$server scaptproxy=$scaptproxy stackdir=$stackdir $thisdir/run-devstack-helper.sh" root
+
+BuildXVA="${BuildXVA-true}"
+if $BuildXVA
+then
+    sudo su -c "server=$server scaptproxy=$scaptproxy stackdir=$stackdir $thisdir/run-devstack-helper.sh" root
+fi
 
 #
 # Copy what we need to the XenServer
