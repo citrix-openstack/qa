@@ -21,10 +21,15 @@ mkdir -p $stackdir
 cd $stackdir
 if [ ! -d $stackdir/devstack ]
 then
-    git clone git@github.com:renuka-apte/devstack.git
+    DefaultDevStackRepo="git@github.com:renuka-apte/devstack.git"
+    DevStackRepo="${DevStackRepo-$DefaultDevStackRepo}"
+    git clone $DevStackRepo
 fi
 cd $stackdir/devstack
-git checkout xenservermodif
+
+DefaultDevStackBranch="xenservermodif"
+DevStackBranch="${DevStackBranch-$DefaultDevStackBranch}"
+git checkout $DevStackBranch
 git pull
 
 #
