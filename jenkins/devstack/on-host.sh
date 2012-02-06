@@ -2,6 +2,8 @@
 
 set -eux
 
+$RunTempest=$1
+
 # tidy up the scripts we copied over on exit
 SCRIPT_TMP_DIR=/tmp/jenkins_test
 cd $SCRIPT_TMP_DIR
@@ -63,5 +65,11 @@ ssh_no_hosts  "stack@$guestnode" \ "~/verify.sh"
 #
 scp_no_hosts "$SCRIPT_TMP_DIR/run-excercise.sh" "stack@$guestnode:~/"
 ssh_no_hosts  "stack@$guestnode" \ "~/run-excercise.sh"
+
+if $RunTempest
+then
+    scp_no_hosts "$SCRIPT_TMP_DIR/run-tempest.sh" "stack@$guestnode:~/"
+    ssh_no_hosts  "stack@$guestnode" \ "~/run-tempest.sh"
+fi
 
 echo "on-host exiting"
