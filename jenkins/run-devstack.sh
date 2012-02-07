@@ -73,6 +73,7 @@ scp $thisdir/common-xe.sh root@$server:$SCRIPT_TMP_DIR
 scp $thisdir/common-ssh.sh root@$server:$SCRIPT_TMP_DIR
 scp $thisdir/devstack/verify.sh root@$server:$SCRIPT_TMP_DIR
 scp $thisdir/devstack/run-excercise.sh root@$server:$SCRIPT_TMP_DIR
+scp $thisdir/devstack/run-tempest.sh root@$server:$SCRIPT_TMP_DIR
 
 #
 # Run the next steps on the XenServer
