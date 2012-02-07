@@ -77,7 +77,7 @@ scp $thisdir/devstack/run-excercise.sh root@$server:$SCRIPT_TMP_DIR
 #
 # Run the next steps on the XenServer
 #
-$RunTempest="${$RunTempest-true}"
+RunTempest="${RunTempest-true}"
 remote_execute "root@$server" "$thisdir/devstack/on-host.sh $RunTempest"
 
 echo "devstack exiting"
