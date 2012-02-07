@@ -2,7 +2,7 @@
 
 set -eux
 
-$RunTempest=$1
+RunTempest=$1
 
 # tidy up the scripts we copied over on exit
 SCRIPT_TMP_DIR=/tmp/jenkins_test
