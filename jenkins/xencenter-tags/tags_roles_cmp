@@ -8,6 +8,7 @@ exclude_list = ['openstack-lb-service',
                 'citrix-geppetto-celerycam',
                 'openstack-nova-objectstore',
                 'openstack-nova-vncproxy',
+                'openstack-nova-ajax-console-proxy',
                 '']
 
 master_url = '%s/openstack/geppetto/v1' % sys.argv[1]
@@ -21,7 +22,7 @@ vm_tags = list(set(vm_tags))
 
 proxy = xmlrpclib.ServerProxy(master_url)
 os_roles = proxy.Role.get_service_roles()
-# Remove services taht have not been deployed, e.g. lb-service
+# Remove services that have not been deployed, e.g. lb-service
 os_roles = [ e for e in os_roles \
                          if e not in exclude_list ]
 
