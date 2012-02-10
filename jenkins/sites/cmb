@@ -1,7 +1,7 @@
 BUILD_RESULT_URL=http://bethany.eng.citrite.net
 TEST_XENSERVER_M_NET=xenbr1
 TEST_XENSERVER_P_NET="OpenStack - Public"
-TEST_XENSERVER=cosmos.eng.citrite.net
+TEST_XENSERVER=camctxlabs-svr06.cam.eu.citrix.com
 TEST_MAIL_SERVER=lonmail.citrite.net
 TEST_MAIL_ACCOUNT=armando.migliaccio@citrix.com
 GUEST_NETWORK="--fixed_range_v4=10.0.0.0/24 --label private"
