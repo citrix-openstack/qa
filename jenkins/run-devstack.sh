@@ -73,11 +73,13 @@ scp $thisdir/common-xe.sh root@$server:$SCRIPT_TMP_DIR
 scp $thisdir/common-ssh.sh root@$server:$SCRIPT_TMP_DIR
 scp $thisdir/devstack/verify.sh root@$server:$SCRIPT_TMP_DIR
 scp $thisdir/devstack/run-excercise.sh root@$server:$SCRIPT_TMP_DIR
+scp $thisdir/devstack/run-tempest.sh root@$server:$SCRIPT_TMP_DIR
 
 #
 # Run the next steps on the XenServer
 #
+RunExercises="${RunExercises-true}"
 RunTempest="${RunTempest-true}"
-remote_execute "root@$server" "$thisdir/devstack/on-host.sh" \""$RunTempest"\"
+remote_execute "root@$server" "$thisdir/devstack/on-host.sh" \""$RunExercises"\" \""$RunTempest"\"
 
 echo "devstack exiting"

@@ -135,9 +135,9 @@ class GeppettoTestCase(common.SeleniumTestCase):
         self.wait_for_page_to_load()
         # Put the Console Proxy on the same node as the Compute API and
         # Dashboard.
-        sel.select("id_worker", "index=%s" % dashboard_node_index)
-        self._click_next()
-        self.wait_for_page_to_load()
+        #sel.select("id_worker", "index=%s" % dashboard_node_index)
+        #self._click_next()
+        #self.wait_for_page_to_load()
         sel.select("id_worker", "index=6")
         self._click_next()
         self.wait_for_page_to_load()

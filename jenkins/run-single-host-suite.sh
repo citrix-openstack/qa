@@ -43,8 +43,8 @@ echo "Testing OpenStack Glance on: $server."
 echo "Testing XenServer Fast Cloning on: $server."
 "$thisdir/run-fast-cloning.sh"
 
-echo "Testing OpenStack Dashboard on: $server."
-"$thisdir/run-dashboard-test.sh"
+#echo "Testing OpenStack Dashboard on: $server."
+#"$thisdir/run-dashboard-test.sh"
 
 echo "Testing Multi-NIC Support on: $server."
 "$thisdir/run-multinic-test.sh"
@@ -52,14 +52,14 @@ echo "Testing Multi-NIC Support on: $server."
 echo "Testing Floating IP Support on: $server."
 "$thisdir/run-floatingip-test.sh"
 
-echo "Testing Keystone Support on: $server."
-"$thisdir/run-keystone-integration.sh"
+#echo "Testing Keystone Support on: $server."
+#"$thisdir/run-keystone-integration.sh"
 
-#echo "Testing if Master VPX backup/restore is working on: $server."
+echo "Testing if Master VPX backup/restore is working on: $server."
 "$thisdir/run-master-upgrade-test.sh"
 
 #echo "Testing if Role Migration is working on: $server."
-"$thisdir/run-role-migration-test.sh"
+#"$thisdir/run-role-migration-test.sh"
 
 # Add other tests here (or in the right order, from the least destructive to
 # the most destructive). E.g. put tests that change the deployment, like role

@@ -2,7 +2,8 @@
 
 set -eux
 
-RunTempest=$1
+RunExercises=$1
+RunTempest=$2
 
 # tidy up the scripts we copied over on exit
 SCRIPT_TMP_DIR=/tmp/jenkins_test
@@ -63,8 +64,11 @@ ssh_no_hosts  "stack@$guestnode" \ "~/verify.sh"
 #
 # Run some tests to make sure everything is working
 #
-scp_no_hosts "$SCRIPT_TMP_DIR/run-excercise.sh" "stack@$guestnode:~/"
-ssh_no_hosts  "stack@$guestnode" \ "~/run-excercise.sh"
+if $RunExercises
+then
+    scp_no_hosts "$SCRIPT_TMP_DIR/run-excercise.sh" "stack@$guestnode:~/"
+    ssh_no_hosts  "stack@$guestnode" \ "~/run-excercise.sh"
+fi
 
 if $RunTempest
 then
