@@ -12,6 +12,7 @@ stackdir="/tmp/stack"
 if $CleanStackDir
 then
     sudo rm -rf $stackdir
+    sudo rm -rf /tmp/stage
 fi
 
 #
@@ -61,7 +62,6 @@ fi
 SCRIPT_TMP_DIR=/tmp/jenkins_test
 
 cd $stackdir/devstack/tools/xen
-mkdir -p $stackdir/devstack/tools/xen/stage
 sudo mv stage /tmp
 add_on_exit "sudo mv /tmp/stage $stackdir/devstack/tools/xen"
 cd ../../../
