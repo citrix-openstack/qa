@@ -29,7 +29,7 @@ cd $stackdir/devstack
 DefaultDevStackRepo="git@github.com:renuka-apte/devstack.git"
 DevStackRepo="${DevStackRepo-$DefaultDevStackRepo}"
 rn=$(echo $DevStackRepo |tr /.: ___)
-git fetch $DevStackRepo refs/changes/*:refs/changes/$rn/* refs/heads/*:refs/heads/$rn/*
+git fetch $DevStackRepo refs/changes/*:$rn/refs/changes/* refs/heads/*:$rn/refs/heads/*
 
 DefaultDevStackBranch="xenservermodif"
 DevStackBranch="${DevStackBranch-$DefaultDevStackBranch}"
