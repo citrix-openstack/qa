@@ -22,16 +22,18 @@ mkdir -p $stackdir
 cd $stackdir
 if [ ! -d $stackdir/devstack ]
 then
-    DefaultDevStackRepo="git@github.com:renuka-apte/devstack.git"
-    DevStackRepo="${DevStackRepo-$DefaultDevStackRepo}"
-    git clone $DevStackRepo
+    git init $stackdir/devstack
 fi
 cd $stackdir/devstack
 
+DefaultDevStackRepo="git@github.com:renuka-apte/devstack.git"
+DevStackRepo="${DevStackRepo-$DefaultDevStackRepo}"
+rn=$(echo $DevStackRepo |tr /.: ___)
+git fetch $DevStackRepo refs/changes/*:refs/changes/$rn/* refs/heads/*:refs/heads/$rn/*
+
 DefaultDevStackBranch="xenservermodif"
 DevStackBranch="${DevStackBranch-$DefaultDevStackBranch}"
-git checkout $DevStackBranch
-git pull
+git checkout $rn/$DevStackBranch
 
 #
 # Get localrc
