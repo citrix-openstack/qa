@@ -42,7 +42,7 @@
     <scmName></scmName>
   </scm>
   <canRoam>true</canRoam>
-  <disabled>false</disabled>
+  <disabled>true</disabled>
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
   <triggers class="vector">
@@ -53,7 +53,8 @@
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>./run_tests.sh -V -f</command>
+      <command>./run_tests.sh -V -f
+</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers>
@@ -68,7 +69,7 @@
   <buildWrappers>
     <hudson.plugins.build__timeout.BuildTimeoutWrapper>
       <timeoutMinutes>90</timeoutMinutes>
-      <failBuild>true</failBuild>
+      <failBuild>false</failBuild>
     </hudson.plugins.build__timeout.BuildTimeoutWrapper>
     <hudson.plugins.timestamper.TimestamperBuildWrapper/>
     <hudson.plugins.dumpinfo.DumpInfoBuildWrapper>

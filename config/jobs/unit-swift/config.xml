@@ -41,7 +41,7 @@
     <skipTag>false</skipTag>
     <scmName></scmName>
   </scm>
-  <assignedNode>cambridge||redmond</assignedNode>
+  <assignedNode>cambridge||cambourne||santa-clara</assignedNode>
   <canRoam>false</canRoam>
   <disabled>false</disabled>
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
@@ -68,7 +68,7 @@
   </publishers>
   <buildWrappers>
     <hudson.plugins.build__timeout.BuildTimeoutWrapper>
-      <timeoutMinutes>30</timeoutMinutes>
+      <timeoutMinutes>60</timeoutMinutes>
       <failBuild>true</failBuild>
     </hudson.plugins.build__timeout.BuildTimeoutWrapper>
     <hudson.plugins.timestamper.TimestamperBuildWrapper/>

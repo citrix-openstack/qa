@@ -22,12 +22,12 @@
           <description>Use ssh-upload-jenkins-keys from root@openstack-jenkins.uk.xensource.com to allow remote login.</description>
           <choices class="java.util.Arrays$ArrayList">
             <a class="string-array">
+              <string>camctxlabs-svr06</string>
               <string>cosmos</string>
               <string>cookbook</string>
               <string>magrathea</string>
               <string>camctxlabs-svr03</string>
               <string>camctxlabs-svr04</string>
-              <string>camctxlabs-svr06</string>
               <string>kria.eng.hq.xensource.com</string>
             </a>
           </choices>
@@ -39,9 +39,9 @@
     <configVersion>2</configVersion>
     <userRemoteConfigs>
       <hudson.plugins.git.UserRemoteConfig>
-        <name></name>
-        <refspec></refspec>
-        <url>http://github.com/citrix-openstack/qa</url>
+        <name>origin</name>
+        <refspec>+refs/heads/*:refs/remotes/origin/*</refspec>
+        <url>https://github.com/citrix-openstack/qa</url>
       </hudson.plugins.git.UserRemoteConfig>
     </userRemoteConfigs>
     <branches>

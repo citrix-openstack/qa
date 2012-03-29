@@ -1,7 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <project>
   <actions/>
-  <description>Test the base logic for hotfix of compute nodes. &#xd;
+  <description>BROKEN: SEE FUNC_DASHBOARD&#xd;
+&#xd;
+Test the base logic for hotfix of compute nodes. &#xd;
 &#xd;
 This adds a new VPX, migrates the old compute node to the new VPX, then runs a dashboard test to check that all is still working well.&#xd;
 </description>
@@ -56,7 +58,7 @@ This adds a new VPX, migrates the old compute node to the new VPX, then runs a d
   </scm>
   <assignedNode>cambourne</assignedNode>
   <canRoam>false</canRoam>
-  <disabled>false</disabled>
+  <disabled>true</disabled>
   <blockBuildWhenDownstreamBuilding>true</blockBuildWhenDownstreamBuilding>
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
   <triggers class="vector"/>

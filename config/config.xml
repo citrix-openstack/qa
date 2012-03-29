@@ -125,13 +125,15 @@
             <unserializable-parents/>
             <tree-map>
               <default>
-                <comparator class="hudson.util.CaseInsensitiveComparator"/>
+                <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../../../../../slave/nodeProperties/hudson.slaves.EnvironmentVariablesNodeProperty/envVars/tree-map/default/comparator"/>
               </default>
-              <int>2</int>
+              <int>3</int>
               <string>PIP_DOWNLOAD_CACHE</string>
               <string>/var/cache/pip_download_cache</string>
               <string>SITE</string>
               <string>cmb</string>
+              <string>XS_ROOT_PASSWORD</string>
+          <string></string>
             </tree-map>
           </envVars>
         </hudson.slaves.EnvironmentVariablesNodeProperty>
@@ -230,7 +232,9 @@
       <filterQueue>false</filterQueue>
       <properties class="hudson.model.View$PropertyList"/>
       <jobNames class="tree-set">
-        <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../../slaves/slave[4]/nodeProperties/hudson.slaves.EnvironmentVariablesNodeProperty/envVars/tree-map/default/comparator"/>
+        <comparator class="hudson.util.CaseInsensitiveComparator"/>
+        <string>devstack-soreta</string>
+        <string>private-dasara-singlehost-suite</string>
         <string>private-netsuite-cloudsetup</string>
         <string>private-netsuite-guest-networking</string>
       </jobNames>

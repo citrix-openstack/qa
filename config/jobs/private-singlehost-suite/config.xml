@@ -19,8 +19,8 @@
         </hudson.model.RunParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>PrivateBuildURL</name>
-          <description>The URL that the VPX and associated scripts can be downloaded from.  Should be the subdirectory that contains os-vpx.xva or os-vpx-devel.xva, install-os-vpx.sh, etc.&#xd;
-&#xd;
+          <description>The URL that the VPX and associated scripts can be downloaded from.  Should be the subdirectory that contains os-vpx.xva or os-vpx-devel.xva, install-os-vpx.sh, etc.
+
 If you want to use a central build instead, use Build above.</description>
           <defaultValue></defaultValue>
         </hudson.model.StringParameterDefinition>
@@ -31,9 +31,9 @@ If you want to use a central build instead, use Build above.</description>
         </hudson.model.StringParameterDefinition>
         <org.jvnet.jenkins.plugins.nodelabelparameter.LabelParameterDefinition>
           <name>SiteLabel</name>
-          <description>One of &quot;bengaluru&quot;, &quot;cambridge&quot;, &quot;cambourne, &quot;redmond&quot;, or &quot;santa-clara&quot;.&#xd;
-&#xd;
-Make sure that this matches the Server and PrivateBuildURL parameters above!  If you get this wrong, then you will end up streaming VM images from one site to another, and the build will time out.&#xd;
+          <description>One of &quot;bengaluru&quot;, &quot;cambridge&quot;, &quot;cambourne, &quot;redmond&quot;, or &quot;santa-clara&quot;.
+
+Make sure that this matches the Server and PrivateBuildURL parameters above!  If you get this wrong, then you will end up streaming VM images from one site to another, and the build will time out.
 </description>
           <defaultValue></defaultValue>
         </org.jvnet.jenkins.plugins.nodelabelparameter.LabelParameterDefinition>

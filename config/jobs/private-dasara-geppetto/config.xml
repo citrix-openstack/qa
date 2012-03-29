@@ -17,7 +17,7 @@ Can also be used to test a central build, for comparison purposes.&#xd;
         <hudson.model.RunParameterDefinition>
           <name>Build</name>
           <description>A central build.</description>
-          <projectName>os-vpx-build-manifest</projectName>
+          <projectName>os-vpx-build</projectName>
         </hudson.model.RunParameterDefinition>
         <hudson.model.StringParameterDefinition>
           <name>PrivateBuildURL</name>
