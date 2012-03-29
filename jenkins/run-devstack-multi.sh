@@ -22,18 +22,16 @@ mkdir -p $stackdir
 cd $stackdir
 if [ ! -d $stackdir/devstack ]
 then
-    git init $stackdir/devstack
+    DefaultDevStackRepo="git@github.com:renuka-apte/devstack.git"
+    DevStackRepo="${DevStackRepo-$DefaultDevStackRepo}"
+    git clone $DevStackRepo
 fi
 cd $stackdir/devstack
 
-DefaultDevStackRepo="git@github.com:renuka-apte/devstack.git"
-DevStackRepo="${DevStackRepo-$DefaultDevStackRepo}"
-rn=$(echo $DevStackRepo |tr /.: ___)
-git fetch $DevStackRepo refs/changes/*:$rn/refs/changes/* refs/heads/*:$rn/refs/heads/*
-
 DefaultDevStackBranch="xenservermodif"
 DevStackBranch="${DevStackBranch-$DefaultDevStackBranch}"
-git checkout $rn/$DevStackBranch
+git checkout $DevStackBranch
+git pull
 
 #
 # Get localrc
@@ -55,7 +53,7 @@ fi
 BuildXVA="${BuildXVA-true}"
 if $BuildXVA
 then
-    sudo su -c "server=$server scaptproxy=$scaptproxy stackdir=$stackdir $thisdir/run-devstack-helper.sh" root
+    sudo su -c "server=$server scaptproxy=$scaptproxy stackdir=$stackdir $thisdir/run-devstack-multihelper.sh" root
 fi
 
 #
@@ -80,8 +78,6 @@ scp $thisdir/devstack/run-tempest.sh root@$server:$SCRIPT_TMP_DIR
 #
 # Run the next steps on the XenServer
 #
-RunExercises="${RunExercises-true}"
-RunTempest="${RunTempest-true}"
-remote_execute "root@$server" "$thisdir/devstack/on-host.sh" \""$RunExercises"\" \""$RunTempest"\"
+remote_execute "root@$server" "$thisdir/devstack/on-host-multi.sh"
 
-echo "devstack exiting"
+echo "devstack multi exiting"
