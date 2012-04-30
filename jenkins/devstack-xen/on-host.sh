@@ -6,6 +6,7 @@ RunExercises=$1
 RunTempest=$2
 DevStackURL=$3
 LocalrcURL=$4
+PreseedURL=$5
 
 # tidy up the scripts we copied over on exit
 SCRIPT_TMP_DIR=/tmp/jenkins_test
@@ -30,11 +31,17 @@ cd devstack/*/
 #
 wget --no-check-certificate $LocalrcURL
 
+cd tools/xen
+
+#
+# Download preseed
+#
+rm devstackubuntupreseed.cfg
+wget --output-document=devstackubuntupreseed.cfg --no-check-certificate $PreseedURL
+
 #
 # Install VM
 #
-
-cd tools/xen
 ./install_os_domU.sh
 
 #

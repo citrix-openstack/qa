@@ -20,6 +20,9 @@ localrcURL="${localrcURL-$defaultlocalrc}"
 RunExercises="${RunExercises-true}"
 RunTempest="${RunTempest-true}"
 
+DefaultPreseedURL="http://gold.eng.hq.xensource.com/devstackubuntupreseed.cfg"
+PreseedURL="${PreseedURL-$DefaultPreseedURL}"
+
 #
 # Copy what we need to the XenServer
 #
@@ -38,6 +41,6 @@ scp $thisdir/devstack/run-tempest.sh root@$server:$SCRIPT_TMP_DIR
 # Run the next steps on the XenServer
 #
 
-remote_execute "root@$server" "$thisdir/devstack-xen/on-host.sh" "${RunExercises}" "${RunTempest}" "${DevStackURL}" "${localrcURL}"
+remote_execute "root@$server" "$thisdir/devstack-xen/on-host.sh" "${RunExercises}" "${RunTempest}" "${DevStackURL}" "${localrcURL}" "${PreseedURL}"
 
 echo "devstack exiting"
