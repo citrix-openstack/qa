@@ -7,11 +7,6 @@ RunTempest=$2
 DevStackURL=$3
 LocalrcURL=$4
 
-wget --no-check-certificate https://github.com/openstack-dev/devstack/zipball/master
-unzip -o master -d ./devstack
-cd devstack/*/
-
-
 # tidy up the scripts we copied over on exit
 SCRIPT_TMP_DIR=/tmp/jenkins_test
 cd $SCRIPT_TMP_DIR
