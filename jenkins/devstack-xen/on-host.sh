@@ -21,8 +21,8 @@ add_on_exit "rm -rf $SCRIPT_TMP_DIR"
 #
 # Download DevStack
 #
-wget --no-check-certificate $DevStackURL
-unzip -o master -d ./devstack
+wget --output-document=devstack.zip --no-check-certificate $DevStackURL
+unzip -o devstack.zip -d ./devstack
 cd devstack/*/
 
 #
