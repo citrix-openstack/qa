@@ -28,6 +28,7 @@ PreseedURL="${PreseedURL-$DefaultPreseedURL}"
 #
 SCRIPT_TMP_DIR=/tmp/jenkins_test
 
+ssh "$server" "rm -rf $SCRIPT_TMP_DIR"
 ssh "$server" "mkdir -p $SCRIPT_TMP_DIR/devstack"
 
 scp $thisdir/common.sh root@$server:$SCRIPT_TMP_DIR
