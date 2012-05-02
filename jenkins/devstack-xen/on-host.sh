@@ -13,10 +13,6 @@ GuestIp=$6
 SCRIPT_TMP_DIR=/tmp/jenkins_test
 cd $SCRIPT_TMP_DIR
 
-# import the common utils
-. "$SCRIPT_TMP_DIR/common.sh"
-. "$SCRIPT_TMP_DIR/common-ssh.sh"
-
 #
 # Download DevStack
 #
@@ -62,12 +58,12 @@ if $RunExercises
 then
     GUEST_NAME=${GUEST_NAME:-"DevStackOSDomU"} # TODO - pull from config
     OPENSTACK_GUEST_IP=$(xe vm-list --minimal name-label=$GUEST_NAME params=networks | sed -ne 's,^.*3/ip: \([0-9.]*\).*$,\1,p')
-    ssh_no_hosts "stack@$OPENSTACK_GUEST_IP" \ "~/devstack/exercise.sh"
+    ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "stack@$OPENSTACK_GUEST_IP" \ "~/devstack/exercise.sh"
 
     if $RunTempest
     then
-        scp_no_hosts "$SCRIPT_TMP_DIR/run-tempest.sh" "stack@$OPENSTACK_GUEST_IP:~/"
-        ssh_no_hosts  "stack@$OPENSTACK_GUEST_IP" \ "~/run-tempest.sh"
+        scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$SCRIPT_TMP_DIR/run-tempest.sh" "stack@$OPENSTACK_GUEST_IP:~/"
+        ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "stack@$OPENSTACK_GUEST_IP" \ "~/run-tempest.sh"
     fi
 fi
 
