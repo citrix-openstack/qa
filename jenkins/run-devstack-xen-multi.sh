@@ -9,7 +9,7 @@ thisdir=$(dirname $(readlink -f "$0"))
 #
 # Install first host (master)
 #
-export server=$Server1
+export Server=$Server1
 export GUEST_IP=""
 
 . "$thisdir/run-devstack-xen.sh"
@@ -17,7 +17,7 @@ export GUEST_IP=""
 #
 # Install second host (compute slave)
 #
-export server=$Server2
+export Server=$Server2
 
 # Find IP address of master
 export GUEST_NAME=${GUEST_NAME:-"DevStackOSDomU"} # TODO - pull from config
