@@ -10,7 +10,7 @@ thisdir=$(dirname $(readlink -f "$0"))
 # Install first host (master)
 #
 export Server=$Server1
-export GUEST_IP=""
+export GUEST_IP=false
 
 . "$thisdir/run-devstack-xen.sh"
 
