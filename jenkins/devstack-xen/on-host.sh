@@ -29,7 +29,7 @@ cd devstack/*/
 #
 wget --output-document=localrc --no-check-certificate $LocalrcURL
 
-if [ -n "$GuestIp" ]
+if $GuestIp
 then
     cat <<EOF >>localrc
 # appended by jenkins

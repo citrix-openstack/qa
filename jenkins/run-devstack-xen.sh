@@ -22,7 +22,7 @@ RunTempest="${RunTempest-false}"
 DefaultPreseedURL="http://gold.eng.hq.xensource.com/devstackubuntupreseed.cfg"
 PreseedURL="${PreseedURL-$DefaultPreseedURL}"
 
-GuestIP="${GUEST_IP-}"
+GuestIP="${GUEST_IP-false}"
 
 #
 # Clean directory, create directory and
