@@ -7,7 +7,7 @@ RunTempest=$2
 DevStackURL=$3
 LocalrcURL=$4
 PreseedURL=$5
-$GuestIp=$6
+GuestIp=$6
 
 # tidy up the scripts we copied over on exit
 SCRIPT_TMP_DIR=/tmp/jenkins_test
