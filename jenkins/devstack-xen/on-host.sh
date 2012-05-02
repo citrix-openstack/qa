@@ -60,13 +60,15 @@ wget --output-document=devstackubuntupreseed.cfg --no-check-certificate $Preseed
 #
 if $RunExercises
 then
+    GUEST_NAME=${GUEST_NAME:-"DevStackOSDomU"} # TODO - pull from config
+    OPENSTACK_GUEST_IP=$(xe vm-list --minimal name-label=$GUEST_NAME params=networks | sed -ne 's,^.*3/ip: \([0-9.]*\).*$,\1,p')
     ssh_no_hosts "stack@$OPENSTACK_GUEST_IP" \ "~/devstack/exercise.sh"
-fi
 
-if $RunTempest
-then
-    scp_no_hosts "$SCRIPT_TMP_DIR/run-tempest.sh" "stack@$OPENSTACK_GUEST_IP:~/"
-    ssh_no_hosts  "stack@$OPENSTACK_GUEST_IP" \ "~/run-tempest.sh"
+    if $RunTempest
+    then
+        scp_no_hosts "$SCRIPT_TMP_DIR/run-tempest.sh" "stack@$OPENSTACK_GUEST_IP:~/"
+        ssh_no_hosts  "stack@$OPENSTACK_GUEST_IP" \ "~/run-tempest.sh"
+    fi
 fi
 
 echo "on-host exiting"
