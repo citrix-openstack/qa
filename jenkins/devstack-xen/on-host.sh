@@ -26,7 +26,7 @@ cd devstack/*/
 #
 # Download localrc
 #
-wget --no-check-certificate $LocalrcURL
+wget --output-document=localrc --no-check-certificate $LocalrcURL
 
 cd tools/xen
 
