@@ -16,11 +16,13 @@ DevStackURL="${DevStackURL-$DefaultDevStackURL}"
 defaultlocalrc="http://gold.eng.hq.xensource.com/localrc"
 localrcURL="${localrcURL-$defaultlocalrc}"
 
-RunExercises="${RunExercises-true}"
-RunTempest="${RunTempest-true}"
+RunExercises="${RunExercises-false}"
+RunTempest="${RunTempest-false}"
 
 DefaultPreseedURL="http://gold.eng.hq.xensource.com/devstackubuntupreseed.cfg"
 PreseedURL="${PreseedURL-$DefaultPreseedURL}"
+
+GuestIP="${GUEST_IP-}"
 
 #
 # Clean directory, create directory and
@@ -38,7 +40,7 @@ scp $thisdir/devstack/run-tempest.sh root@$server:$SCRIPT_TMP_DIR
 #
 # Run the next steps on the XenServer
 #
-remote_execute "root@$server" "$thisdir/devstack-xen/on-host.sh" "${RunExercises}" "${RunTempest}" "${DevStackURL}" "${localrcURL}" "${PreseedURL}"
+remote_execute "root@$server" "$thisdir/devstack-xen/on-host.sh" "${RunExercises}" "${RunTempest}" "${DevStackURL}" "${localrcURL}" "${PreseedURL}" "${GuestIP}"
 
 #
 # Tidy up after running the test

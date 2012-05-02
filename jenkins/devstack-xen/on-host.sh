@@ -7,6 +7,7 @@ RunTempest=$2
 DevStackURL=$3
 LocalrcURL=$4
 PreseedURL=$5
+$GuestIp=$6
 
 # tidy up the scripts we copied over on exit
 SCRIPT_TMP_DIR=/tmp/jenkins_test
@@ -27,6 +28,19 @@ cd devstack/*/
 # Download localrc
 #
 wget --output-document=localrc --no-check-certificate $LocalrcURL
+
+if [ -n "$GuestIp" ]
+then
+    cat <<EOF >>localrc
+# appended by jenkins
+MASTER_SERVER=$GuestIp
+ENABLED_SERVICES=n-cpu,n-net,n-api
+MYSQL_HOST=$MASTER_SERVER
+RABBIT_HOST=$MASTER_SERVER
+KEYSTONE_AUTH_HOST=$MASTER_SERVER
+GLANCE_HOSTPORT=$MASTER_SERVER:9292
+EOF
+fi
 
 cd tools/xen
 
