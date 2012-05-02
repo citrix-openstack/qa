@@ -9,18 +9,18 @@ thisdir=$(dirname $(readlink -f "$0"))
 #
 # Install first host (master)
 #
-server=$Server1
-GUEST_IP=""
+export server=$Server1
+export GUEST_IP=""
 
 . "$thisdir/run-devstack-xen.sh"
 
 #
 # Install second host (compute slave)
 #
-server=$Server2
+export server=$Server2
 
 # Find IP address of master
-GUEST_NAME=${GUEST_NAME:-"DevStackOSDomU"} # TODO - pull from config
-GUEST_IP=$(ssh_no_hosts "$server" "xe vm-list --minimal name-label=$GUEST_NAME params=networks | sed -ne 's,^.*3/ip: \([0-9.]*\).*$,\1,p'")
+export GUEST_NAME=${GUEST_NAME:-"DevStackOSDomU"} # TODO - pull from config
+export GUEST_IP=$(ssh_no_hosts "$server" "xe vm-list --minimal name-label=$GUEST_NAME params=networks | sed -ne 's,^.*3/ip: \([0-9.]*\).*$,\1,p'")
 
 . "$thisdir/run-devstack-xen.sh"
