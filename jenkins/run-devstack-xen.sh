@@ -43,11 +43,6 @@ scp $thisdir/devstack/run-tempest.sh root@$server:$SCRIPT_TMP_DIR
 remote_execute "root@$server" "$thisdir/devstack-xen/on-host.sh" "${RunExercises}" "${RunTempest}" "${DevStackURL}" "${localrcURL}" "${PreseedURL}" "${GuestIP}"
 
 #
-# Tidy up after running the test
-#
-ssh "$server" "rm -rf $SCRIPT_TMP_DIR"
-
-#
 # All done!
 #
 echo "Test complete"
