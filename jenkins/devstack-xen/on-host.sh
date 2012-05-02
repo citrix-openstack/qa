@@ -39,7 +39,7 @@ wget --output-document=devstackubuntupreseed.cfg --no-check-certificate $Preseed
 #
 # Install VM
 #
-. ./install_os_domU.sh
+./install_os_domU.sh
 
 #
 # Run some tests to make sure everything is working
