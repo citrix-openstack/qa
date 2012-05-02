@@ -16,9 +16,6 @@ cd $SCRIPT_TMP_DIR
 . "$SCRIPT_TMP_DIR/common.sh"
 . "$SCRIPT_TMP_DIR/common-ssh.sh"
 
-# clean up after we are done
-add_on_exit "rm -rf $SCRIPT_TMP_DIR"
-
 #
 # Download DevStack
 #
@@ -42,21 +39,20 @@ wget --output-document=devstackubuntupreseed.cfg --no-check-certificate $Preseed
 #
 # Install VM
 #
-./install_os_domU.sh
+. ./install_os_domU.sh
 
 #
 # Run some tests to make sure everything is working
 #
 if $RunExercises
 then
-    scp_no_hosts "$SCRIPT_TMP_DIR/run-excercise.sh" "stack@$guestnode:~/"
-    ssh_no_hosts  "stack@$guestnode" \ "~/run-excercise.sh"
+    ssh_no_hosts "stack@$OPENSTACK_GUEST_IP" \ "~/devstack/exercise.sh"
 fi
 
 if $RunTempest
 then
-    scp_no_hosts "$SCRIPT_TMP_DIR/run-tempest.sh" "stack@$guestnode:~/"
-    ssh_no_hosts  "stack@$guestnode" \ "~/run-tempest.sh"
+    scp_no_hosts "$SCRIPT_TMP_DIR/run-tempest.sh" "stack@$OPENSTACK_GUEST_IP:~/"
+    ssh_no_hosts  "stack@$OPENSTACK_GUEST_IP" \ "~/run-tempest.sh"
 fi
 
 echo "on-host exiting"
