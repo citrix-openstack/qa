@@ -50,20 +50,4 @@ wget --output-document=devstackubuntupreseed.cfg --no-check-certificate $Preseed
 #
 ./install_os_domU.sh
 
-#
-# Run some tests to make sure everything is working
-#
-if $RunExercises
-then
-    GUEST_NAME=${GUEST_NAME:-"DevStackOSDomU"} # TODO - pull from config
-    OPENSTACK_GUEST_IP=$(xe vm-list --minimal name-label=$GUEST_NAME params=networks | sed -ne 's,^.*3/ip: \([0-9.]*\).*$,\1,p')
-    ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "stack@$OPENSTACK_GUEST_IP" \ "~/devstack/exercise.sh"
-
-    if $RunTempest
-    then
-        scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$SCRIPT_TMP_DIR/run-tempest.sh" "stack@$OPENSTACK_GUEST_IP:~/"
-        ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "stack@$OPENSTACK_GUEST_IP" \ "~/run-tempest.sh"
-    fi
-fi
-
 echo "on-host exiting"

@@ -14,4 +14,6 @@ fi
 # Run exercise.sh
 ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "stack@$GUEST_IP" \ "~/devstack/exercise.sh"
 
-# TODO - run tempest
+# Run devstack on the DomU
+scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$SCRIPT_TMP_DIR/run-tempest.sh" "stack@$OPENSTACK_GUEST_IP:~/"
+ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "stack@$OPENSTACK_GUEST_IP" \ "~/run-tempest.sh"
