@@ -14,3 +14,6 @@ scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$thisdir/devsta
 
 # run test script
 ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$server" "$tmpdir/on-host-tests.sh"
+
+# clean up a little after the test
+ssh "$server" "rm -rf $tmpdir"
