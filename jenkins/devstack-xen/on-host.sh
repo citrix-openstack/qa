@@ -29,7 +29,7 @@ if [ "$GuestIp" != "false" ]
 then
     cat <<EOF >>localrc
 # appended by jenkins
-ENABLED_SERVICES=n-cpu,n-net,n-api
+ENABLED_SERVICES=n-cpu,n-net,n-api,g-api
 MYSQL_HOST=$GuestIp
 RABBIT_HOST=$GuestIp
 KEYSTONE_AUTH_HOST=$GuestIp
