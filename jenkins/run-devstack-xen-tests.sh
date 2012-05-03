@@ -2,16 +2,15 @@
 
 set -eux
 
-# Find IP address of master
-export GUEST_NAME=${GUEST_NAME:-"DevStackOSDomU"} # TODO - pull from config
-export GUEST_IP=$(ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$Server" "xe vm-list --minimal name-label=$GUEST_NAME params=networks | sed -ne 's,^.*3/ip: \([0-9.]*\).*$,\1,p'")
-if [ -z "$GUEST_IP" ]
-then
-  echo "Failed to find IP address of DevStack DomU on $Server1"
-  exit 1
-fi
+thisdir=$(dirname $(readlink -f "$0"))
 
-# Run exercise.sh
-ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "stack@$GUEST_IP" \ "~/devstack/exercise.sh"
+server=$Server
 
-# TODO - run tempest
+# copy over test script
+tmpdir=/tmp/jenkins_run_tests
+ssh "$server" "rm -rf $tmpdir"
+ssh "$server" "mkdir -p $tmpdir"
+scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$thisdir/devstack-xen/on-host-tests.sh" "$server:$tmpdir"
+
+# run test script
+ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$server" "$tmpdir/on-host-tests.sh"
