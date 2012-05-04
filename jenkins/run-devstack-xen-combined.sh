@@ -15,10 +15,10 @@ export Server=$Server1
 #
 # Install second host (compute slave)
 #
-. "$thisdir/run-devstack-multi.sh"
+. "$thisdir/run-devstack-xen-multi.sh"
 
 #
 # Run tests
 #
 export Server=$Server1
-. "$thisdir/run-devstack-tests.sh"
+. "$thisdir/run-devstack-xen-tests.sh"
