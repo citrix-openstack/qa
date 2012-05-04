@@ -26,8 +26,8 @@ server=$Server
 tmpdir=/tmp/jenkins_run_tests
 ssh "$server" "rm -rf $tmpdir"
 ssh "$server" "mkdir -p $tmpdir"
-scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$thisdir/devstack-xen/on-host-tests.sh" "root@$server:$tmpdir"
-scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$thisdir/devstack/run-tempest.sh" "root@$server:$tmpdir"
+scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$thisdir/on-host-tests.sh" "root@$server:$tmpdir"
+scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$thisdir/on-domu-run-tempest.sh" "root@$server:$tmpdir"
 
 #
 # Run tests
