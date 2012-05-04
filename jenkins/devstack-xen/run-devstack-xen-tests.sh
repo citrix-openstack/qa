@@ -26,10 +26,10 @@ server=$Server
 tmpdir=/tmp/jenkins_run_tests
 ssh "$server" "rm -rf $tmpdir"
 ssh "$server" "mkdir -p $tmpdir"
-scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$thisdir/devstack-xen/on-host-tests.sh" "$server:$tmpdir"
-scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$thisdir/devstack/run-tempest.sh" "$server:$tmpdir"
+scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$thisdir/devstack-xen/on-host-tests.sh" "root@$server:$tmpdir"
+scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$thisdir/devstack/run-tempest.sh" "root@$server:$tmpdir"
 
 #
 # Run tests
 #
-ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$server" "$tmpdir/on-host-tests.sh"
+ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "root@$server" "$tmpdir/on-host-tests.sh"

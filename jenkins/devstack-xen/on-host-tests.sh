@@ -35,5 +35,5 @@ ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "stack@$GUEST_IP
 # Run devstack on the DomU
 #
 # TODO(johngarbutt) - fixme - needs to be updated for latest Tempest
-# scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$thisdir/on-domu-run-tempest.sh" "stack@$OPENSTACK_GUEST_IP:~/"
-# ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "stack@$OPENSTACK_GUEST_IP" "~/on-domu-run-tempest.sh"
+# scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$thisdir/on-domu-run-tempest.sh" "stack@$GUEST_IP:~/"
+# ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "stack@$GUEST_IP" "~/on-domu-run-tempest.sh"

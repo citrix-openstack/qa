@@ -59,5 +59,5 @@ ssh "$server" "mkdir -p $SCRIPT_TMP_DIR"
 #
 # Run the next steps on the XenServer host
 #
-scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$thisdir/on-host-install.sh" "stack@$OPENSTACK_GUEST_IP:$SCRIPT_TMP_DIR"
-ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "stack@$OPENSTACK_GUEST_IP" "$SCRIPT_TMP_DIR/on-host-install.sh" "${RunExercises}" "${RunTempest}" "${DevStackURL}" "${localrcURL}" "${PreseedURL}" "${GuestIP}"
+scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$thisdir/on-host-install.sh" "root@$server:$SCRIPT_TMP_DIR"
+ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "root@$server" "$SCRIPT_TMP_DIR/on-host-install.sh" "${RunExercises}" "${RunTempest}" "${DevStackURL}" "${localrcURL}" "${PreseedURL}" "${GuestIP}"
