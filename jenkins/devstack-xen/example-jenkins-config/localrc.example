@@ -1,0 +1,73 @@
+# Example localrc file to use with Jenkins
+#
+# This needs to live on a webserver so the scripts can
+# download the localrc file into the DevStack DomU VM
+#
+# This assumes a XenServer with two interfaces.
+# - xenbr0: on a network with DHCP
+#          (used as public network
+#           but XenServer xenapi also listening)
+# - xenbr1: on an isolated network without DHCP
+#          (used as management network, but not really used)
+# - vmbr:   is created on VLAN 100 on eth0
+#          (used for the VM instance traffic
+
+MYSQL_PASSWORD=citrix
+SERVICE_TOKEN=citrix
+ADMIN_PASSWORD=citrix
+SERVICE_PASSWORD=citrix
+RABBIT_PASSWORD=citrix
+GUEST_PASSWORD=citrix
+# IMPORTANT: The following must be set to your dom0 root password!
+XENAPI_PASSWORD=XXXXXX
+
+# Things to make devstack work better with XenServer
+IMAGE_URLS=""
+VIRT_DRIVER=xenserver
+
+# Give extra time for VM to boot
+# due to lack of agent in image
+ACTIVE_TIMEOUT=500
+
+# test image doesn have the agent, so don't bother waiting too long
+# use the default SR, so we can use shared storage if we wish
+EXTRA_OPTS="agent_version_timeout=1 sr_matching_filter='default-sr:true'"
+# Use the Dom0 iptables driver
+XEN_FIREWALL_DRIVER=nova.virt.xenapi.firewall.Dom0IptablesFirewallDriver
+
+# DomU example networking config
+# given two nic XenServer described above
+# and the defaults already in DevStack scripts
+# see xenrc in DevStack for the defaults
+PUB_IP="dhcp"
+PUB_BR=xenbr0
+PUB_NETMASK=255.255.255.0
+
+MGT_IP=192.168.1.1
+MGT_NETMASK=255.255.255.0
+MGT_BR=xenbr1
+MGT_VLAN=-1
+
+# Use this to test a feature branch
+#NOVA_REPO=https://github.com/citrix-openstack/nova.git
+#NOVA_BRANCH=live-migration-trunk
+
+# turn off rate limit to help tempest
+API_RATE_LIMIT=False
+
+# Use DHCP on eth3 (public network) to install Ubuntu
+NETINSTALLIP="dhcp"
+NAMESERVERS=""
+NETMAST=""
+GATEWAY=""
+
+# Using eth3 for public and management networks
+# As described above
+HOST_IP_IFACE=eth3
+
+# Enable volume, on top default set of services
+ENABLED_SERVICES=g-api,g-reg,key,n-api,n-crt,n-obj,n-cpu,n-net,n-sch,n-novnc,n-xvnc,n-cauth,horizon,mysql,rabbit,n-vol
+
+# Use this name so when doing multi-host deployments
+# the network only needs the same name and not the same network id
+FLAT_NETWORK_BRIDGE="vmbr"
