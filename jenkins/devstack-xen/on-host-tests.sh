@@ -26,14 +26,32 @@ then
   exit 1
 fi
 
+# try all the tests, don't fail at first failure
+set +e
+
 #
 # Run exercise.sh
 #
 ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "stack@$GUEST_IP" \ "~/devstack/exercise.sh"
+EXERCISE_RESULT=$?
 
 #
 # Run devstack on the DomU
 #
-# TODO(johngarbutt) - fixme - needs to be updated for latest Tempest
-# scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$thisdir/on-domu-run-tempest.sh" "stack@$GUEST_IP:~/"
-# ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "stack@$GUEST_IP" "~/on-domu-run-tempest.sh"
+scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$thisdir/on-domu-run-tempest.sh" "stack@$GUEST_IP:~/"
+ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "stack@$GUEST_IP" "~/on-domu-run-tempest.sh"
+TEMPEST_RESULT=$?
+
+echo "*********************************"
+echo "Exercise Result: $EXERCISE_RESULT"
+echo "Tempest Result:  $TEMPEST_RESULT"
+echo "*********************************"
+
+if [ $EXERCISE_RESULT -eq 0 ] && [ $TEMPEST_RESULT -eq 0 ]
+then
+    echo "Success"
+    exit 0
+else
+    echo "Failure"
+    exit -1
+fi

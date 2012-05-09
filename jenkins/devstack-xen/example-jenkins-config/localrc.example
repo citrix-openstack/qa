@@ -31,7 +31,7 @@ ACTIVE_TIMEOUT=500
 
 # test image doesn have the agent, so don't bother waiting too long
 # use the default SR, so we can use shared storage if we wish
-EXTRA_OPTS="agent_version_timeout=1 sr_matching_filter='default-sr:true'"
+EXTRA_OPTS="agent_version_timeout=1 sr_matching_filter='default-sr:true' multi_host=true"
 # Use the Dom0 iptables driver
 XEN_FIREWALL_DRIVER=nova.virt.xenapi.firewall.Dom0IptablesFirewallDriver
 
