@@ -23,6 +23,7 @@ DevStackURL=$3
 LocalrcURL=$4
 PreseedURL=$5
 GuestIp=$6
+CleanTemplates=$7
 
 # Go into temp directory
 SCRIPT_TMP_DIR=/tmp/jenkins_test
@@ -61,6 +62,13 @@ VM_IP=10.255.255.254
 GUEST_NAME=DevStackComputeSlave
 EOF
 fi
+
+#
+# Add the clean templates setting
+#
+cat <<EOF >>localrc
+CLEAN_TEMPLATES=$CleanTemplates
+EOF
 
 #
 # Download preseed

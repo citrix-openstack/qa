@@ -22,6 +22,7 @@ thisdir=$(dirname $(readlink -f "$0"))
 # $DevStackURL - URL of the devstack zip file
 # $localrcURL - URL to the localrc file
 # $PreseedURL - URL to the ubuntu preseed URL
+# $CleanTemplates - If true, clean the templates
 #
 # Internal param:
 # $GuestIp - pram used to trigger localrc editing
@@ -44,6 +45,8 @@ RunTempest="${RunTempest-false}"
 DefaultPreseedURL="http://gold.eng.hq.xensource.com/devstackubuntupreseed.cfg"
 PreseedURL="${PreseedURL-$DefaultPreseedURL}"
 
+CleanTemplates="${CleanTemplates-false}"
+
 # GUEST_IP is used by run-devstack-xen-mutli
 # to trigger a re-write of the localrc file
 GuestIP="${GUEST_IP-false}"
@@ -60,4 +63,4 @@ ssh "$server" "mkdir -p $SCRIPT_TMP_DIR"
 # Run the next steps on the XenServer host
 #
 scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$thisdir/on-host-install.sh" "root@$server:$SCRIPT_TMP_DIR"
-ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "root@$server" "$SCRIPT_TMP_DIR/on-host-install.sh" "${RunExercises}" "${RunTempest}" "${DevStackURL}" "${localrcURL}" "${PreseedURL}" "${GuestIP}"
+ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "root@$server" "$SCRIPT_TMP_DIR/on-host-install.sh" "${RunExercises}" "${RunTempest}" "${DevStackURL}" "${localrcURL}" "${PreseedURL}" "${GuestIP}" "${CleanTemplates}"

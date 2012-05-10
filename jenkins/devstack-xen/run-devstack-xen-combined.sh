@@ -22,6 +22,7 @@
 # $DevStackURL - URL of the devstack zip file
 # $localrcURL - URL to the localrc file
 # $PreseedURL - URL to the ubuntu preseed URL
+# $CleanTemplates - If true, clean the templates
 
 set -eux
 thisdir=$(dirname $(readlink -f "$0"))
