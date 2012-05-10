@@ -57,7 +57,7 @@ KEYSTONE_AUTH_HOST=$GuestIp
 GLANCE_HOSTPORT=$GuestIp:9292
 
 # TODO - allow these to be configured
-MGT_IP=192.168.1.2
+PUB_IP=172.24.4.11
 VM_IP=10.255.255.254
 GUEST_NAME=DevStackComputeSlave
 EOF
