@@ -22,4 +22,4 @@ cd tempest
 #
 # Run tempest
 #
-nosetests -v tempest
+nosetests -v tempest -e "test_change_server_password"
