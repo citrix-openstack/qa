@@ -65,9 +65,12 @@ fi
 
 #
 # Add the clean templates setting
+# and correct the IP address for dom0
 #
+XenApiIP=`ifconfig xenbr0 | grep "inet addr" | cut -d ":" -f2 | sed "s/ .*//"`
 cat <<EOF >>localrc
 CLEAN_TEMPLATES=$CleanTemplates
+XENAPI_CONNECTION_URL="http://$XenApiIP"
 EOF
 
 #
