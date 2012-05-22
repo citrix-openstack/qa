@@ -71,6 +71,7 @@ XenApiIP=`ifconfig xenbr0 | grep "inet addr" | cut -d ":" -f2 | sed "s/ .*//"`
 cat <<EOF >>localrc
 CLEAN_TEMPLATES=$CleanTemplates
 XENAPI_CONNECTION_URL="http://$XenApiIP"
+VNCSERVER_PROXYCLIENT_ADDRESS=$XenApiIP
 EOF
 
 #
