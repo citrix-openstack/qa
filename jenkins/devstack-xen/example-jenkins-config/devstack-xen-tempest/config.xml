@@ -1,7 +1,11 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <project>
   <actions/>
-  <description>Run tests on an existing DevStack domU.</description>
+  <description>This runs tempest on the nova domU on the specified server.&#xd;
+&lt;br&gt;&#xd;
+This should be the server running nova-api/horizon etc, not a compute slave.&#xd;
+&lt;br&gt;&#xd;
+This runs-automatically after devstack-xen-combined</description>
   <logRotator>
     <daysToKeep>7</daysToKeep>
     <numToKeep>-1</numToKeep>
@@ -42,15 +46,18 @@
     <wipeOutWorkspace>false</wipeOutWorkspace>
     <pruneBranches>false</pruneBranches>
     <remotePoll>false</remotePoll>
+    <ignoreNotifyCommit>false</ignoreNotifyCommit>
     <buildChooser class="hudson.plugins.git.util.DefaultBuildChooser"/>
     <gitTool>Default</gitTool>
     <submoduleCfg class="list"/>
     <relativeTargetDir></relativeTargetDir>
+    <reference></reference>
     <excludedRegions></excludedRegions>
     <excludedUsers></excludedUsers>
     <gitConfigName></gitConfigName>
     <gitConfigEmail></gitConfigEmail>
     <skipTag>false</skipTag>
+    <includedRegions></includedRegions>
     <scmName></scmName>
   </scm>
   <assignedNode>santa-clara</assignedNode>
@@ -59,10 +66,10 @@
   <blockBuildWhenDownstreamBuilding>true</blockBuildWhenDownstreamBuilding>
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
   <triggers class="vector"/>
-  <concurrentBuild>false</concurrentBuild>
+  <concurrentBuild>true</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>jenkins/run-devstack-xen-tests.sh</command>
+      <command>jenkins/devstack-xen/run-devstack-xen-tempest.sh</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers/>

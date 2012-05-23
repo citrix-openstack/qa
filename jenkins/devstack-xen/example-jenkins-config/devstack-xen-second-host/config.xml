@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <project>
   <actions/>
-  <description>Installs two nodes, and joins them together.</description>
+  <description>Install a second host that has nova-compute, nova-network and nova-api running.</description>
   <logRotator>
     <daysToKeep>7</daysToKeep>
     <numToKeep>-1</numToKeep>
@@ -25,11 +25,11 @@
         <hudson.model.StringParameterDefinition>
           <name>localrcURL</name>
           <description>URL to your private localrc file</description>
-          <defaultValue></defaultValue>
+          <defaultValue>http://hostname/localrc</defaultValue>
         </hudson.model.StringParameterDefinition>
         <hudson.model.BooleanParameterDefinition>
           <name>CleanTemplates</name>
-          <description>Clean the templates</description>
+          <description>Cleans the templates</description>
           <defaultValue>false</defaultValue>
         </hudson.model.BooleanParameterDefinition>
         <hudson.model.StringParameterDefinition>
@@ -37,6 +37,16 @@
           <description>The URL to the zip ball of your devstack repo</description>
           <defaultValue>https://github.com/citrix-openstack/devstack/zipball/master</defaultValue>
         </hudson.model.StringParameterDefinition>
+        <hudson.model.BooleanParameterDefinition>
+          <name>RunExercises</name>
+          <description></description>
+          <defaultValue>false</defaultValue>
+        </hudson.model.BooleanParameterDefinition>
+        <hudson.model.BooleanParameterDefinition>
+          <name>RunTempest</name>
+          <description></description>
+          <defaultValue>false</defaultValue>
+        </hudson.model.BooleanParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
   </properties>
@@ -65,9 +75,6 @@
     <ignoreNotifyCommit>false</ignoreNotifyCommit>
     <buildChooser class="hudson.plugins.git.util.DefaultBuildChooser"/>
     <gitTool>Default</gitTool>
-    <browser class="hudson.plugins.git.browser.GithubWeb">
-      <url>http://github.com/citrix-openstack/qa/</url>
-    </browser>
     <submoduleCfg class="list"/>
     <relativeTargetDir></relativeTargetDir>
     <reference></reference>
@@ -88,22 +95,13 @@
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>jenkins/devstack-xen/run-devstack-xen-combined.sh</command>
+      <command>jenkins/devstack-xen/run-devstack-xen-multi.sh</command>
     </hudson.tasks.Shell>
   </builders>
-  <publishers>
-    <hudson.tasks.BuildTrigger>
-      <childProjects>devstack-xen-exercise</childProjects>
-      <threshold>
-        <name>SUCCESS</name>
-        <ordinal>0</ordinal>
-        <color>BLUE</color>
-      </threshold>
-    </hudson.tasks.BuildTrigger>
-  </publishers>
+  <publishers/>
   <buildWrappers>
     <hudson.plugins.build__timeout.BuildTimeoutWrapper>
-      <timeoutMinutes>180</timeoutMinutes>
+      <timeoutMinutes>90</timeoutMinutes>
       <failBuild>true</failBuild>
     </hudson.plugins.build__timeout.BuildTimeoutWrapper>
   </buildWrappers>

@@ -1,0 +1,73 @@
+MYSQL_PASSWORD=citrix
+SERVICE_TOKEN=citrix
+ADMIN_PASSWORD=citrix
+SERVICE_PASSWORD=citrix
+RABBIT_PASSWORD=citrix
+# This is the password for your guest (for both stack and root users)
+GUEST_PASSWORD=citrix
+# IMPORTANT: The following must be set to your dom0 root password!
+XENAPI_PASSWORD=asdf
+# Use our custom images
+#IMAGE_URLS="http://gold.eng.hq.xensource.com/images/GoldenImageNginx/golden-image-nginx.tar.gz"
+IMAGE_URLS="http://gold.eng.hq.xensource.com/images/TTY/tty.tgz"
+UPLOAD_LEGACY_TTY=
+# Explicitly set virt driver here
+VIRT_DRIVER=xenserver
+# Give extra time for boot
+ACTIVE_TIMEOUT=500
+# our deployments have network on every node
+MULTI_HOST=true
+
+# test image doesn have the agent, so don't bother waiting too long
+EXTRA_OPTS="agent_version_timeout=1 sr_matching_filter='default-sr:true' use_syslog=true"
+
+# MGMT network params
+MGT_IP="dhcp"
+MGT_NETMASK=255.255.255.0
+MGT_BR=xenbr0
+MGT_VLAN=-1
+MGT_DEV=eth0
+
+# Public network
+PUB_IP=172.24.4.10
+PUB_NETMASK=255.255.255.0
+PUB_BR=xenbr1
+PUB_VLAN=-1
+PUB_DEV=eth1
+
+# VM network params
+VM_IP=10.255.255.255
+VM_NETMASK=255.255.255.0
+VM_BR=""
+VM_VLAN=19
+VM_DEV=eth1
+
+# Use the name to help the multi-host case
+FLAT_NETWORK_BRIDGE="vmbr"
+
+# XenAPI is on mangement network
+HOST_IP_IFACE=eth2
+
+# Make sure the correct ip address is used
+MY_IP=$(ifconfig $HOST_IP_IFACE | grep "inet addr" | sed -ne 's,^.*addr:\([0-9.]*\).*$,\1,p')
+EXTRA_OPTS="$EXTRA_OPTS my_ip=$MY_IP iscsi_ip_address=$MY_IP"
+
+VDI_MB=3000
+OSDOMU_MEM_MB=2048
+XEN_FIREWALL_DRIVER=nova.virt.xenapi.firewall.Dom0IptablesFirewallDriver
+
+#NOVA_REPO=https://github.com/citrix-openstack/nova.git
+#NOVA_BRANCH=live-migration-trunk
+
+# turn off rate limit to help tempest
+API_RATE_LIMIT=False
+
+# ubuntu install params
+NETINSTALLIP="dhcp"
+NETINSTALL_IFACE=eth2
+NAMESERVERS=""
+NETMAST=""
+GATEWAY=""
+
+# boot from volume doesn't yet work on XenServer
+SKIP_EXERCISES="boot_from_volume"
