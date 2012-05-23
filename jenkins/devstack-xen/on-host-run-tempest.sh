@@ -6,8 +6,8 @@
 #
 # It does the following:
 # - find ip address of DevStack DomU
-# - run exercise.sh on DevStack DomU
-# - upload helper script and run Tempest on DevStack DomU
+# - upload helper script
+# - run Tempest on DevStack DomU
 #
 # It assumes the SSH keys on the XenServer were copied
 # into the DevStack DomU
@@ -26,32 +26,8 @@ then
   exit 1
 fi
 
-# try all the tests, don't fail at first failure
-set +e
-
-#
-# Run exercise.sh
-#
-ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "stack@$GUEST_IP" \ "~/devstack/exercise.sh"
-EXERCISE_RESULT=$?
-
 #
 # Run devstack on the DomU
 #
 scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$thisdir/on-domu-run-tempest.sh" "stack@$GUEST_IP:~/"
 ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "stack@$GUEST_IP" "~/on-domu-run-tempest.sh"
-TEMPEST_RESULT=$?
-
-echo "*********************************"
-echo "Exercise Result: $EXERCISE_RESULT"
-echo "Tempest Result:  $TEMPEST_RESULT"
-echo "*********************************"
-
-if [ $EXERCISE_RESULT -eq 0 ] && [ $TEMPEST_RESULT -eq 0 ]
-then
-    echo "Success"
-    exit 0
-else
-    echo "Failure"
-    exit -1
-fi

@@ -10,7 +10,7 @@
 #
 # This script does the following:
 # - creates a fresh temp directory on the XenServer
-# - uploads and runs the on-host-tests.sh script
+# - uploads and runs the on-host-run-exercise.sh script
 #
 # The parmaters expected are:
 # $Server - XenServer host that has a DevStack DomU VM
@@ -26,10 +26,9 @@ server=$Server
 tmpdir=/tmp/jenkins_run_tests
 ssh "$server" "rm -rf $tmpdir"
 ssh "$server" "mkdir -p $tmpdir"
-scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$thisdir/on-host-tests.sh" "root@$server:$tmpdir"
-scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$thisdir/on-domu-run-tempest.sh" "root@$server:$tmpdir"
+scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$thisdir/on-host-run-exercise.sh" "root@$server:$tmpdir"
 
 #
 # Run tests
 #
-ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "root@$server" "$tmpdir/on-host-tests.sh"
+ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "root@$server" "$tmpdir/on-host-run-exercise.sh"
