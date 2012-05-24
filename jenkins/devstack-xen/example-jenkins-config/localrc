@@ -5,7 +5,9 @@ SERVICE_PASSWORD=citrix
 RABBIT_PASSWORD=citrix
 # This is the password for your guest (for both stack and root users)
 GUEST_PASSWORD=citrix
+#
 # IMPORTANT: The following must be set to your dom0 root password!
+#
 XENAPI_PASSWORD=asdf
 # Use our custom images
 #IMAGE_URLS="http://gold.eng.hq.xensource.com/images/GoldenImageNginx/golden-image-nginx.tar.gz"
