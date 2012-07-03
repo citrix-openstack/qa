@@ -3,16 +3,21 @@
   <disabledAdministrativeMonitors>
     <string>hudson.node_monitors.MonitorMarkedNodeOffline</string>
   </disabledAdministrativeMonitors>
-  <version>1.418</version>
+  <version>1.457</version>
   <numExecutors>4</numExecutors>
-  <mode>NORMAL</mode>
+  <mode>EXCLUSIVE</mode>
   <useSecurity>true</useSecurity>
   <authorizationStrategy class="hudson.security.AuthorizationStrategy$Unsecured"/>
   <securityRealm class="hudson.security.PAMSecurityRealm">
     <serviceName>sshd</serviceName>
   </securityRealm>
-  <systemMessage>&lt;p style=&quot;text-align: center; margin-right: 50px&quot;&gt;&lt;img src=&quot;/static-images/citrix-openstack-cambridge-500.png&quot; /&gt;&lt;/p&gt;</systemMessage>
-  <markupFormatter class="hudson.markup.RawHtmlMarkupFormatter"/>
+  <projectNamingStrategy class="jenkins.model.ProjectNamingStrategy$DefaultProjectNamingStrategy"/>
+  <workspaceDir>${ITEM_ROOTDIR}/workspace</workspaceDir>
+  <buildsDir>${ITEM_ROOTDIR}/builds</buildsDir>
+  <systemMessage></systemMessage>
+  <markupFormatter class="hudson.markup.RawHtmlMarkupFormatter">
+    <disableSyntaxHighlighting>false</disableSyntaxHighlighting>
+  </markupFormatter>
   <jdks/>
   <viewsTabBar class="hudson.views.DefaultViewsTabBar"/>
   <myViewsTabBar class="hudson.views.DefaultMyViewsTabBar"/>
@@ -73,7 +78,7 @@
               <string>SITE</string>
               <string>rdm</string>
               <string>XS_ROOT_PASSWORD</string>
-          <string></string>
+              <string></string>
             </tree-map>
           </envVars>
         </hudson.slaves.EnvironmentVariablesNodeProperty>
@@ -104,7 +109,7 @@
               <string>SITE</string>
               <string>blr</string>
               <string>XS_ROOT_PASSWORD</string>
-          <string></string>
+              <string></string>
             </tree-map>
           </envVars>
         </hudson.slaves.EnvironmentVariablesNodeProperty>
@@ -125,15 +130,13 @@
             <unserializable-parents/>
             <tree-map>
               <default>
-                <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../../../../../slave/nodeProperties/hudson.slaves.EnvironmentVariablesNodeProperty/envVars/tree-map/default/comparator"/>
+                <comparator class="hudson.util.CaseInsensitiveComparator"/>
               </default>
-              <int>3</int>
+              <int>2</int>
               <string>PIP_DOWNLOAD_CACHE</string>
               <string>/var/cache/pip_download_cache</string>
               <string>SITE</string>
               <string>cmb</string>
-              <string>XS_ROOT_PASSWORD</string>
-          <string></string>
             </tree-map>
           </envVars>
         </hudson.slaves.EnvironmentVariablesNodeProperty>
@@ -154,89 +157,17 @@
     </hudson.model.AllView>
     <listView>
       <owner class="hudson" reference="../../.."/>
-      <name>OpenStack central</name>
-      <description>&lt;p style=&quot;text-align: center; margin-right: 50px&quot;&gt;&lt;img src=&quot;/static-images/citrix-openstack-cambridge-500.png&quot; /&gt;&lt;/p&gt;</description>
-      <filterExecutors>false</filterExecutors>
-      <filterQueue>false</filterQueue>
-      <properties class="hudson.model.View$PropertyList"/>
-      <jobNames class="tree-set">
-        <comparator class="hudson.util.CaseInsensitiveComparator"/>
-      </jobNames>
-      <jobFilters/>
-      <columns>
-        <hudson.views.StatusColumn/>
-        <hudson.views.WeatherColumn/>
-        <hudson.views.BuildButtonColumn/>
-        <hudson.plugins.favorite.column.FavoriteColumn/>
-        <hudson.views.JobColumn/>
-        <hudson.views.LastSuccessColumn/>
-        <hudson.plugins.column.console.LastSuccessfulBuildColumn/>
-        <hudson.views.LastFailureColumn/>
-        <hudson.plugins.column.console.LastFailedBuildColumn/>
-      </columns>
-      <includeRegex>unit-.*|func-(?!netsuite.*).*|os-vpx-.*</includeRegex>
-    </listView>
-    <listView>
-      <owner class="hudson" reference="../../.."/>
-      <name>Favourites</name>
-      <description>&lt;p style=&quot;text-align: center; margin-right: 50px&quot;&gt;&lt;img src=&quot;/static-images/citrix-openstack-cambridge-500.png&quot; /&gt;&lt;/p&gt;</description>
-      <filterExecutors>false</filterExecutors>
-      <filterQueue>false</filterQueue>
-      <properties class="hudson.model.View$PropertyList"/>
-      <jobNames class="tree-set">
-        <comparator class="hudson.util.CaseInsensitiveComparator"/>
-        <string>os-vpx-test-all</string>
-      </jobNames>
-      <jobFilters/>
-      <columns>
-        <hudson.views.StatusColumn/>
-        <hudson.views.WeatherColumn/>
-        <hudson.views.BuildButtonColumn/>
-        <hudson.plugins.favorite.column.FavoriteColumn/>
-        <hudson.views.JobColumn/>
-        <hudson.views.LastSuccessColumn/>
-        <hudson.plugins.column.console.LastSuccessfulBuildColumn/>
-        <hudson.views.LastFailureColumn/>
-        <hudson.plugins.column.console.LastFailedBuildColumn/>
-      </columns>
-    </listView>
-    <listView>
-      <owner class="hudson" reference="../../.."/>
-      <name>OpenStack all</name>
-      <description>&lt;p style=&quot;text-align: center; margin-right: 50px&quot;&gt;&lt;img src=&quot;/static-images/citrix-openstack-cambridge-500.png&quot; /&gt;&lt;/p&gt;</description>
-      <filterExecutors>false</filterExecutors>
-      <filterQueue>false</filterQueue>
-      <properties class="hudson.model.View$PropertyList"/>
-      <jobNames class="tree-set">
-        <comparator class="hudson.util.CaseInsensitiveComparator"/>
-        <string>os-vpx-build-cmb</string>
-      </jobNames>
-      <jobFilters/>
-      <columns>
-        <hudson.views.StatusColumn/>
-        <hudson.views.WeatherColumn/>
-        <hudson.views.BuildButtonColumn/>
-        <hudson.plugins.favorite.column.FavoriteColumn/>
-        <hudson.views.JobColumn/>
-        <hudson.views.LastSuccessColumn/>
-        <hudson.plugins.column.console.LastSuccessfulBuildColumn/>
-        <hudson.views.LastFailureColumn/>
-        <hudson.plugins.column.console.LastFailedBuildColumn/>
-      </columns>
-      <includeRegex>(?!(XenAPI|build-).*).*</includeRegex>
-    </listView>
-    <listView>
-      <owner class="hudson" reference="../../.."/>
       <name>Private Jobs</name>
       <filterExecutors>false</filterExecutors>
       <filterQueue>false</filterQueue>
       <properties class="hudson.model.View$PropertyList"/>
       <jobNames class="tree-set">
-        <comparator class="hudson.util.CaseInsensitiveComparator"/>
-        <string>devstack-soreta</string>
-        <string>private-dasara-singlehost-suite</string>
-        <string>private-netsuite-cloudsetup</string>
-        <string>private-netsuite-guest-networking</string>
+        <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../../slaves/slave[4]/nodeProperties/hudson.slaves.EnvironmentVariablesNodeProperty/envVars/tree-map/default/comparator"/>
+        <string>devstack-xen-second-host</string>
+        <string>devstack-xen-single-host</string>
+        <string>devstack-xen-test-exercise</string>
+        <string>devstack-xen-test-tempest</string>
+        <string>johngar-devstack-xen-combined</string>
       </jobNames>
       <jobFilters/>
       <columns>
@@ -247,31 +178,24 @@
         <hudson.views.LastFailureColumn/>
         <hudson.views.LastDurationColumn/>
         <hudson.views.BuildButtonColumn/>
-        <de.fspengler.hudson.pview.ConsoleViewColumn/>
-        <hudson.plugins.favorite.column.FavoriteColumn/>
-        <hudson.plugins.column.console.LastBuildColumn/>
-        <hudson.plugins.column.console.LastFailedBuildColumn/>
-        <hudson.plugins.column.console.LastStableBuildColumn/>
-        <hudson.plugins.column.console.LastSuccessfulBuildColumn/>
-        <hudson.plugins.column.console.LastUnstableBuildColumn/>
-        <hudson.plugins.column.console.LastUnsuccessfulBuildColumn/>
-        <hudson.plugins.projectstats.column.NumBuildsColumn/>
       </columns>
       <includeRegex>private-.*</includeRegex>
     </listView>
     <listView>
       <owner class="hudson" reference="../../.."/>
-      <name>Dasara</name>
+      <name>Folsom Trunk</name>
       <filterExecutors>false</filterExecutors>
       <filterQueue>false</filterQueue>
       <properties class="hudson.model.View$PropertyList"/>
       <jobNames class="tree-set">
         <comparator class="hudson.util.CaseInsensitiveComparator"/>
-        <string>dasara-func-geppetto-cmb</string>
-        <string>dasara-func-multihost-suite-sc</string>
-        <string>dasara-func-singlehost-suite-sc</string>
-        <string>os-vpx-build</string>
-        <string>os-vpx-test-all</string>
+        <string>suppack-xapi-plugins</string>
+        <string>trunk-devstack-xen</string>
+        <string>trunk-devstack-xen-exercise</string>
+        <string>trunk-devstack-xen-tempest</string>
+        <string>trunk-devstack-xentrunk</string>
+        <string>trunk-devstack-xentrunk-exercise</string>
+        <string>trunk-devstack-xentrunk-quantum</string>
       </jobNames>
       <jobFilters/>
       <columns>
@@ -282,15 +206,6 @@
         <hudson.views.LastFailureColumn/>
         <hudson.views.LastDurationColumn/>
         <hudson.views.BuildButtonColumn/>
-        <de.fspengler.hudson.pview.ConsoleViewColumn/>
-        <hudson.plugins.favorite.column.FavoriteColumn/>
-        <hudson.plugins.column.console.LastBuildColumn/>
-        <hudson.plugins.column.console.LastFailedBuildColumn/>
-        <hudson.plugins.column.console.LastStableBuildColumn/>
-        <hudson.plugins.column.console.LastSuccessfulBuildColumn/>
-        <hudson.plugins.column.console.LastUnstableBuildColumn/>
-        <hudson.plugins.column.console.LastUnsuccessfulBuildColumn/>
-        <hudson.plugins.projectstats.column.NumBuildsColumn/>
       </columns>
     </listView>
     <listView>
@@ -302,10 +217,6 @@
       <jobNames class="tree-set">
         <comparator class="hudson.util.CaseInsensitiveComparator"/>
         <string>cache-git-update-cmb</string>
-        <string>os-vpx-build-blr</string>
-        <string>os-vpx-build-cmb</string>
-        <string>os-vpx-build-manifest</string>
-        <string>os-vpx-build-sc</string>
       </jobNames>
       <jobFilters/>
       <columns>
@@ -316,22 +227,38 @@
         <hudson.views.LastFailureColumn/>
         <hudson.views.LastDurationColumn/>
         <hudson.views.BuildButtonColumn/>
-        <de.fspengler.hudson.pview.ConsoleViewColumn/>
-        <hudson.plugins.favorite.column.FavoriteColumn/>
-        <hudson.plugins.column.console.LastBuildColumn/>
-        <hudson.plugins.column.console.LastFailedBuildColumn/>
-        <hudson.plugins.column.console.LastStableBuildColumn/>
-        <hudson.plugins.column.console.LastSuccessfulBuildColumn/>
-        <hudson.plugins.column.console.LastUnstableBuildColumn/>
-        <hudson.plugins.column.console.LastUnsuccessfulBuildColumn/>
-        <hudson.plugins.projectstats.column.NumBuildsColumn/>
       </columns>
       <includeRegex>(build|cache)-.*</includeRegex>
+    </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>Essex Stable</name>
+      <description>Testing Essex Stable commits on zarss, running XenServer 6.0.2</description>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>false</filterQueue>
+      <properties class="hudson.model.View$PropertyList"/>
+      <jobNames class="tree-set">
+        <comparator class="hudson.util.CaseInsensitiveComparator"/>
+        <string>essex-stable-devstack-xen</string>
+        <string>essex-stable-devstack-xen-exercises</string>
+        <string>essex-stable-devstack-xen-tempest</string>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+        <hudson.views.BuildButtonColumn/>
+        <hudson.plugins.favorite.column.FavoriteColumn/>
+      </columns>
     </listView>
   </views>
   <primaryView>All</primaryView>
   <slaveAgentPort>0</slaveAgentPort>
-  <label>cambridge</label>
+  <label>santa-clara</label>
   <nodeProperties/>
   <globalNodeProperties>
     <hudson.slaves.EnvironmentVariablesNodeProperty>
@@ -339,7 +266,7 @@
         <unserializable-parents/>
         <tree-map>
           <default>
-            <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../../../../views/listView[3]/jobNames/comparator"/>
+            <comparator class="hudson.util.CaseInsensitiveComparator"/>
           </default>
           <int>5</int>
           <string>PIP_DEFAULT_TIMEOUT</string>
@@ -349,9 +276,9 @@
           <string>PIP_USE_MIRRORS</string>
           <string>true</string>
           <string>SITE</string>
-          <string>cam</string>
+          <string>sc</string>
           <string>XS_ROOT_PASSWORD</string>
-          <string></string>
+          <string>xenroot</string>
         </tree-map>
       </envVars>
     </hudson.slaves.EnvironmentVariablesNodeProperty>

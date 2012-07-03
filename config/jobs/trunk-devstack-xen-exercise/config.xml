@@ -1,22 +1,32 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <project>
   <actions/>
-  <description></description>
+  <description>This runs excercise.sh after devstack-xen-trunk completes</description>
   <logRotator>
-    <daysToKeep>-1</daysToKeep>
-    <numToKeep>10</numToKeep>
+    <daysToKeep>7</daysToKeep>
+    <numToKeep>-1</numToKeep>
     <artifactDaysToKeep>-1</artifactDaysToKeep>
     <artifactNumToKeep>-1</artifactNumToKeep>
   </logRotator>
   <keepDependencies>false</keepDependencies>
-  <properties/>
+  <properties>
+    <hudson.model.ParametersDefinitionProperty>
+      <parameterDefinitions>
+        <hudson.model.StringParameterDefinition>
+          <name>Server</name>
+          <description>XenServer hosting a master DevStack DomU instance.</description>
+          <defaultValue>megadodo.eng.hq.xensource.com</defaultValue>
+        </hudson.model.StringParameterDefinition>
+      </parameterDefinitions>
+    </hudson.model.ParametersDefinitionProperty>
+  </properties>
   <scm class="hudson.plugins.git.GitSCM">
     <configVersion>2</configVersion>
     <userRemoteConfigs>
       <hudson.plugins.git.UserRemoteConfig>
         <name>origin</name>
         <refspec>+refs/heads/*:refs/remotes/origin/*</refspec>
-        <url>https://github.com/citrix-openstack/infrastructure</url>
+        <url>http://github.com/citrix-openstack/qa</url>
       </hudson.plugins.git.UserRemoteConfig>
     </userRemoteConfigs>
     <branches>
@@ -46,23 +56,37 @@
     <includedRegions></includedRegions>
     <scmName></scmName>
   </scm>
-  <assignedNode>cambourne</assignedNode>
+  <assignedNode>santa-clara</assignedNode>
   <canRoam>false</canRoam>
-  <disabled>true</disabled>
-  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>true</blockBuildWhenDownstreamBuilding>
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
-  <triggers class="vector">
-    <hudson.triggers.TimerTrigger>
-      <spec>@daily</spec>
-    </hudson.triggers.TimerTrigger>
-  </triggers>
+  <triggers class="vector"/>
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>./cache-git-update
-</command>
+      <command>jenkins/devstack-xen/run-devstack-xen-exercise.sh</command>
     </hudson.tasks.Shell>
   </builders>
-  <publishers/>
-  <buildWrappers/>
+  <publishers>
+    <hudson.tasks.BuildTrigger>
+      <childProjects>trunk-devstack-xen-tempest</childProjects>
+      <threshold>
+        <name>SUCCESS</name>
+        <ordinal>0</ordinal>
+        <color>BLUE</color>
+      </threshold>
+    </hudson.tasks.BuildTrigger>
+    <hudson.tasks.Mailer>
+      <recipients>john.garbutt@citrix.com</recipients>
+      <dontNotifyEveryUnstableBuild>false</dontNotifyEveryUnstableBuild>
+      <sendToIndividuals>false</sendToIndividuals>
+    </hudson.tasks.Mailer>
+  </publishers>
+  <buildWrappers>
+    <hudson.plugins.build__timeout.BuildTimeoutWrapper>
+      <timeoutMinutes>90</timeoutMinutes>
+      <failBuild>true</failBuild>
+    </hudson.plugins.build__timeout.BuildTimeoutWrapper>
+  </buildWrappers>
 </project>

@@ -39,7 +39,7 @@
     <skipTag>false</skipTag>
     <scmName></scmName>
   </scm>
-  <assignedNode>cambridge</assignedNode>
+  <assignedNode>santa-clara/assignedNode>
   <canRoam>false</canRoam>
   <disabled>false</disabled>
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>

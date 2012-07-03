@@ -24,26 +24,31 @@
         <name>**</name>
       </hudson.plugins.git.BranchSpec>
     </branches>
+    <disableSubmodules>false</disableSubmodules>
     <recursiveSubmodules>false</recursiveSubmodules>
     <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
     <authorOrCommitter>false</authorOrCommitter>
     <clean>true</clean>
     <wipeOutWorkspace>false</wipeOutWorkspace>
     <pruneBranches>false</pruneBranches>
+    <remotePoll>false</remotePoll>
+    <ignoreNotifyCommit>false</ignoreNotifyCommit>
     <buildChooser class="hudson.plugins.git.util.DefaultBuildChooser"/>
     <gitTool>Default</gitTool>
     <submoduleCfg class="list"/>
     <relativeTargetDir></relativeTargetDir>
+    <reference></reference>
     <excludedRegions></excludedRegions>
     <excludedUsers></excludedUsers>
     <gitConfigName></gitConfigName>
     <gitConfigEmail></gitConfigEmail>
     <skipTag>false</skipTag>
+    <includedRegions></includedRegions>
     <scmName></scmName>
   </scm>
   <assignedNode>bengaluru</assignedNode>
   <canRoam>false</canRoam>
-  <disabled>false</disabled>
+  <disabled>true</disabled>
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
   <triggers class="vector">
