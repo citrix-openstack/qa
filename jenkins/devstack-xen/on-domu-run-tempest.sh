@@ -8,6 +8,8 @@
 set -o errexit
 set -o xtrace
 
+TEMPEST_PARAMS=$1
+
 # get nova branch
 BRANCH=$(cat /opt/stack/nova/.git/HEAD | sed -ne 's,^.*heads/\([a-x0-9/]*\)$,\1,p')
 
@@ -26,4 +28,4 @@ git checkout $BRANCH
 #
 # Run tempest
 #
-nosetests --attr=type=smoke -v tempest -e "test_change_server_password"
+nosetests $TEMPEST_PARAMS -v tempest -e "test_change_server_password"
