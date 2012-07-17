@@ -18,7 +18,7 @@
 set -eux
 thisdir=$(dirname $(readlink -f "$0"))
 server=$Server
-TEMPEST_PARAMS=${TempestParams:-"--attr=type=smoke"}
+TEMPEST_PARAMS=${TempestParams:-""}
 
 #
 # Copy over test scripts
