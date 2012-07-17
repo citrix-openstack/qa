@@ -12,10 +12,11 @@
 # It assumes the SSH keys on the XenServer were copied
 # into the DevStack DomU
 
-set -eux
+set -o errexit
+set -o xtrace
 thisdir=$(dirname $(readlink -f "$0"))
 
-TEMPEST_PARAMS=$1
+TEMPEST_PARAMS=${1-""}
 
 #
 # Find IP address of master
