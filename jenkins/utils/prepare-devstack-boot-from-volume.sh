@@ -81,7 +81,7 @@ nova-manage sm flavor_create gold "Not all that glitters"
 echo -e "y\n" | nova-manage sm backend_add gold nfs name_label=mybackend server=copper serverpath=/bootfromvolume
 
 # Start nova-volume
-NL=$(echo -e "\n")
+NL=`echo -ne '\015'`
 screen -S stack -p n-vol -X stuff "cd /opt/stack/nova && /opt/stack/nova/bin/nova-volume$NL"
 sleep 2
 
