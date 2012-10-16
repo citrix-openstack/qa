@@ -45,6 +45,8 @@ git checkout master
 git checkout fb101685cc14ed9b0396ce966e571d3fb457c32f
 # Apply John's patch - otherwise n-vol fails to start
 wget -qO - "https://review.openstack.org/gitweb?p=openstack/nova.git;a=commitdiff_plain;h=bb0682fc193833a4ef7c27085ea7c1be31139102" | patch -p1
+# Apply Renuka's patch
+wget -qO - "https://review.openstack.org/gitweb?p=openstack/nova.git;a=commitdiff_plain;h=2b96874dad5000ecfe22df209b6aad9d7f87971c" | patch -p1
 )
 
 ##################################################
