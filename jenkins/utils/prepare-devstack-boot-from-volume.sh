@@ -42,7 +42,8 @@ EOLOC
 cd nova 
 git checkout -- .
 git checkout master
-git checkout fb101685cc14ed9b0396ce966e571d3fb457c32f
+# As the fixed IP bug is already fixed, we can go with trunk.
+# git checkout fb101685cc14ed9b0396ce966e571d3fb457c32f
 # Apply John's patch - otherwise n-vol fails to start
 wget -qO - "https://review.openstack.org/gitweb?p=openstack/nova.git;a=commitdiff_plain;h=bb0682fc193833a4ef7c27085ea7c1be31139102" | patch -p1
 # Apply Renuka's patch
@@ -86,8 +87,3 @@ echo -e "y\n" | nova-manage sm backend_add gold nfs name_label=mybackend server=
 NL=`echo -ne '\015'`
 screen -S stack -p n-vol -X stuff "cd /opt/stack/nova && /opt/stack/nova/bin/nova-volume$NL"
 sleep 2
-
-##################################################
-### RUNNING exercise.sh
-##################################################
-# ./exercise.sh
