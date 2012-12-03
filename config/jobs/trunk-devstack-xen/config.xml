@@ -48,11 +48,6 @@ It then triggers devstack-xen-trunk-tests, if successful.</description>
         </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
-    <hudson.plugins.promoted__builds.JobPropertyImpl plugin="promoted-builds@2.8">
-      <activeProcessNames>
-        <string>AllTestsPassed</string>
-      </activeProcessNames>
-    </hudson.plugins.promoted__builds.JobPropertyImpl>
   </properties>
   <scm class="hudson.plugins.git.GitSCM" plugin="git@1.1.26">
     <configVersion>2</configVersion>
@@ -124,7 +119,7 @@ git checkout master
       </threshold>
     </hudson.tasks.BuildTrigger>
     <hudson.tasks.Mailer>
-      <recipients>john.garbutt@citrix.com mate.lakat@citrix.com renuka.apte@citrix.com</recipients>
+      <recipients>openstack@citrix.com</recipients>
       <dontNotifyEveryUnstableBuild>false</dontNotifyEveryUnstableBuild>
       <sendToIndividuals>false</sendToIndividuals>
     </hudson.tasks.Mailer>

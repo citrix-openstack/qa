@@ -85,7 +85,7 @@
       </threshold>
     </hudson.tasks.BuildTrigger>
     <hudson.tasks.Mailer>
-      <recipients>john.garbutt@citrix.com mate.lakat@citrix.com renuka.apte@citrix.com</recipients>
+      <recipients>openstack@citrix.com</recipients>
       <dontNotifyEveryUnstableBuild>false</dontNotifyEveryUnstableBuild>
       <sendToIndividuals>false</sendToIndividuals>
     </hudson.tasks.Mailer>

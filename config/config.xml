@@ -4,7 +4,7 @@
     <string>hudson.node_monitors.MonitorMarkedNodeOffline</string>
   </disabledAdministrativeMonitors>
   <version>1.492</version>
-  <numExecutors>4</numExecutors>
+  <numExecutors>0</numExecutors>
   <mode>EXCLUSIVE</mode>
   <useSecurity>true</useSecurity>
   <authorizationStrategy class="hudson.security.AuthorizationStrategy$Unsecured"/>

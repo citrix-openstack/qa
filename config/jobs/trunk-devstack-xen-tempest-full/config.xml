@@ -78,7 +78,7 @@ It runs all the tests, no just the smoke tests.</description>
   </builders>
   <publishers>
     <hudson.tasks.Mailer>
-      <recipients>john.garbutt@citrix.com</recipients>
+      <recipients>openstack@citrix.com</recipients>
       <dontNotifyEveryUnstableBuild>false</dontNotifyEveryUnstableBuild>
       <sendToIndividuals>false</sendToIndividuals>
     </hudson.tasks.Mailer>
