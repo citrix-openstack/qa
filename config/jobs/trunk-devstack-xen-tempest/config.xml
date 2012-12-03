@@ -17,14 +17,68 @@
           <description>XenServer hosting a master DevStack DomU instance.</description>
           <defaultValue>megadodo.eng.hq.xensource.com</defaultValue>
         </hudson.model.StringParameterDefinition>
-        <hudson.model.StringParameterDefinition>
-          <name>TempestParams</name>
-          <description>The extra prams sent when starting the tempest tests, such as:
---attr=type=smoke</description>
-          <defaultValue>--attr=type=smoke</defaultValue>
-        </hudson.model.StringParameterDefinition>
       </parameterDefinitions>
     </hudson.model.ParametersDefinitionProperty>
+    <com.sonyericsson.jenkins.plugins.externalresource.dispatcher.SelectionCriteria plugin="externalresource-dispatcher@1.0b">
+      <selectionEnabled>false</selectionEnabled>
+    </com.sonyericsson.jenkins.plugins.externalresource.dispatcher.SelectionCriteria>
+    <job-metadata plugin="metadata@1.0b">
+      <values class="linked-list">
+        <metadata-tree>
+          <name>job-info</name>
+          <parent class="job-metadata" reference="../../.."/>
+          <generated>true</generated>
+          <exposedToEnvironment>false</exposedToEnvironment>
+          <children class="linked-list">
+            <metadata-tree>
+              <name>last-saved</name>
+              <description></description>
+              <parent class="metadata-tree" reference="../../.."/>
+              <generated>true</generated>
+              <exposedToEnvironment>false</exposedToEnvironment>
+              <children class="linked-list">
+                <metadata-date>
+                  <name>time</name>
+                  <description></description>
+                  <parent class="metadata-tree" reference="../../.."/>
+                  <generated>true</generated>
+                  <exposedToEnvironment>false</exposedToEnvironment>
+                  <value>
+                    <time>1354558517643</time>
+                    <timezone>Etc/UTC</timezone>
+                  </value>
+                  <checked>false</checked>
+                </metadata-date>
+                <metadata-tree>
+                  <name>user</name>
+                  <parent class="metadata-tree" reference="../../.."/>
+                  <generated>true</generated>
+                  <exposedToEnvironment>false</exposedToEnvironment>
+                  <children class="linked-list">
+                    <metadata-string>
+                      <name>display-name</name>
+                      <description></description>
+                      <parent class="metadata-tree" reference="../../.."/>
+                      <generated>true</generated>
+                      <exposedToEnvironment>false</exposedToEnvironment>
+                      <value>unknown</value>
+                    </metadata-string>
+                    <metadata-string>
+                      <name>full-name</name>
+                      <description></description>
+                      <parent class="metadata-tree" reference="../../.."/>
+                      <generated>true</generated>
+                      <exposedToEnvironment>false</exposedToEnvironment>
+                      <value>unknown</value>
+                    </metadata-string>
+                  </children>
+                </metadata-tree>
+              </children>
+            </metadata-tree>
+          </children>
+        </metadata-tree>
+      </values>
+    </job-metadata>
   </properties>
   <scm class="hudson.plugins.git.GitSCM" plugin="git@1.1.26">
     <configVersion>2</configVersion>
@@ -72,7 +126,8 @@
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>jenkins/devstack-xen/run-devstack-xen-tempest.sh</command>
+      <command>export TempestParams=&quot;--attr=type=smoke&quot;
+jenkins/devstack-xen/run-devstack-xen-tempest.sh</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers>

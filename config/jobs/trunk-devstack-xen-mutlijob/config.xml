@@ -1,55 +1,11 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<project>
+<com.tikal.jenkins.plugins.multijob.MultiJobProject plugin="jenkins-multijob-plugin@1.7">
   <actions/>
-  <description>This test polls nova trunk, and builds when people checkin to trunk.&#xd;
-&lt;br&gt;&#xd;
-It installs DevStack on two servers, and joins them together.&#xd;
-&lt;br&gt;&#xd;
-It then triggers devstack-xen-trunk-tests, if successful.</description>
-  <logRotator>
-    <daysToKeep>7</daysToKeep>
-    <numToKeep>50</numToKeep>
-    <artifactDaysToKeep>-1</artifactDaysToKeep>
-    <artifactNumToKeep>-1</artifactNumToKeep>
-  </logRotator>
+  <description></description>
   <keepDependencies>false</keepDependencies>
   <properties>
-    <hudson.model.ParametersDefinitionProperty>
-      <parameterDefinitions>
-        <hudson.model.BooleanParameterDefinition>
-          <name>CleanTemplates</name>
-          <description>Clean the templates</description>
-          <defaultValue>false</defaultValue>
-        </hudson.model.BooleanParameterDefinition>
-        <hudson.model.StringParameterDefinition>
-          <name>DevStackURL</name>
-          <description>&lt;h2&gt;The URL to the zip ball of your devstack repo&lt;/h2&gt;
-&lt;ul&gt;
- &lt;li&gt;https://github.com/openstack-dev/devstack/zipball/master&lt;/li&gt;
- &lt;li&gt;https://github.com/citrix-openstack/devstack/zipball/xenserver-ci-improvements&lt;/li&gt;
- &lt;li&gt;https://github.com/citrix-openstack/devstack/zipball/fix-tgt-config&lt;/li&gt;
-&lt;/ul&gt;</description>
-          <defaultValue>https://github.com/citrix-openstack-build/devstack/zipball/master</defaultValue>
-        </hudson.model.StringParameterDefinition>
-        <hudson.model.StringParameterDefinition>
-          <name>PreseedURL</name>
-          <description></description>
-          <defaultValue>http://copper.eng.hq.xensource.com/devstackubuntupreseed.cfg</defaultValue>
-        </hudson.model.StringParameterDefinition>
-        <hudson.model.StringParameterDefinition>
-          <name>Server</name>
-          <description></description>
-          <defaultValue></defaultValue>
-        </hudson.model.StringParameterDefinition>
-        <hudson.model.StringParameterDefinition>
-          <name>localrcURL</name>
-          <description></description>
-          <defaultValue></defaultValue>
-        </hudson.model.StringParameterDefinition>
-      </parameterDefinitions>
-    </hudson.model.ParametersDefinitionProperty>
     <com.sonyericsson.jenkins.plugins.externalresource.dispatcher.SelectionCriteria plugin="externalresource-dispatcher@1.0b">
-      <selectionEnabled>false</selectionEnabled>
+      <selectionEnabled>true</selectionEnabled>
       <resourceSelectionList>
         <com.sonyericsson.jenkins.plugins.externalresource.dispatcher.selection.StringResourceSelection>
           <name>numberOfServers</name>
@@ -79,7 +35,7 @@ It then triggers devstack-xen-trunk-tests, if successful.</description>
                   <generated>true</generated>
                   <exposedToEnvironment>false</exposedToEnvironment>
                   <value>
-                    <time>1354559476137</time>
+                    <time>1354559491609</time>
                     <timezone>Etc/UTC</timezone>
                   </value>
                   <checked>false</checked>
@@ -119,21 +75,21 @@ It then triggers devstack-xen-trunk-tests, if successful.</description>
     <configVersion>2</configVersion>
     <userRemoteConfigs>
       <hudson.plugins.git.UserRemoteConfig>
-        <name>origin</name>
-        <refspec>+refs/heads/*:refs/remotes/origin/*</refspec>
-        <url>http://github.com/citrix-openstack/qa.git</url>
+        <name></name>
+        <refspec></refspec>
+        <url>http://github.com/openstack/nova.git</url>
       </hudson.plugins.git.UserRemoteConfig>
     </userRemoteConfigs>
     <branches>
       <hudson.plugins.git.BranchSpec>
-        <name>**</name>
+        <name>master</name>
       </hudson.plugins.git.BranchSpec>
     </branches>
     <disableSubmodules>false</disableSubmodules>
     <recursiveSubmodules>false</recursiveSubmodules>
     <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
     <authorOrCommitter>false</authorOrCommitter>
-    <clean>true</clean>
+    <clean>false</clean>
     <wipeOutWorkspace>false</wipeOutWorkspace>
     <pruneBranches>false</pruneBranches>
     <remotePoll>false</remotePoll>
@@ -141,9 +97,6 @@ It then triggers devstack-xen-trunk-tests, if successful.</description>
     <useShallowClone>false</useShallowClone>
     <buildChooser class="hudson.plugins.git.util.DefaultBuildChooser"/>
     <gitTool>Default</gitTool>
-    <browser class="hudson.plugins.git.browser.GithubWeb">
-      <url>http://github.com/openstack/nova/</url>
-    </browser>
     <submoduleCfg class="list"/>
     <relativeTargetDir></relativeTargetDir>
     <reference></reference>
@@ -157,30 +110,65 @@ It then triggers devstack-xen-trunk-tests, if successful.</description>
   </scm>
   <canRoam>true</canRoam>
   <disabled>false</disabled>
-  <blockBuildWhenDownstreamBuilding>true</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
-  <triggers class="vector"/>
+  <triggers class="vector">
+    <hudson.triggers.SCMTrigger>
+      <spec>*/30 * * * *</spec>
+    </hudson.triggers.SCMTrigger>
+  </triggers>
   <concurrentBuild>false</concurrentBuild>
   <builders>
-    <hudson.tasks.Shell>
-      <command>jenkins/devstack-xen/run-devstack-xen.sh</command>
-    </hudson.tasks.Shell>
+    <com.tikal.jenkins.plugins.multijob.MultiJobBuilder>
+      <phaseName>install-devstack</phaseName>
+      <phaseJobs>
+        <com.tikal.jenkins.plugins.multijob.PhaseJobsConfig>
+          <jobName>trunk-devstack-xen</jobName>
+          <currParams>true</currParams>
+          <exposedSCM>false</exposedSCM>
+          <configs>
+            <com.tikal.jenkins.plugins.multijob.PredefinedBuildParameters>
+              <jobProperties>localrcURL=$MD_EXTERNAL_RESOURCES_LOCKED_LOCALRCURL
+Server=$MD_EXTERNAL_RESOURCES_LOCKED_SERVER</jobProperties>
+            </com.tikal.jenkins.plugins.multijob.PredefinedBuildParameters>
+          </configs>
+        </com.tikal.jenkins.plugins.multijob.PhaseJobsConfig>
+      </phaseJobs>
+      <continuationCondition>SUCCESSFUL</continuationCondition>
+    </com.tikal.jenkins.plugins.multijob.MultiJobBuilder>
+    <com.tikal.jenkins.plugins.multijob.MultiJobBuilder>
+      <phaseName>run-exercises</phaseName>
+      <phaseJobs>
+        <com.tikal.jenkins.plugins.multijob.PhaseJobsConfig>
+          <jobName>trunk-devstack-xen-exercise</jobName>
+          <currParams>true</currParams>
+          <exposedSCM>false</exposedSCM>
+          <configs>
+            <com.tikal.jenkins.plugins.multijob.PredefinedBuildParameters>
+              <jobProperties>Server=$MD_EXTERNAL_RESOURCES_LOCKED_SERVER</jobProperties>
+            </com.tikal.jenkins.plugins.multijob.PredefinedBuildParameters>
+          </configs>
+        </com.tikal.jenkins.plugins.multijob.PhaseJobsConfig>
+      </phaseJobs>
+      <continuationCondition>SUCCESSFUL</continuationCondition>
+    </com.tikal.jenkins.plugins.multijob.MultiJobBuilder>
+    <com.tikal.jenkins.plugins.multijob.MultiJobBuilder>
+      <phaseName>run-tempest</phaseName>
+      <phaseJobs>
+        <com.tikal.jenkins.plugins.multijob.PhaseJobsConfig>
+          <jobName>trunk-devstack-xen-tempest</jobName>
+          <currParams>true</currParams>
+          <exposedSCM>false</exposedSCM>
+          <configs>
+            <com.tikal.jenkins.plugins.multijob.PredefinedBuildParameters>
+              <jobProperties>Server=$MD_EXTERNAL_RESOURCES_LOCKED_SERVER</jobProperties>
+            </com.tikal.jenkins.plugins.multijob.PredefinedBuildParameters>
+          </configs>
+        </com.tikal.jenkins.plugins.multijob.PhaseJobsConfig>
+      </phaseJobs>
+      <continuationCondition>SUCCESSFUL</continuationCondition>
+    </com.tikal.jenkins.plugins.multijob.MultiJobBuilder>
   </builders>
-  <publishers>
-    <hudson.tasks.Mailer>
-      <recipients>openstack@citrix.com</recipients>
-      <dontNotifyEveryUnstableBuild>false</dontNotifyEveryUnstableBuild>
-      <sendToIndividuals>false</sendToIndividuals>
-    </hudson.tasks.Mailer>
-  </publishers>
-  <buildWrappers>
-    <hudson.plugins.build__timeout.BuildTimeoutWrapper plugin="build-timeout@1.11">
-      <timeoutMinutes>120</timeoutMinutes>
-      <failBuild>false</failBuild>
-      <writingDescription>false</writingDescription>
-      <timeoutPercentage>0</timeoutPercentage>
-      <timeoutType>absolute</timeoutType>
-      <timeoutMinutesElasticDefault>3</timeoutMinutesElasticDefault>
-    </hudson.plugins.build__timeout.BuildTimeoutWrapper>
-  </buildWrappers>
-</project>
+  <publishers/>
+  <buildWrappers/>
+</com.tikal.jenkins.plugins.multijob.MultiJobProject>

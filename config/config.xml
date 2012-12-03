@@ -35,7 +35,64 @@
         <password>rNS3tUnlQfEmCun0o+A5ww==</password>
       </launcher>
       <label>santa-clara</label>
-      <nodeProperties/>
+      <nodeProperties>
+        <node-metadata plugin="metadata@1.0b">
+          <values>
+            <com.sonyericsson.jenkins.plugins.externalresource.dispatcher.data.ExternalResourceTreeNode plugin="externalresource-dispatcher@1.0b">
+              <name>XenServers</name>
+              <parent class="node-metadata" reference="../../.."/>
+              <generated>false</generated>
+              <exposedToEnvironment>true</exposedToEnvironment>
+              <children>
+                <external-resource>
+                  <name>zarss</name>
+                  <description></description>
+                  <parent class="com.sonyericsson.jenkins.plugins.externalresource.dispatcher.data.ExternalResourceTreeNode" reference="../../.."/>
+                  <generated>false</generated>
+                  <exposedToEnvironment>false</exposedToEnvironment>
+                  <children>
+                    <metadata-string plugin="metadata@1.0b">
+                      <name>version</name>
+                      <parent class="external-resource" reference="../../.."/>
+                      <generated>false</generated>
+                      <exposedToEnvironment>false</exposedToEnvironment>
+                      <value>6.1</value>
+                    </metadata-string>
+                    <metadata-string plugin="metadata@1.0b">
+                      <name>Server</name>
+                      <parent class="external-resource" reference="../../.."/>
+                      <generated>false</generated>
+                      <exposedToEnvironment>false</exposedToEnvironment>
+                      <value>zarss.eng.hq.xensource.com</value>
+                    </metadata-string>
+                    <metadata-string plugin="metadata@1.0b">
+                      <name>localrcURL</name>
+                      <parent class="external-resource" reference="../../.."/>
+                      <generated>false</generated>
+                      <exposedToEnvironment>false</exposedToEnvironment>
+                      <value>http://copper.eng.hq.xensource.com/localrc-zarss</value>
+                    </metadata-string>
+                    <metadata-number plugin="metadata@1.0b">
+                      <name>numberOfServers</name>
+                      <parent class="external-resource" reference="../../.."/>
+                      <generated>false</generated>
+                      <exposedToEnvironment>false</exposedToEnvironment>
+                      <value>1</value>
+                    </metadata-number>
+                  </children>
+                  <id>zarss</id>
+                  <locked>
+                    <stashedBy>job/trunk-devstack-xen-mutlijob/8/</stashedBy>
+                    <type>INTERNAL</type>
+                    <key>noop</key>
+                  </locked>
+                  <enabled>true</enabled>
+                </external-resource>
+              </children>
+            </com.sonyericsson.jenkins.plugins.externalresource.dispatcher.data.ExternalResourceTreeNode>
+          </values>
+        </node-metadata>
+      </nodeProperties>
       <userId>anonymous</userId>
     </slave>
   </slaves>
@@ -48,105 +105,6 @@
       <filterExecutors>false</filterExecutors>
       <filterQueue>false</filterQueue>
     </hudson.model.AllView>
-    <listView>
-      <owner class="hudson" reference="../../.."/>
-      <name>Private Jobs</name>
-      <filterExecutors>false</filterExecutors>
-      <filterQueue>false</filterQueue>
-      <properties class="hudson.model.View$PropertyList"/>
-      <jobNames class="tree-set">
-        <comparator class="hudson.util.CaseInsensitiveComparator"/>
-        <string>devstack-xen-second-host</string>
-        <string>devstack-xen-single-host</string>
-        <string>devstack-xen-test-exercise</string>
-        <string>devstack-xen-test-tempest</string>
-        <string>johngar-devstack-xen-combined</string>
-      </jobNames>
-      <jobFilters/>
-      <columns>
-        <hudson.views.StatusColumn/>
-        <hudson.views.WeatherColumn/>
-        <hudson.views.JobColumn/>
-        <hudson.views.LastSuccessColumn/>
-        <hudson.views.LastFailureColumn/>
-        <hudson.views.LastDurationColumn/>
-        <hudson.views.BuildButtonColumn/>
-      </columns>
-      <includeRegex>private-.*</includeRegex>
-    </listView>
-    <listView>
-      <owner class="hudson" reference="../../.."/>
-      <name>Folsom Trunk</name>
-      <filterExecutors>false</filterExecutors>
-      <filterQueue>false</filterQueue>
-      <properties class="hudson.model.View$PropertyList"/>
-      <jobNames class="tree-set">
-        <comparator class="hudson.util.CaseInsensitiveComparator"/>
-        <string>suppack-xapi-plugins</string>
-        <string>trunk-devstack-xen</string>
-        <string>trunk-devstack-xen-exercise</string>
-        <string>trunk-devstack-xen-tempest</string>
-        <string>trunk-devstack-xentrunk</string>
-        <string>trunk-devstack-xentrunk-exercise</string>
-        <string>trunk-devstack-xentrunk-quantum</string>
-      </jobNames>
-      <jobFilters/>
-      <columns>
-        <hudson.views.StatusColumn/>
-        <hudson.views.WeatherColumn/>
-        <hudson.views.JobColumn/>
-        <hudson.views.LastSuccessColumn/>
-        <hudson.views.LastFailureColumn/>
-        <hudson.views.LastDurationColumn/>
-        <hudson.views.BuildButtonColumn/>
-      </columns>
-    </listView>
-    <listView>
-      <owner class="hudson" reference="../../.."/>
-      <name>Infrastructure</name>
-      <filterExecutors>false</filterExecutors>
-      <filterQueue>false</filterQueue>
-      <properties class="hudson.model.View$PropertyList"/>
-      <jobNames class="tree-set">
-        <comparator class="hudson.util.CaseInsensitiveComparator"/>
-        <string>cache-git-update-cmb</string>
-      </jobNames>
-      <jobFilters/>
-      <columns>
-        <hudson.views.StatusColumn/>
-        <hudson.views.WeatherColumn/>
-        <hudson.views.JobColumn/>
-        <hudson.views.LastSuccessColumn/>
-        <hudson.views.LastFailureColumn/>
-        <hudson.views.LastDurationColumn/>
-        <hudson.views.BuildButtonColumn/>
-      </columns>
-      <includeRegex>(build|cache)-.*</includeRegex>
-    </listView>
-    <listView>
-      <owner class="hudson" reference="../../.."/>
-      <name>Essex Stable</name>
-      <description>Testing Essex Stable commits on zarss, running XenServer 6.0.2</description>
-      <filterExecutors>false</filterExecutors>
-      <filterQueue>false</filterQueue>
-      <properties class="hudson.model.View$PropertyList"/>
-      <jobNames class="tree-set">
-        <comparator class="hudson.util.CaseInsensitiveComparator"/>
-        <string>essex-stable-devstack-xen</string>
-        <string>essex-stable-devstack-xen-exercises</string>
-        <string>essex-stable-devstack-xen-tempest</string>
-      </jobNames>
-      <jobFilters/>
-      <columns>
-        <hudson.views.StatusColumn/>
-        <hudson.views.WeatherColumn/>
-        <hudson.views.JobColumn/>
-        <hudson.views.LastSuccessColumn/>
-        <hudson.views.LastFailureColumn/>
-        <hudson.views.LastDurationColumn/>
-        <hudson.views.BuildButtonColumn/>
-      </columns>
-    </listView>
   </views>
   <primaryView>All</primaryView>
   <slaveAgentPort>0</slaveAgentPort>
