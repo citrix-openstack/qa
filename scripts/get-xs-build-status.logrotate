@@ -1,4 +1,0 @@
-/var/log/get-xs-build-status.log {
-    daily
-    missingok
-}
