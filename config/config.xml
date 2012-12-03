@@ -3,18 +3,17 @@
   <disabledAdministrativeMonitors>
     <string>hudson.node_monitors.MonitorMarkedNodeOffline</string>
   </disabledAdministrativeMonitors>
-  <version>1.457</version>
+  <version>1.492</version>
   <numExecutors>4</numExecutors>
   <mode>EXCLUSIVE</mode>
   <useSecurity>true</useSecurity>
   <authorizationStrategy class="hudson.security.AuthorizationStrategy$Unsecured"/>
-  <securityRealm class="hudson.security.PAMSecurityRealm">
+  <securityRealm class="hudson.security.PAMSecurityRealm" plugin="pam-auth@1.0">
     <serviceName>sshd</serviceName>
   </securityRealm>
   <projectNamingStrategy class="jenkins.model.ProjectNamingStrategy$DefaultProjectNamingStrategy"/>
   <workspaceDir>${ITEM_ROOTDIR}/workspace</workspaceDir>
   <buildsDir>${ITEM_ROOTDIR}/builds</buildsDir>
-  <systemMessage></systemMessage>
   <markupFormatter class="hudson.markup.RawHtmlMarkupFormatter">
     <disableSyntaxHighlighting>false</disableSyntaxHighlighting>
   </markupFormatter>
@@ -24,126 +23,20 @@
   <clouds/>
   <slaves>
     <slave>
-      <name>copper</name>
-      <description></description>
-      <remoteFS>/opt/jenkins</remoteFS>
-      <numExecutors>4</numExecutors>
-      <mode>NORMAL</mode>
-      <retentionStrategy class="hudson.slaves.RetentionStrategy$Always"/>
-      <launcher class="hudson.slaves.JNLPLauncher"/>
-      <label>santa-clara</label>
-      <nodeProperties>
-        <hudson.slaves.EnvironmentVariablesNodeProperty>
-          <envVars serialization="custom">
-            <unserializable-parents/>
-            <tree-map>
-              <default>
-                <comparator class="hudson.util.CaseInsensitiveComparator"/>
-              </default>
-              <int>3</int>
-              <string>GIT_PROTOCOL</string>
-              <string>true</string>
-              <string>PIP_DOWNLOAD_CACHE</string>
-              <string>/opt/jenkins/pip_download_cache</string>
-              <string>SITE</string>
-              <string>sc</string>
-            </tree-map>
-          </envVars>
-        </hudson.slaves.EnvironmentVariablesNodeProperty>
-        <hudson.tools.ToolLocationNodeProperty>
-          <locations/>
-        </hudson.tools.ToolLocationNodeProperty>
-      </nodeProperties>
-    </slave>
-    <slave>
-      <name>rdm</name>
-      <description></description>
-      <remoteFS>/opt/jenkins</remoteFS>
-      <numExecutors>4</numExecutors>
-      <mode>NORMAL</mode>
-      <retentionStrategy class="hudson.slaves.RetentionStrategy$Always"/>
-      <launcher class="hudson.slaves.JNLPLauncher"/>
-      <label>redmond</label>
-      <nodeProperties>
-        <hudson.slaves.EnvironmentVariablesNodeProperty>
-          <envVars serialization="custom">
-            <unserializable-parents/>
-            <tree-map>
-              <default>
-                <comparator class="hudson.util.CaseInsensitiveComparator"/>
-              </default>
-              <int>3</int>
-              <string>PIP_DOWNLOAD_CACHE</string>
-              <string>/opt/jenkins/pip_download_cache</string>
-              <string>SITE</string>
-              <string>rdm</string>
-              <string>XS_ROOT_PASSWORD</string>
-              <string></string>
-            </tree-map>
-          </envVars>
-        </hudson.slaves.EnvironmentVariablesNodeProperty>
-      </nodeProperties>
-    </slave>
-    <slave>
-      <name>blr</name>
-      <description></description>
-      <remoteFS>/var/lib/jenkins</remoteFS>
-      <numExecutors>4</numExecutors>
-      <mode>NORMAL</mode>
-      <retentionStrategy class="hudson.slaves.RetentionStrategy$Always"/>
-      <launcher class="hudson.slaves.JNLPLauncher"/>
-      <label>bengaluru</label>
-      <nodeProperties>
-        <hudson.slaves.EnvironmentVariablesNodeProperty>
-          <envVars serialization="custom">
-            <unserializable-parents/>
-            <tree-map>
-              <default>
-                <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../../../../../slave/nodeProperties/hudson.slaves.EnvironmentVariablesNodeProperty/envVars/tree-map/default/comparator"/>
-              </default>
-              <int>4</int>
-              <string>GIT_PROTOCOL</string>
-              <string>true</string>
-              <string>PIP_DOWNLOAD_CACHE</string>
-              <string>/var/cache/pip_download_cache</string>
-              <string>SITE</string>
-              <string>blr</string>
-              <string>XS_ROOT_PASSWORD</string>
-              <string></string>
-            </tree-map>
-          </envVars>
-        </hudson.slaves.EnvironmentVariablesNodeProperty>
-      </nodeProperties>
-    </slave>
-    <slave>
-      <name>bethany</name>
+      <name>silicon</name>
       <description></description>
       <remoteFS>/home/jenkins</remoteFS>
       <numExecutors>4</numExecutors>
       <mode>NORMAL</mode>
       <retentionStrategy class="hudson.slaves.RetentionStrategy$Always"/>
-      <launcher class="hudson.slaves.JNLPLauncher"/>
-      <label>cambourne</label>
-      <nodeProperties>
-        <hudson.slaves.EnvironmentVariablesNodeProperty>
-          <envVars serialization="custom">
-            <unserializable-parents/>
-            <tree-map>
-              <default>
-                <comparator class="hudson.util.CaseInsensitiveComparator"/>
-              </default>
-              <int>2</int>
-              <string>PIP_DOWNLOAD_CACHE</string>
-              <string>/var/cache/pip_download_cache</string>
-              <string>SITE</string>
-              <string>cmb</string>
-            </tree-map>
-          </envVars>
-        </hudson.slaves.EnvironmentVariablesNodeProperty>
-        <hudson.tools.ToolLocationNodeProperty>
-          <locations/>
-        </hudson.tools.ToolLocationNodeProperty>
-      </nodeProperties>
+      <launcher class="hudson.plugins.sshslaves.SSHLauncher" plugin="ssh-slaves@0.21">
+        <host>silicon.eng.hq.xensource.com</host>
+        <port>22</port>
+        <password>rNS3tUnlQfEmCun0o+A5ww==</password>
+      </launcher>
+      <label>santa-clara</label>
+      <nodeProperties/>
+      <userId>anonymous</userId>
     </slave>
   </slaves>
   <quietPeriod>5</quietPeriod>
@@ -162,7 +55,7 @@
       <filterQueue>false</filterQueue>
       <properties class="hudson.model.View$PropertyList"/>
       <jobNames class="tree-set">
-        <comparator class="hudson.util.CaseInsensitiveComparator" reference="../../../../slaves/slave[4]/nodeProperties/hudson.slaves.EnvironmentVariablesNodeProperty/envVars/tree-map/default/comparator"/>
+        <comparator class="hudson.util.CaseInsensitiveComparator"/>
         <string>devstack-xen-second-host</string>
         <string>devstack-xen-single-host</string>
         <string>devstack-xen-test-exercise</string>
@@ -252,7 +145,6 @@
         <hudson.views.LastFailureColumn/>
         <hudson.views.LastDurationColumn/>
         <hudson.views.BuildButtonColumn/>
-        <hudson.plugins.favorite.column.FavoriteColumn/>
       </columns>
     </listView>
   </views>
