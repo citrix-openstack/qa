@@ -79,7 +79,7 @@ It then triggers devstack-xen-trunk-tests, if successful.</description>
                   <generated>true</generated>
                   <exposedToEnvironment>false</exposedToEnvironment>
                   <value>
-                    <time>1354559476137</time>
+                    <time>1354560749757</time>
                     <timezone>Etc/UTC</timezone>
                   </value>
                   <checked>false</checked>
@@ -142,7 +142,7 @@ It then triggers devstack-xen-trunk-tests, if successful.</description>
     <buildChooser class="hudson.plugins.git.util.DefaultBuildChooser"/>
     <gitTool>Default</gitTool>
     <browser class="hudson.plugins.git.browser.GithubWeb">
-      <url>http://github.com/openstack/nova/</url>
+      <url>http://github.com/citrix-openstack/qa/</url>
     </browser>
     <submoduleCfg class="list"/>
     <relativeTargetDir></relativeTargetDir>
@@ -163,7 +163,7 @@ It then triggers devstack-xen-trunk-tests, if successful.</description>
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>jenkins/devstack-xen/run-devstack-xen.sh</command>
+      <command>./jenkins/devstack-xen/run-devstack-xen.sh</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers>
