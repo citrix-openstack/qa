@@ -1,1 +1,0 @@
-../keystone-integration/common.py
