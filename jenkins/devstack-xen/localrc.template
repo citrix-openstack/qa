@@ -1,0 +1,92 @@
+#
+# Set passwords to avoid prompts
+#
+MYSQL_PASSWORD=citrix
+SERVICE_TOKEN=citrix
+ADMIN_PASSWORD=citrix
+SERVICE_PASSWORD=citrix
+RABBIT_PASSWORD=citrix
+# This is the password for your DomU (for both stack and root users)
+GUEST_PASSWORD=citrix
+# IMPORTANT: The following must be set to your dom0 root password!
+XENAPI_PASSWORD=${XenServerPassword}
+
+
+#
+# Use our local images
+#
+#IMAGE_URLS=TODO
+DEFAULT_IMAGE_NAME=ami
+
+#
+# Compute settings
+#
+MULTI_HOST=true
+# our image doesn't have the agent
+EXTRA_OPTS=("xenapi_disable_agent=True")
+OSDOMU_MEM_MB=2048
+XEN_FIREWALL_DRIVER=nova.virt.xenapi.firewall.Dom0IptablesFirewallDriver
+# turn off rate limit to help tempest
+API_RATE_LIMIT=False
+
+
+#
+# Volume settings
+#
+# make tempest pass by having bigger volume file
+VOLUME_BACKING_FILE_SIZE=3200M
+
+
+#
+# Networking settings
+#
+
+# MGMT network params
+MGT_IP="dhcp"
+MGT_NETMASK=255.255.255.0
+MGT_BR=xenbr0
+MGT_VLAN=-1
+MGT_DEV=eth0
+
+# Public network
+PUB_IP=172.24.4.10
+PUB_NETMASK=255.255.255.0
+PUB_BR=xenbr1
+PUB_VLAN=-1
+PUB_DEV=eth1
+
+# VM network params
+VM_IP=10.255.255.255
+VM_NETMASK=255.255.255.0
+VM_BR=""
+VM_VLAN=${XenServer-VM-VLAN}
+VM_DEV=eth1
+FLAT_NETWORK_BRIDGE="vmbr"
+
+# XenAPI is on mangement network
+HOST_IP_IFACE=eth2
+
+
+#
+# DevStack XenServer tools settings
+#
+NETINSTALLIP="dhcp"
+NETINSTALL_IFACE=eth2
+NAMESERVERS=""
+NETMAST=""
+GATEWAY=""
+UBUNTU_INST_RELEASE=precise
+
+
+#
+# exercise.sh settings
+#
+# boot from volume doesn't yet work on our setup
+SKIP_EXERCISES="boot_from_volume"
+
+#
+# DevStack settings
+#
+LOGFILE=/tmp/devstack/log/stack.log
+SCREEN_LOGDIR=/tmp/devstack/log/
+
