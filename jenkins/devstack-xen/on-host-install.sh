@@ -20,10 +20,13 @@ set -eux
 RunExercises=$1
 RunTempest=$2
 DevStackURL=$3
+# TODO remove localrcURL
 LocalrcURL=$4
 PreseedURL=$5
 GuestIp=$6
 CleanTemplates=$7
+XenServerVmVlan=$8
+XenServerPassword=$9
 
 # Go into temp directory
 SCRIPT_TMP_DIR=/tmp/jenkins_test
@@ -39,7 +42,11 @@ cd devstack/*/
 #
 # Download localrc
 #
-wget --output-document=localrc --no-check-certificate $LocalrcURL
+cp ../../localrc.template localrc
+sed -e "s,%XenServerVmVlan%,$XenServerVmVlan,g;
+        s,%XenServerPassword%,$XenServerPassword,g;
+" -i localrc
+
 
 #
 # Optionally modify localrc

@@ -31,20 +31,17 @@ thisdir=$(dirname $(readlink -f "$0"))
 #
 # Get parameters
 #
-server="${Server-"default_test_xenserver"}"
+Server="$Server"
+LocalrcURL="$localrcURL"
+PreseedURL="$PreseedURL"
+XenServerVmVlan="$XenServerVmVlan"
+XenServerPassword="$XenServerPassword"
 
 DefaultDevStackURL="https://github.com/openstack-dev/devstack/zipball/master"
 DevStackURL="${DevStackURL-$DefaultDevStackURL}"
 
-defaultlocalrc="http://gold.eng.hq.xensource.com/localrc"
-localrcURL="${localrcURL-$defaultlocalrc}"
-
 RunExercises="${RunExercises-false}"
 RunTempest="${RunTempest-false}"
-
-DefaultPreseedURL="http://gold.eng.hq.xensource.com/devstackubuntupreseed.cfg"
-PreseedURL="${PreseedURL-$DefaultPreseedURL}"
-
 CleanTemplates="${CleanTemplates-false}"
 
 # GUEST_IP is used by run-devstack-xen-mutli
@@ -56,11 +53,12 @@ GuestIP="${GUEST_IP-false}"
 # copy what we need to the XenServer
 #
 SCRIPT_TMP_DIR=/tmp/jenkins_test
-ssh "$server" "rm -rf $SCRIPT_TMP_DIR"
-ssh "$server" "mkdir -p $SCRIPT_TMP_DIR"
+ssh "$Server" "rm -rf $SCRIPT_TMP_DIR"
+ssh "$Server" "mkdir -p $SCRIPT_TMP_DIR"
 
 #
 # Run the next steps on the XenServer host
 #
-scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$thisdir/on-host-install.sh" "root@$server:$SCRIPT_TMP_DIR"
-ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "root@$server" "$SCRIPT_TMP_DIR/on-host-install.sh" "${RunExercises}" "${RunTempest}" "${DevStackURL}" "${localrcURL}" "${PreseedURL}" "${GuestIP}" "${CleanTemplates}"
+scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$thisdir/on-host-install.sh" "root@$Server:$SCRIPT_TMP_DIR"
+scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$thisdir/*.template" "root@$Server:$SCRIPT_TMP_DIR"
+ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "root@$Server" "$SCRIPT_TMP_DIR/on-host-install.sh" "${RunExercises}" "${RunTempest}" "${DevStackURL}" "${LocalrcURL}" "${PreseedURL}" "${GuestIP}" "${CleanTemplates}" "${XenServerVmVlan}" "${XenServerPassword}"

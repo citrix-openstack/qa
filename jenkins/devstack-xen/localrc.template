@@ -9,7 +9,7 @@ RABBIT_PASSWORD=citrix
 # This is the password for your DomU (for both stack and root users)
 GUEST_PASSWORD=citrix
 # IMPORTANT: The following must be set to your dom0 root password!
-XENAPI_PASSWORD=${XenServerPassword}
+XENAPI_PASSWORD=%XenServerPassword%
 
 
 #
@@ -59,7 +59,7 @@ PUB_DEV=eth1
 VM_IP=10.255.255.255
 VM_NETMASK=255.255.255.0
 VM_BR=""
-VM_VLAN=${XenServer-VM-VLAN}
+VM_VLAN=%XenServerVmVlan%
 VM_DEV=eth1
 FLAT_NETWORK_BRIDGE="vmbr"
 
