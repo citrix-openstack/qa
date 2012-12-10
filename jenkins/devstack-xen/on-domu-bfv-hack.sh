@@ -9,9 +9,10 @@ function get_old_bfv_exercise
 cd $HOME/devstack
 # Check out an elder version of boot from volume, and patch it
 # git show 96288ba9a9fffa0d45545d091bd9781476503f7c:exercises/boot_from_volume.sh > exercises/boot_from_volume.sh
-wget -qO - "https://raw.github.com/citrix-openstack/devstack/96288ba9a9fffa0d45545d091bd9781476503f7c/exercises/boot_from_volume.sh" > exercises/boot_from_volume.sh
-wget -qO - "https://review.openstack.org/gitweb?p=openstack-dev/devstack.git;a=commitdiff_plain;h=7e6a648670bfaab75dc8c08ad522e611ca32d994" |
-patch exercises/boot_from_volume.sh
+#wget -qO - "https://raw.github.com/citrix-openstack/devstack/96288ba9a9fffa0d45545d091bd9781476503f7c/exercises/boot_from_volume.sh" > exercises/boot_from_volume.sh
+#wget -qO - "https://review.openstack.org/gitweb?p=openstack-dev/devstack.git;a=commitdiff_plain;h=7e6a648670bfaab75dc8c08ad522e611ca32d994" |
+#patch exercises/boot_from_volume.sh
+wget -qO - "https://raw.github.com/citrix-openstack/devstack/qndbfv/exercises/boot_from_volume.sh" > exercises/boot_from_volume.sh
 }
 
 
