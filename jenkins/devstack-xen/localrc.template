@@ -84,6 +84,9 @@ UBUNTU_INST_RELEASE=precise
 # boot from volume doesn't yet work on our setup
 SKIP_EXERCISES="boot_from_volume"
 
+# extra timeout
+ACTIVE_TIMEOUT=500
+
 #
 # DevStack settings
 #
