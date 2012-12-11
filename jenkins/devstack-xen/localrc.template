@@ -28,6 +28,7 @@ OSDOMU_MEM_MB=2048
 XEN_FIREWALL_DRIVER=nova.virt.xenapi.firewall.Dom0IptablesFirewallDriver
 # turn off rate limit to help tempest
 API_RATE_LIMIT=False
+VIRT_DRIVER=xenserver
 
 
 #
