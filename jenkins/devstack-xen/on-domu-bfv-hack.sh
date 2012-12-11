@@ -74,8 +74,15 @@ cd $HOME
 wget -qN https://launchpad.net/cirros/trunk/0.3.0/+download/cirros-0.3.0-x86_64-rootfs.img.gz
 }
 
+function apply_nova_patches
+{
+cd $HOME/nova
+git fetch https://review.openstack.org/openstack/nova refs/changes/26/17726/4 && git cherry-pick FETCH_HEAD
+}
+
 get_old_bfv_exercise
 amend_localrc_for_bfv
+#apply_nova_patches
 restart_devstack
 upload_cirros
 pre_cache_cirros_rootfs
