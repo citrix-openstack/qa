@@ -82,6 +82,13 @@ VNCSERVER_PROXYCLIENT_ADDRESS=$XenApiIP
 EOF
 
 #
+# Show the content on the localrc file
+#
+echo "Content of localrc file:"
+cat localrc
+echo "** end of localrc file **"
+
+#
 # Download preseed
 #
 cd tools/xen
