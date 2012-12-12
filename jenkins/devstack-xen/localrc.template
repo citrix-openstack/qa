@@ -93,4 +93,5 @@ TERMINATE_TIMEOUT=500
 #
 LOGFILE=/tmp/devstack/log/stack.log
 SCREEN_LOGDIR=/tmp/devstack/log/
+ENABLED_SERVICES+=,tempest,
 
