@@ -16,6 +16,11 @@
 set -eux
 thisdir=$(dirname $(readlink -f "$0"))
 
+function on_xenserver
+{
+ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "root@$Server" "$@"
+}
+
 # The parmaters expected are:
 # $Server1 - XenServer host for master compute DomU
 # $Server2 - XenServer host for second compute DomU
@@ -25,7 +30,7 @@ thisdir=$(dirname $(readlink -f "$0"))
 # $CleanTemplates - If true, clean the templates
 #
 # Internal param:
-# $GuestIp - pram used to trigger localrc editing
+# $GuestIP - pram used to trigger localrc editing
 #            to allow secondary compute node
 
 #
@@ -56,9 +61,62 @@ SCRIPT_TMP_DIR=/tmp/jenkins_test
 ssh "$Server" "rm -rf $SCRIPT_TMP_DIR"
 ssh "$Server" "mkdir -p $SCRIPT_TMP_DIR"
 
+
+TEMPLATE_LOCALRC="${thisdir}/localrc.template"
+GENERATED_LOCALRC=`tempfile`
+
+
+# Generate localrc
+cat $TEMPLATE_LOCALRC |
+sed -e "s,%XenServerVmVlan%,$XenServerVmVlan,g;
+        s,%XenServerPassword%,$XenServerPassword,g;
+" > $GENERATED_LOCALRC
+
+
+#
+# Optionally modify localrc
+# to create a secondary compute host
+#
+if [ "$GuestIP" != "false" ]
+then
+    cat <<EOF >> $GENERATED_LOCALRC
+# appended by jenkins
+# TODO - g-api only added due to dependency error with glance client
+ENABLED_SERVICES=n-cpu,n-net,n-api,g-api
+MYSQL_HOST=$GuestIP
+RABBIT_HOST=$GuestIP
+KEYSTONE_AUTH_HOST=$GuestIP
+GLANCE_HOSTPORT=$GuestIP:9292
+
+# TODO - allow these to be configured
+PUB_IP=172.24.4.11
+VM_IP=10.255.255.254
+GUEST_NAME=DevStackComputeSlave
+EOF
+fi
+
+#
+# Add the clean templates setting
+# and correct the IP address for dom0
+#
+XenApiIP=`on_xenserver ifconfig xenbr0 | grep "inet addr" | cut -d ":" -f2 | sed "s/ .*//"`
+cat <<EOF >> $GENERATED_LOCALRC
+CLEAN_TEMPLATES=$CleanTemplates
+XENAPI_CONNECTION_URL="http://$XenApiIP"
+VNCSERVER_PROXYCLIENT_ADDRESS=$XenApiIP
+EOF
+
+#
+# Show the content on the localrc file
+#
+echo "Content of localrc file:"
+cat $GENERATED_LOCALRC
+echo "** end of localrc file **"
+
 #
 # Run the next steps on the XenServer host
 #
 scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$thisdir/on-host-install.sh" "root@$Server:$SCRIPT_TMP_DIR"
-scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$thisdir/localrc.template" "root@$Server:$SCRIPT_TMP_DIR"
-ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "root@$Server" "$SCRIPT_TMP_DIR/on-host-install.sh" "${RunExercises}" "${RunTempest}" "${DevStackURL}" "${LocalrcURL}" "${PreseedURL}" "${GuestIP}" "${CleanTemplates}" "${XenServerVmVlan}" "${XenServerPassword}"
+scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$GENERATED_LOCALRC" "root@$Server:$SCRIPT_TMP_DIR/localrc"
+rm $GENERATED_LOCALRC
+ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "root@$Server" "$SCRIPT_TMP_DIR/on-host-install.sh" "${DevStackURL}" "${PreseedURL}"
