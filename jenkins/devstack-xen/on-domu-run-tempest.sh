@@ -18,6 +18,14 @@ cd /opt/stack/tempest
 cat ./etc/tempest.conf
 
 #
+# Update nosetests if using oneiric
+#
+if grep -q "oneiric" /etc/*-release;
+then
+  sudo pip install -U nose
+fi
+
+#
 # Run tempest
 #
 nosetests --with-xunit -sv --nologcapture $TEMPEST_PARAMS tempest
