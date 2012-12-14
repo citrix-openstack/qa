@@ -25,7 +25,6 @@ ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "root@$Server" "
 # $Server1 - XenServer host for master compute DomU
 # $Server2 - XenServer host for second compute DomU
 # $DevStackURL - URL of the devstack zip file
-# $localrcURL - URL to the localrc file
 # $PreseedURL - URL to the ubuntu preseed URL
 # $CleanTemplates - If true, clean the templates
 #
@@ -37,7 +36,6 @@ ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "root@$Server" "
 # Get parameters
 #
 Server="$Server"
-LocalrcURL="$localrcURL"
 PreseedURL="$PreseedURL"
 XenServerVmVlan="$XenServerVmVlan"
 XenServerPassword="$XenServerPassword"
