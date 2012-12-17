@@ -12,11 +12,11 @@ GUEST_PASSWORD=citrix
 XENAPI_PASSWORD=%XenServerPassword%
 
 
+# TEMPEST SETTINGS
 #
-# Use our local images
-#
-#IMAGE_URLS=TODO
-DEFAULT_IMAGE_NAME=ami
+# Need to be set, otherwise image resize fails (TODO: bug)
+DEFAULT_INSTANCE_TYPE="m1.small"
+
 
 #
 # Compute settings
@@ -24,7 +24,7 @@ DEFAULT_IMAGE_NAME=ami
 MULTI_HOST=true
 # our image doesn't have the agent
 EXTRA_OPTS=("xenapi_disable_agent=True")
-OSDOMU_MEM_MB=2048
+OSDOMU_MEM_MB=4096
 XEN_FIREWALL_DRIVER=nova.virt.xenapi.firewall.Dom0IptablesFirewallDriver
 # turn off rate limit to help tempest
 API_RATE_LIMIT=False
@@ -35,7 +35,7 @@ VIRT_DRIVER=xenserver
 # Volume settings
 #
 # make tempest pass by having bigger volume file
-VOLUME_BACKING_FILE_SIZE=3200M
+VOLUME_BACKING_FILE_SIZE=10000M
 
 
 #
@@ -95,3 +95,7 @@ LOGFILE=/tmp/devstack/log/stack.log
 SCREEN_LOGDIR=/tmp/devstack/log/
 ENABLED_SERVICES+=,tempest,
 
+#
+# XenServer settings
+#
+OSDOMU_VDI_GB=40
