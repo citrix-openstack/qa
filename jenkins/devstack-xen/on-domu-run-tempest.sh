@@ -8,7 +8,6 @@
 set -o errexit
 set -o xtrace
 
-TEMPEST_PARAMS=${1-""}
 
 cd /opt/stack/tempest
 
@@ -28,4 +27,4 @@ fi
 #
 # Run tempest
 #
-nosetests --with-xunit -sv --nologcapture $TEMPEST_PARAMS tempest
+nosetests --with-xunit -sv --nologcapture $@ tempest
