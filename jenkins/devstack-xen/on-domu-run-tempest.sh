@@ -29,7 +29,7 @@ fi
 #
 # Run tempest
 #
-if [ "$SMOKE_ONLY" -eq "true" ];
+if [[ "$SMOKE_ONLY" -eq "true" ]];
 then
     TEMPEST_ARGS="-I test_ec2_volumes.py --attr=type=smoke"
 else
