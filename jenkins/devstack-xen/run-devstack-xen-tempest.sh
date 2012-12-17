@@ -18,7 +18,7 @@
 set -eux
 thisdir=$(dirname $(readlink -f "$0"))
 server=$Server
-TEMPEST_PARAMS=${TempestParams:-""}
+SMOKE_ONLY=${SmokeOnly:-true}
 
 #
 # Copy over test scripts
@@ -33,4 +33,4 @@ scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$thisdir/on-dom
 #
 # Run tests
 #
-ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "root@$server" "$tmpdir/on-host-run-tempest.sh" "$TEMPEST_PARAMS"
+ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "root@$server" "$tmpdir/on-host-run-tempest.sh" "$SMOKE_ONLY"

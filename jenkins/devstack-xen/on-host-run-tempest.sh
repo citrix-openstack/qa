@@ -16,7 +16,7 @@ set -o errexit
 set -o xtrace
 thisdir=$(dirname $(readlink -f "$0"))
 
-TEMPEST_PARAMS="$@"
+SMOKE_ONLY=$1
 
 #
 # Find IP address of master
@@ -33,4 +33,4 @@ fi
 # Run devstack on the DomU
 #
 scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$thisdir/on-domu-run-tempest.sh" "stack@$GUEST_IP:~/"
-ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "stack@$GUEST_IP" "~/on-domu-run-tempest.sh" "$TEMPEST_PARAMS"
+ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "stack@$GUEST_IP" "~/on-domu-run-tempest.sh" "$SMOKE_ONLY"

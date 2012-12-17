@@ -8,6 +8,8 @@
 set -o errexit
 set -o xtrace
 
+SMOKE_ONLY=$1
+
 
 cd /opt/stack/tempest
 
@@ -27,4 +29,11 @@ fi
 #
 # Run tempest
 #
-nosetests --with-xunit -sv --nologcapture $@ tempest
+if [ "$SMOKE_ONLY" -eq "true" ];
+then
+    TEMPEST_ARGS="-I test_ec2_volumes.py --attr=type=smoke"
+else
+    TEMPEST_ARGS=""
+fi
+
+nosetests --with-xunit -sv --nologcapture $TEMPEST_ARGS tempest
