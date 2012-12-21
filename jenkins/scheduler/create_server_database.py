@@ -3,4 +3,7 @@
 import database
 import sys
 
-database.set_database('server.database', sys.stdin.read())
+servers_dot_py, = sys.argv[1:]
+
+with open(servers_dot_py, 'rb') as f:
+    database.set_database('server.database', f.read())
