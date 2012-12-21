@@ -4,14 +4,24 @@ import database
 import time
 import random
 import string
+from selectors import first
 
 lock = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(16))
 
+
+def is_server(item):
+    try:
+        return bool(item.get("HOST"))
+    except:
+        return False
+
+
 while True:
-    items = database.lock_items('server.database', lock)
+    items = database.lock_items('server.database', lock, first(is_server))
     if items:
         break
     time.sleep(1)
+
 
 server_data, = items
 for item in server_data.items():

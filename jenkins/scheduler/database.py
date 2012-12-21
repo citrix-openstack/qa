@@ -1,3 +1,6 @@
+from selectors import first
+
+
 def set_database(filename, contents):
     """
     >>> import os
@@ -52,18 +55,6 @@ def get_database(filename):
     return result
 
 
-def _first():
-    accumulator = []
-
-    def term_generator(item):
-        if len(accumulator) == 0:
-            accumulator.append(item)
-            return lambda: True
-        return lambda: False
-
-    return term_generator
-
-
 def lock_items(filename, lock, term_generator=None):
     """
     >>> set_database('test_db', '[1, 2, 3]')
@@ -94,7 +85,7 @@ def lock_items(filename, lock, term_generator=None):
 
     c = conn.cursor()
 
-    term_generator = term_generator or _first()
+    term_generator = term_generator or first()
 
     terms_ids_items = []
     for id, data in c.execute('SELECT id, data FROM stuff WHERE lock = :empty_lock ORDER by id', dict(empty_lock="")).fetchall():
