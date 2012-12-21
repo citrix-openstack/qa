@@ -2,7 +2,7 @@ def set_database(filename, contents):
     """
     >>> import os
     >>> if os.path.exists('test_db'): os.unlink('test_db')
-    >>> set_database('test_db', '')
+    >>> set_database('test_db', '[]')
     >>> os.path.exists('test_db')
     True
     >>> if os.path.exists('test_db'): os.unlink('test_db')
@@ -19,11 +19,6 @@ def set_database(filename, contents):
     c.execute('DROP TABLE IF EXISTS stuff')
     c.execute('CREATE TABLE stuff (id INTEGER PRIMARY KEY, data TEXT, lock TEXT)')
 
-    try:
-        records = eval(contents)
-    except SyntaxError:
-        return
-
     id = 0
     for record in eval(contents):
         c.execute('INSERT INTO stuff (id, data, lock) VALUES(:id, :data, :lock)',
@@ -38,8 +33,8 @@ def get_database(filename):
     """
     >>> set_database('test_db', '["a", "b", "c"]')
     >>> get_database('test_db')
-    [(0, 'a'), (1, 'b'), (2, 'c')]
-    >>> set_database('test_db', '')
+    ['a', 'b', 'c']
+    >>> set_database('test_db', '[]')
     >>> get_database('test_db')
     []
     """
@@ -51,7 +46,7 @@ def get_database(filename):
 
     result = []
     for id, data in c.execute('SELECT id, data FROM stuff ORDER by id'):
-        result.append((id, eval(data)))
+        result.append(eval(data))
 
     conn.close()
     return result
@@ -80,7 +75,7 @@ def lock_items(filename, lock, term_generator=None):
     Traceback (most recent call last):
     ...
     ValueError: Invalid lock value: ''
-    >>> set_database('test_db', '')
+    >>> set_database('test_db', '[]')
     >>> lock_items('test_db', 'c')
     []
     >>> set_database('test_db', '[1, 2, 3]')
