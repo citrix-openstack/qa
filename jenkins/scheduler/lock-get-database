@@ -4,4 +4,4 @@ import database
 import pprint
 
 
-pprint.pprint(database.get_database('server.database'))
+pprint.pprint(database.get_database('server.database'), indent=4)
