@@ -61,7 +61,7 @@ set +u
 cd $HOME/devstack
 . openrc admin
 glance image-create --name cirros \
---copy-from=http://copper.eng.hq.xensource.com/images-new/cirros-0.3.0-x86_64-disk.vhd.tgz \
+--copy-from=https://github.com/downloads/citrix-openstack/warehouse/cirros-0.3.0-x86_64-disk.vhd.tgz \
 --container-format=ovf --disk-format=vhd
 echo "Cirros image uploaded, waiting 10 secs for glance..."
 sleep 10
