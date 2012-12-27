@@ -10,7 +10,7 @@ set -eux
 # Get Arguments
 #
 DevStackURL=$1
-PreseedURL=$2
+UbuntuMirror=$2
 
 # Go into temp directory
 SCRIPT_TMP_DIR=/tmp/jenkins_test
@@ -25,12 +25,10 @@ cd devstack/*/
 cp ../../localrc .
 
 #
-# Download preseed
+# Prepare preseed
 #
 cd tools/xen
-rm devstackubuntupreseed.cfg
-wget --output-document=devstackubuntupreseed.cfg --no-check-certificate $PreseedURL
-
+sed -ie "s,\(d-i mirror/http/hostname string\).*,\1 ${UbuntuMirror},g" devstackubuntupreseed.cfg
 
 #
 # Install VM

@@ -22,11 +22,12 @@ ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "root@$Server" "
 }
 
 # The parmaters expected are:
-# $Server1 - XenServer host for master compute DomU
-# $Server2 - XenServer host for second compute DomU
-# $DevStackURL - URL of the devstack zip file
-# $PreseedURL - URL to the ubuntu preseed URL
-# $CleanTemplates - If true, clean the templates
+# $Server - XenServer host for compute DomU
+# $UbuntuMirror - Ubuntu mirror to use
+# $XenServerVmVlan - Vlan ID
+# $XenServerPassword - Password for your XenServer
+# $DevStackURL (optional) - URL of the devstack zip file
+# $CleanTemplates (default:false) - If true, clean the templates
 #
 # Internal param:
 # $GuestIP - pram used to trigger localrc editing
@@ -36,15 +37,11 @@ ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "root@$Server" "
 # Get parameters
 #
 Server="$Server"
-PreseedURL="$PreseedURL"
+UbuntuMirror="$UbuntuMirror"
 XenServerVmVlan="$XenServerVmVlan"
 XenServerPassword="$XenServerPassword"
 
-DefaultDevStackURL="https://github.com/openstack-dev/devstack/zipball/master"
-DevStackURL="${DevStackURL-$DefaultDevStackURL}"
-
-RunExercises="${RunExercises-false}"
-RunTempest="${RunTempest-false}"
+DevStackURL=${DevStackURL-"https://github.com/openstack-dev/devstack/zipball/master"}
 CleanTemplates="${CleanTemplates-false}"
 
 # GUEST_IP is used by run-devstack-xen-mutli
@@ -117,4 +114,4 @@ echo "** end of localrc file **"
 scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$thisdir/on-host-install.sh" "root@$Server:$SCRIPT_TMP_DIR"
 scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$GENERATED_LOCALRC" "root@$Server:$SCRIPT_TMP_DIR/localrc"
 rm $GENERATED_LOCALRC
-ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "root@$Server" "$SCRIPT_TMP_DIR/on-host-install.sh" "${DevStackURL}" "${PreseedURL}"
+ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "root@$Server" "$SCRIPT_TMP_DIR/on-host-install.sh" "${DevStackURL}" "${UbuntuMirror}"
