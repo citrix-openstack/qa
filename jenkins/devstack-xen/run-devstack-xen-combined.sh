@@ -11,23 +11,33 @@
 # to your XenServer with the hostname $Server
 #
 # The parmaters expected are:
+# The same parameters as for run-devstack-xen.sh
+# Instead of Server:
 # $Server1 - XenServer host for master compute DomU
 # $Server2 - XenServer host for second compute DomU
-# $DevStackURL - URL of the devstack zip file
-# $localrcURL - URL to the localrc file
-# $PreseedURL - URL to the ubuntu preseed URL
-# $CleanTemplates - If true, clean the templates
 
 set -eux
 thisdir=$(dirname $(readlink -f "$0"))
 
 #
-# Install first host
+# Install first host - this is a regular installation
 #
 export Server=$Server1
 . "$thisdir/run-devstack-xen.sh"
 
 #
-# Install second host (the compute slave)
+# Export GUEST_IP
 #
-. "$thisdir/run-devstack-xen-multi.sh"
+GUEST_NAME=${GUEST_NAME:-"DevStackOSDomU"} # TODO - pull from config
+export GUEST_IP=$(ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$Server1" "xe vm-list --minimal name-label=$GUEST_NAME params=networks | sed -ne 's,^.*2/ip: \([0-9.]*\).*$,\1,p'")
+if [ -z "$GUEST_IP" ]
+then
+  echo "Failed to find IP address of DevStack DomU on $Server1"
+  exit 1
+fi
+
+#
+# Install the second domU VM
+#
+export Server=$Server2
+. "$thisdir/run-devstack-xen.sh"
