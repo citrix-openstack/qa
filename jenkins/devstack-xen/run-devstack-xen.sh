@@ -49,6 +49,8 @@ MirrorHttpProxy=${MirrorHttpProxy-""}
 DevStackURL=${DevStackURL-"https://github.com/openstack-dev/devstack/zipball/master"}
 CleanTemplates="${CleanTemplates-false}"
 
+LocalrcAppend=${LocalrcAppend-"localrc.append"}
+
 # GUEST_IP is used by run-devstack-xen-mutli
 # to trigger a re-write of the localrc file
 GuestIP="${GUEST_IP-false}"
@@ -105,6 +107,8 @@ CLEAN_TEMPLATES=$CleanTemplates
 XENAPI_CONNECTION_URL="http://$XenApiIP"
 VNCSERVER_PROXYCLIENT_ADDRESS=$XenApiIP
 EOF
+
+[ -e "${LocalrcAppend}" ] && ( cat "$LocalrcAppend" >> $GENERATED_LOCALRC ) || echo "$LocalrcAppend was not found, not appending to localrc"
 
 #
 # Show the content on the localrc file
