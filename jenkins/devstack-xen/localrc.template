@@ -25,7 +25,7 @@ MULTI_HOST=true
 # our image doesn't have the agent
 EXTRA_OPTS=("xenapi_disable_agent=True")
 OSDOMU_MEM_MB=4096
-XEN_FIREWALL_DRIVER=nova.virt.xenapi.firewall.Dom0IptablesFirewallDriver
+#FIXME - see LP 1102964 XEN_FIREWALL_DRIVER=nova.virt.xenapi.firewall.Dom0IptablesFirewallDriver
 # turn off rate limit to help tempest
 API_RATE_LIMIT=False
 VIRT_DRIVER=xenserver
