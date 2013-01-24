@@ -3,7 +3,7 @@ set -eu
 
 XENSERVER_HOST="$1"
 SCRIPT_TO_RUN="$2"
-GUEST_NAME=${3:-"DevStackOSDomU"}
+GUEST_NAME=${GUEST_NAME:-"DevStackOSDomU"}
 
 function on_xenserver
 {
@@ -20,4 +20,6 @@ then
   exit 1
 fi
 
-cat $SCRIPT_TO_RUN | on_xenserver ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "stack@$GUEST_IP" bash
+shift 2
+
+cat $SCRIPT_TO_RUN | on_xenserver ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "stack@$GUEST_IP" bash -s -- "$@"
