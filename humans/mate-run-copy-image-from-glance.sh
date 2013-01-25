@@ -9,5 +9,5 @@ NFSPATH="/mate-test"
 
 (
 cd $TOP_DIR/jenkins/devstack-xen/
-./run-on-devstack.sh "$SERVERNAME" on-domu-configure-xenapinfs.sh "copper.eng.hq.xensource.com" "$NFSPATH"
+./run-on-devstack.sh "$SERVERNAME" on-domu-copy-image-from-glance.sh
 )
