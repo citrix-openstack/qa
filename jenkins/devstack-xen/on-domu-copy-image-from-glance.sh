@@ -3,7 +3,7 @@
 cd devstack
 . openrc admin
 
-set -eux
+set -eu
 
 function extract_id
 {
@@ -25,7 +25,7 @@ IMAGEID=`glance image-list | grep cfgtest | extract_id`
 
 function given_creating_volume_from_image
 {
-cinder create --display_name="created-volume" --image-id $IMAGEID 2
+cinder create --display_name="created-volume" --image-id $IMAGEID 1
 }
 
 function given_no_created_volume
@@ -41,14 +41,14 @@ done
 ) || true
 }
 
-function then_status_is_not_error
+function assert_status_is
 {
-cinder list | grep created-volume | grep error && false
+cinder list | grep created-volume | grep "$1";
 }
 
-function when_status_is_not_creating
+function wait_till_status_is_not
 {
-while cinder list | grep created-volume | grep creating;
+while cinder list | grep created-volume | grep "$1";
 do
 sleep 1
 done
@@ -57,7 +57,9 @@ done
 given_no_created_volume
 given_image_is_there
 given_creating_volume_from_image
-when_status_is_not_creating
-then_status_is_not_error
+wait_till_status_is_not "creating"
+assert_status_is "downloading"
+wait_till_status_is_not "downloading"
+assert_status_is "available"
 
 echo "TESTS PASSED"
