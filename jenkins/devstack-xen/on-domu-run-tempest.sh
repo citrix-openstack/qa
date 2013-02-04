@@ -31,7 +31,8 @@ fi
 #
 if [ "$SMOKE_ONLY" = "true" ];
 then
-    TEMPEST_ARGS="-I test_ec2_volumes.py --attr=type=smoke"
+# test_ec2_instance_run.py - because console support is not available
+    TEMPEST_ARGS="-I test_ec2_volumes.py -I test_ec2_instance_run.py --attr=type=smoke"
 else
     TEMPEST_ARGS=""
 fi
