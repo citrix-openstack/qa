@@ -2,9 +2,9 @@
 
 Scripts that are useful for Jenkins jobs:
 
-- DevStack setup
-- Run exercieses.sh
-- Various tempest runs
+- Running tests
+- Manage repositories
+- Provide locking
 
 # `humans` Directory
 
