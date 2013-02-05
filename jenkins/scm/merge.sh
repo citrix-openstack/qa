@@ -38,8 +38,8 @@ exit 1
 
 cd ws
 
-git remote rm m_src_repo
-git remote rm m_tgt_repo
+git remote rm m_src_repo || true
+git remote rm m_tgt_repo || true
 
 git remote add m_src_repo "$SOURCE_REPO" || true
 git remote update m_src_repo
