@@ -30,8 +30,7 @@ VOLID=`cinder list | grep created-volume | extract_id`
 
 function when_upload_volume
 {
-# TODO cinder upload-to-image --container-format=ovf --disk-format=vhd $VOLID imagefromvolume
-cinder upload-to-image $VOLID imagefromvolume
+cinder upload-to-image --container-format=ovf --disk-format=vhd $VOLID imagefromvolume
 }
 
 function then_volume_created

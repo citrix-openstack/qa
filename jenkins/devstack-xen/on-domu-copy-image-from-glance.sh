@@ -15,7 +15,7 @@ function given_image_is_there
 glance image-list | grep cfgtest || (
 glance image-create --name cfgtest \
 --copy-from=https://github.com/downloads/citrix-openstack/warehouse/cirros-0.3.0-x86_64-disk.vhd.tgz \
---container-format=bare --disk-format=vdi
+--container-format=ovf --disk-format=vhd
 echo "Cirros image uploaded, waiting 10 secs for glance to settle"
 sleep 10
 )
