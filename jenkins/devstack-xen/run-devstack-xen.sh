@@ -84,7 +84,7 @@ then
     cat <<EOF >> $GENERATED_LOCALRC
 # appended by jenkins
 # TODO - g-api only added due to dependency error with glance client
-ENABLED_SERVICES=n-cpu,n-net,n-api,g-api
+ENABLED_SERVICES="n-cpu,n-net,n-api,g-api,-mysql"
 MYSQL_HOST=$GuestIP
 RABBIT_HOST=$GuestIP
 KEYSTONE_AUTH_HOST=$GuestIP
