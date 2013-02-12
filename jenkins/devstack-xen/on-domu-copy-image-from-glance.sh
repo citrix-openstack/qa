@@ -16,9 +16,15 @@ glance image-list | grep cfgtest || (
 glance image-create --name cfgtest \
 --copy-from=https://github.com/downloads/citrix-openstack/warehouse/cirros-0.3.0-x86_64-disk.vhd.tgz \
 --container-format=ovf --disk-format=vhd
-echo "Cirros image uploaded, waiting 10 secs for glance to settle"
-sleep 10
 )
+
+function wait_till_image_is_active
+{
+while ! glance image-list | grep cfgtest | grep active;
+do
+    sleep 1
+done
+}
 
 IMAGEID=`glance image-list | grep cfgtest | extract_id`
 }
@@ -56,6 +62,7 @@ done
 
 given_no_created_volume
 given_image_is_there
+wait_till_image_is_active
 given_creating_volume_from_image
 wait_till_status_is_not "creating"
 assert_status_is "downloading"
