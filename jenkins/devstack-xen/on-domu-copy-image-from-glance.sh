@@ -3,7 +3,7 @@
 cd devstack
 . openrc admin
 
-set -eu
+set -eux
 
 function extract_id
 {
