@@ -4,7 +4,7 @@ set -eu
 
 SCRIPTDIR=$(cd $(dirname $(readlink -f "$0")) && cd .. && cd devstack-xen && pwd)
 XSLIB=$(cd $(dirname $(readlink -f "$0")) && cd xslib && pwd)
-SLAVELIB=$(cd $(dirname $(readlink -f "$0")) && cd slavelib && pwd)
+TESTLIB=$(cd $(dirname $(readlink -f "$0")) && cd tests && pwd)
 
 function print_usage_and_die
 {
@@ -53,4 +53,4 @@ function run_on
 destroy_slave
 start_slave
 SLAVE_IP=$(get_slave_ip)
-run_on $SLAVE_IP "$SLAVELIB/cinder-xenapinfs-tests.sh"
+run_on $SLAVE_IP "$TESTLIB/cinder-xenapinfs-tests.sh"
