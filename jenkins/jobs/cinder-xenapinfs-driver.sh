@@ -37,6 +37,11 @@ function run_on
     THE_IP="$1"
     SCRIPT="$2"
     shift 2
+    while ! ssh -q -o Batchmode=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "ubuntu@$THE_IP" ls;
+    do
+        sleep 1
+    done
+
     cat "$SCRIPT" | ssh -q -o Batchmode=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "ubuntu@$THE_IP" bash -s -- "$@"
 }
 
