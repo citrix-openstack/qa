@@ -9,6 +9,6 @@ NFSPATH="/mate-test"
 
 (
 cd $TOP_DIR/jenkins/devstack-xen/
-./run-on-devstack.sh "$SERVERNAME" on-domu-stop-update-restart-cinder.sh
+# ./run-on-devstack.sh "$SERVERNAME" on-domu-stop-update-restart-cinder.sh
 ./run-on-devstack.sh "$SERVERNAME" on-domu-copy-image-from-glance.sh
 ) 2>&1 | tee -a mate.log

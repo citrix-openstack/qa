@@ -6,7 +6,7 @@ SCRIPT_TO_RUN="$2"
 
 function on_xenserver
 {
-ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "root@$XENSERVER_HOST" "$@"
+ssh -q -o Batchmode=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "root@$XENSERVER_HOST" bash -s -- "$@"
 }
 
 cat $SCRIPT_TO_RUN | on_xenserver
