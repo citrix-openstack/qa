@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eu
+set -eux
 
 SCRIPTDIR=$(cd $(dirname $(readlink -f "$0")) && cd .. && cd devstack-xen && pwd)
 XSLIB=$(cd $(dirname $(readlink -f "$0")) && cd xslib && pwd)
