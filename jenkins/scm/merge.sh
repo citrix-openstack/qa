@@ -47,6 +47,8 @@ git remote update m_src_repo
 git remote add m_tgt_repo "$TARGET_REPO" || true
 git remote update m_tgt_repo
 
+git remote update origin
+
 git checkout -B build-temp "origin/$BASE_BRANCH"
 git merge "m_src_repo/$SOURCE_BRANCH"
 
