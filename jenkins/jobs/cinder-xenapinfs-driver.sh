@@ -18,6 +18,7 @@ positional arguments:
  NFSSERVER      Server, that has the NFS share
  NFSPATH        The path of the exported nfs server
  SERVERPASS     The password for the XenServer
+ BRANCH         The branch of the repo https://github.com/citrix-openstack/cinder to run the tests against
 EOF
 exit 1
 }
@@ -26,6 +27,7 @@ SERVERNAME="${1-$(print_usage_and_die)}"
 NFSSERVER="${2-$(print_usage_and_die)}"
 NFSPATH="${3-$(print_usage_and_die)}"
 SERVERPASS="${4-$(print_usage_and_die)}"
+SERVERPASS="${5-$(print_usage_and_die)}"
 
 function start_slave
 {
@@ -43,4 +45,4 @@ function run_on
 
 SLAVE_IP=$(start_slave)
 echo "SLAVE IP: $SLAVE_IP"
-run_on $SLAVE_IP "$TESTLIB/cinder-xenapinfs-tests.sh" "$SERVERNAME" "$SERVERPASS" "$NFSSERVER" "$NFSPATH"
+run_on $SLAVE_IP "$TESTLIB/cinder-xenapinfs-tests.sh" "$SERVERNAME" "$SERVERPASS" "$NFSSERVER" "$NFSPATH" "$BRANCH"

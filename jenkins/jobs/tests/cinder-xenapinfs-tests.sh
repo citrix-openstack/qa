@@ -8,6 +8,8 @@ export NFSSERVER="$3"
 export NFSPATH="$4"
 export LOCALPATHTONFS="/mnt/nfsdir"
 
+export BRANCH="$5"
+
 export DEBIAN_FRONTEND=noninteractive
 
 sudo apt-get install -qy git nfs-common python-virtualenv blktap-utils python-dev
