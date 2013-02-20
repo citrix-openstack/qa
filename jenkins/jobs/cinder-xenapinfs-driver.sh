@@ -27,7 +27,7 @@ SERVERNAME="${1-$(print_usage_and_die)}"
 NFSSERVER="${2-$(print_usage_and_die)}"
 NFSPATH="${3-$(print_usage_and_die)}"
 SERVERPASS="${4-$(print_usage_and_die)}"
-SERVERPASS="${5-$(print_usage_and_die)}"
+BRANCH="${5-$(print_usage_and_die)}"
 
 function start_slave
 {
