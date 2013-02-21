@@ -28,4 +28,4 @@ fi
 #
 # Run exercise.sh
 #
-ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "stack@$GUEST_IP" \ "~/devstack/exercise.sh"
+ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "stack@$GUEST_IP" \ "cd devstack && ./exercise.sh"
