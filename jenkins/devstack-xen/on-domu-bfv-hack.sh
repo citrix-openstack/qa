@@ -70,7 +70,7 @@ sleep 10
 
 function pre_cache_cirros_rootfs
 {
-cd $HOME
+cd $HOME/devstack
 wget -qN https://launchpad.net/cirros/trunk/0.3.0/+download/cirros-0.3.0-x86_64-rootfs.img.gz
 }
 
