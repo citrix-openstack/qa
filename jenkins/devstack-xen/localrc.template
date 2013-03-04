@@ -10,6 +10,8 @@ RABBIT_PASSWORD=citrix
 GUEST_PASSWORD=citrix
 # IMPORTANT: The following must be set to your dom0 root password!
 XENAPI_PASSWORD=%XenServerPassword%
+# As swift is enabled by default, we need a hash for it:
+SWIFT_HASH="66a3d6b56c1f479c8b4e70ab5c2000f5"
 
 
 # TEMPEST SETTINGS
