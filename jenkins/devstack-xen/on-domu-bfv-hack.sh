@@ -18,6 +18,7 @@ wget -qO - "https://raw.github.com/citrix-openstack/devstack/qndbfv/exercises/bo
 
 function amend_localrc_for_bfv
 {
+cd $HOME/devstack
 
 eval `grep XENAPI_PASSWORD localrc`
 eval `grep XENAPI_CONNECTION_URL localrc`
