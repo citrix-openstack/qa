@@ -43,7 +43,7 @@ DEFAULT_IMAGE_NAME=cirros
 DEFAULT_INSTANCE_TYPE=m1.small
 
 # Don't reclone - otherwise patches are overwritten
-RECLONE=no
+# RECLONE=no
 
 EOF
 }
@@ -80,7 +80,7 @@ cd $HOME/nova
 git fetch https://review.openstack.org/openstack/nova refs/changes/26/17726/4 && git cherry-pick FETCH_HEAD
 }
 
-get_old_bfv_exercise
+#get_old_bfv_exercise
 amend_localrc_for_bfv
 #apply_nova_patches
 restart_devstack
