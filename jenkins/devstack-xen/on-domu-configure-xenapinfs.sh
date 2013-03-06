@@ -31,7 +31,7 @@ function restart_devstack
 {
 (
 cd $HOME
-./run.sh
+./run.sh < /dev/null
 )
 }
 

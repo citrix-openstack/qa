@@ -101,3 +101,5 @@ ENABLED_SERVICES+=,tempest,
 # XenServer settings
 #
 OSDOMU_VDI_GB=40
+
+VERBOSE=False
