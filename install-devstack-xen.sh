@@ -219,6 +219,16 @@ SCRIPT_TMP_DIR=/tmp/jenkins_test
 
 cat > $tmpdir/install_devstack.sh <<EOF
 #!/bin/bash
+
+# Verify the host is suitable for devstack
+defaultSR=\`xe pool-list params=default-SR minimal=true\`
+if [ "\`xe sr-param-get uuid=\$defaultSR param-name=type\`" != "ext" ]; then
+    echo ""
+    echo "ERROR: The xenserver host must have an EXT3 SR as the default SR"
+    echo ""
+    exit 1
+fi
+
 rm -rf $SCRIPT_TMP_DIR
 mkdir -p $SCRIPT_TMP_DIR
 
