@@ -25,7 +25,8 @@ function upload_image {
     glance image-list | grep $1 || {
         glance image-create --name $1 \
         --copy-from=https://github.com/downloads/citrix-openstack/warehouse/cirros-0.3.0-x86_64-disk.vhd.tgz \
-        --container-format=ovf --disk-format=vhd --is-public=True --property auto_disk_config=true
+        --container-format=ovf --disk-format=vhd --is-public=True --property auto_disk_config=true \
+        --min-disk=1 --min-ram=256
     }
 }
 
@@ -50,8 +51,6 @@ addflavor 8 m1.twogig 2
 IMAGEID=$(imageid tempestimage)
 
 [ ! -z "$IMAGEID" ]
-
-glance image-update $IMAGEID --min-ram=256 --min-disk=1
 
 TEMPESTCONFIG=/opt/stack/tempest/etc/tempest.conf
 
