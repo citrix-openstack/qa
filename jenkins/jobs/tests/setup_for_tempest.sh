@@ -51,6 +51,8 @@ IMAGEID=$(imageid tempestimage)
 
 [ ! -z "$IMAGEID" ]
 
+glance image-update $IMAGEID --min-ram=256 --min-disk=1
+
 TEMPESTCONFIG=/opt/stack/tempest/etc/tempest.conf
 
 sed -i \
