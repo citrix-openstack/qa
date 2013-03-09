@@ -54,9 +54,11 @@ IMAGEID=$(imageid tempestimage)
 
 TEMPESTCONFIG=/opt/stack/tempest/etc/tempest.conf
 
+# tempest.tests.compute.images.test_images_oneserver:ImagesOneServerTestJSON.test_create_delete_image
+# might break, if the flavor's disk is bigger than the image
 sed -i \
 -e "s,\(^image_ref =\).*$,\1 $IMAGEID,g" \
 -e "s,\(^image_ref_alt =\).*$,\1 $IMAGEID,g" \
--e "s,\(^flavor_ref_alt =\).*$,\1 7,g" \
--e "s,\(^flavor_ref =\).*$,\1 8,g" \
+-e "s,\(^flavor_ref_alt =\).*$,\1 8,g" \
+-e "s,\(^flavor_ref =\).*$,\1 7,g" \
 $TEMPESTCONFIG
