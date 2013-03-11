@@ -22,4 +22,4 @@ SERVERNAME="${1-$(print_usage_and_die)}"
 
 set -exu
 
-"$SCRIPTDIR/run-on-devstack.sh" "$SERVERNAME" "$TESTDIR/delete-instance-with-volume.sh"
+"$SCRIPTDIR/run-on-devstack.sh" "$SERVERNAME" <(cat $TESTDIR/lib.sh; cat $TESTDIR/delete-instance-with-volume.sh)
