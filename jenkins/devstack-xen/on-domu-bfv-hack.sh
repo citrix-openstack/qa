@@ -64,8 +64,11 @@ cd $HOME/devstack
 glance image-create --name cirros \
 --copy-from=https://github.com/downloads/citrix-openstack/warehouse/cirros-0.3.0-x86_64-disk.vhd.tgz \
 --container-format=ovf --disk-format=vhd
-echo "Cirros image uploaded, waiting 10 secs for glance..."
-sleep 10
+echo "Cirros image uploaded, waiting for image to be active"
+while ! glance image-list | grep cirros | grep ovf | grep active
+do
+    sleep 1
+done
 )
 }
 
