@@ -12,6 +12,8 @@ export BRANCH="$5"
 
 export DEBIAN_FRONTEND=noninteractive
 
+sudo apt-get update
+sudo apt-get upgrade
 sudo apt-get install -qy git nfs-common python-virtualenv blktap-utils python-dev
 sudo mkdir -p /mnt/nfsdir
 sudo mount -t nfs "${NFSSERVER}:${NFSPATH}" /mnt/nfsdir
