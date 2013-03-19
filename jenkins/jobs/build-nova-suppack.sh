@@ -4,7 +4,7 @@ set -eu
 
 SCRIPTDIR=$(cd $(dirname $(readlink -f "$0")) && cd .. && cd devstack-xen && pwd)
 XSLIB=$(cd $(dirname $(readlink -f "$0")) && cd xslib && pwd)
-BUILDLIB=$(cd $(dirname $(readlink -f "$0")) && cd tests && pwd)
+BUILDLIB=$(cd $(dirname $(readlink -f "$0")) && cd builds && pwd)
 
 function print_usage_and_die
 {
