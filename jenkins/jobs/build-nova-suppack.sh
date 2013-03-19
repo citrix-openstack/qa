@@ -1,3 +1,5 @@
+#!/bin/bash
+
 set -eu
 
 SCRIPTDIR=$(cd $(dirname $(readlink -f "$0")) && cd .. && cd devstack-xen && pwd)
