@@ -19,6 +19,10 @@ cd plugins/xenserver/xenapi/contrib/
 
 # Get old of ddk
 cd
+RPMFILE=$(find -name "*.noarch.rpm" -print)
+
+mkdir suppack
+
 wget -q http://copper.eng.hq.xensource.com/ddk.iso
 DDKMOUNT=$(mktemp -d)
 sudo mount -o loop ddk.iso $DDKMOUNT
@@ -32,4 +36,18 @@ sudo mount /dev/mapper/loop1p1 $DDKROOT
 sudo mkdir $DDKROOT/mnt/host
 sudo mount --bind $(pwd) $DDKROOT/mnt/host
 
-sudo chroot $DDKROOT /usr/bin/build-supplemental-pack.sh --help
+sudo chroot $DDKROOT /usr/bin/build-supplemental-pack.sh \
+--output=/mnt/host/suppack \
+--vendor-code=novaplugin \
+--vendor-name=openstack \
+--label=novaplugins \
+--text="nova plugins" \
+--version=0 \
+/mnt/host/$RPMFILE
+
+exit 0
+# Cleanup
+sudo umount $DDKROOT/mnt/host
+sudo umount $DDKROOT
+sudo kpartx -d xvda.raw
+sudo umount $DDKMOUNT
