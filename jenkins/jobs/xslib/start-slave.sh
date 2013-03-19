@@ -1,5 +1,5 @@
 #!/bin/bash
-set -eu
+set -eux
 
 if [ -z "$(xe snapshot-list name-label=slave-fresh --minimal)" ]
 then
