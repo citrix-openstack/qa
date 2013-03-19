@@ -10,7 +10,7 @@ then
     VM=$(xe vm-import filename=/mnt/exported-vms/slave.xva)
     umount /mnt/exported-vms
 
-    xe vm-snapshot vm=slave new-name-label=slave-fresh
+    xe vm-snapshot vm=slave new-name-label=slave-fresh > /dev/null
 fi
 
 SNAP=$(xe snapshot-list name-label=slave-fresh --minimal)
