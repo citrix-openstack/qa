@@ -9,19 +9,21 @@ BUILDLIB=$(cd $(dirname $(readlink -f "$0")) && cd builds && pwd)
 function print_usage_and_die
 {
 cat >&2 << EOF
-usage: $0 SERVERNAME
+usage: $0 SERVERNAME GITREPO DDK_ROOT_URL
 
 Build Nova Supplemental Pack
 
 positional arguments:
  SERVERNAME     The name of the XenServer
  GITREPO        The git repository containing nova code
+ DDK_ROOT_URL   An Url pointing to a tgz containing ddk rootfs
 EOF
 exit 1
 }
 
 SERVERNAME="${1-$(print_usage_and_die)}"
 GITREPO="${2-$(print_usage_and_die)}"
+DDK_ROOT_URL="${3-$(print_usage_and_die)}"
 
 function start_slave
 {
@@ -40,4 +42,4 @@ function run_on
 echo "Spinning up virtual machine"
 SLAVE_IP=$(start_slave)
 echo "Starting job on $SLAVE_IP"
-run_on $SLAVE_IP "$BUILDLIB/build-nova-suppack.sh" "$GITREPO"
+run_on $SLAVE_IP "$BUILDLIB/build-nova-suppack.sh" "$GITREPO" "$DDK_ROOT_URL"
