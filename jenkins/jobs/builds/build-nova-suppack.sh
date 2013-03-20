@@ -2,6 +2,7 @@ set -eux
 
 GITREPO="$1"
 DDK_ROOT_URL="$2"
+GITBRANCH="$3"
 
 
 # Update system and install dependencies
@@ -12,7 +13,7 @@ sudo apt-get -qy upgrade
 sudo apt-get install -qy git rpm
 
 # Create rpm file
-git clone "$GITREPO"
+git clone -b "$GITBRANCH" "$GITREPO"
 cd nova
 cd plugins/xenserver/xenapi/contrib/
 ./build-rpm.sh
