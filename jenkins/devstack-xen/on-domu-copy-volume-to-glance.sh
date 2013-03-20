@@ -12,7 +12,14 @@ sed -e 's/^| //g' -e 's/ |.*$//g'
 
 function assert_status_is
 {
-glance image-list | grep imagefromvolume | grep "$1";
+local STATUS=$(glance image-list | grep imagefromvolume)
+if echo "$STATUS" | grep "$1"
+then
+    return 0
+else
+    echo "Expected Status: $0 Actual: $STATUS" >&2
+    return 1
+fi
 }
 
 function wait_till_status_is_not
@@ -56,6 +63,8 @@ given_volume_is_there
 when_upload_volume
 then_volume_created
 wait_till_status_is_not "queued"
+assert_status_is "saving"
+wait_till_status_is_not "saving"
 assert_status_is "active"
 
 echo "TESTS PASSED"
