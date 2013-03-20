@@ -1,7 +1,7 @@
 set -exu
 
 cd devstack
-./unstack.sh
+./unstack.sh || true
 sudo vgremove stack-volumes
 sudo pvcreate /dev/xvdb
 sudo vgcreate stack-volumes /dev/xvdb
