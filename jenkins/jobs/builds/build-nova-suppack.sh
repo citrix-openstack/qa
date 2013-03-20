@@ -17,7 +17,7 @@ cd nova
 cd plugins/xenserver/xenapi/contrib/
 ./build-rpm.sh
 
-# Get old of ddk
+# Get hold of ddk
 cd
 RPMFILE=$(find -name "*.noarch.rpm" -print)
 
