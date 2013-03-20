@@ -14,11 +14,8 @@ sudo apt-get install -qy git rpm
 
 # Create rpm file
 git clone -b "$GITBRANCH" "$GITREPO"
-cd nova
-cd plugins/xenserver/xenapi/contrib/
-./build-rpm.sh
+nova/plugins/xenserver/xenapi/contrib/build-rpm.sh
 
-cd
 RPMFILE=$(find -name "*.noarch.rpm" -print)
 
 # Create Supplemental pack
