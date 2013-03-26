@@ -1,6 +1,9 @@
 set -eux
 
-DEVSTACKVM=$(xe vm-list name-label=DevStackOSDomU --minimal)
+MACHINE_NAME="$1"
+DISK_SIZE="$2"
+
+DEVSTACKVM=$(xe vm-list name-label="$MACHINE_NAME" --minimal)
 
 for VBD in $(xe vbd-list vm-uuid=$DEVSTACKVM --minimal |  sed -e 's/,/ /g')
 do
@@ -15,7 +18,7 @@ do
 done
 
 LOCALSR=$(xe sr-list name-label="Local storage" --minimal)
-EXTRA_VDI=$(xe vdi-create name-label=extra-disk-for-os-volumes virtual-size=20GiB sr-uuid=$LOCALSR type=user)
+EXTRA_VDI=$(xe vdi-create name-label=extra-disk-for-os-volumes virtual-size="$DISK_SIZE" sr-uuid=$LOCALSR type=user)
 EXTRA_VBD=$(xe vbd-create vm-uuid=$DEVSTACKVM vdi-uuid=$EXTRA_VDI device=autodetect)
 xe vbd-plug uuid=$EXTRA_VBD
 DEVICE=$(xe vbd-param-get uuid=$EXTRA_VBD param-name=device)

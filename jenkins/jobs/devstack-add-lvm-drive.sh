@@ -22,5 +22,5 @@ exit 1
 SERVERNAME="${1-$(print_usage_and_die)}"
 
 
-$SCRIPTDIR/run-on-xenserver.sh $SERVERNAME $XSDIR/add-extra-hdd.sh
+$SCRIPTDIR/run-on-xenserver.sh $SERVERNAME $XSDIR/add-extra-hdd.sh DevStackOSDomU 20GiB
 $SCRIPTDIR/run-on-devstack.sh $SERVERNAME $OSLIBDIR/setup-extra-hdd.sh
