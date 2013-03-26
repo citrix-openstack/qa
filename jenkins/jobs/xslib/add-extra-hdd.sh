@@ -3,9 +3,9 @@ set -eux
 MACHINE_NAME="$1"
 DISK_SIZE="$2"
 
-DEVSTACKVM=$(xe vm-list name-label="$MACHINE_NAME" --minimal)
+VM=$(xe vm-list name-label="$MACHINE_NAME" --minimal)
 
-for VBD in $(xe vbd-list vm-uuid=$DEVSTACKVM --minimal |  sed -e 's/,/ /g')
+for VBD in $(xe vbd-list vm-uuid=$VM --minimal |  sed -e 's/,/ /g')
 do
     DEVICE=$(xe vbd-param-get uuid=$VBD param-name=device)
     if [ "$DEVICE" != "xvda" ]
@@ -19,7 +19,7 @@ done
 
 LOCALSR=$(xe sr-list name-label="Local storage" --minimal)
 EXTRA_VDI=$(xe vdi-create name-label=extra-disk-for-os-volumes virtual-size="$DISK_SIZE" sr-uuid=$LOCALSR type=user)
-EXTRA_VBD=$(xe vbd-create vm-uuid=$DEVSTACKVM vdi-uuid=$EXTRA_VDI device=autodetect)
+EXTRA_VBD=$(xe vbd-create vm-uuid=$VM vdi-uuid=$EXTRA_VDI device=autodetect)
 xe vbd-plug uuid=$EXTRA_VBD
 DEVICE=$(xe vbd-param-get uuid=$EXTRA_VBD param-name=device)
 
