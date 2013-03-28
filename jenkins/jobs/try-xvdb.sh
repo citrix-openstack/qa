@@ -2,9 +2,9 @@
 
 set -eu
 
-SCRIPTDIR=$(cd $(dirname $(readlink -f "$0")) && cd .. && cd devstack-xen && pwd)
 XSLIB=$(cd $(dirname $(readlink -f "$0")) && cd xslib && pwd)
 BUILDLIB=$(cd $(dirname $(readlink -f "$0")) && cd builds && pwd)
+REMOTELIB=$(cd $(dirname $(readlink -f "$0")) && cd remote && pwd)
 
 function print_usage_and_die
 {
@@ -23,37 +23,27 @@ exit 1
 SERVERNAME="${1-$(print_usage_and_die)}"
 VDI="${2-$(print_usage_and_die)}"
 
-function run_on
-{
-    THE_IP="$1"
-    SCRIPT="$2"
-    shift 2
-
-    cat "$SCRIPT" | ssh -q -o Batchmode=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "ubuntu@$THE_IP" bash -s -- "$@"
-}
-
-
 while true
 do
-    VM=$($SCRIPTDIR/run-on-xenserver.sh $SERVERNAME $XSLIB/start-vm-with-vdi.sh "$VDI")
+    VM=$($REMOTELIB/bash.sh root@$SERVERNAME $XSLIB/start-vm-with-vdi.sh "$VDI")
 
     echo "VM launched. Please press Enter as finished (temp VM is $VM)"
     read
 
-    $SCRIPTDIR/run-on-xenserver.sh $SERVERNAME $XSLIB/stop-destroy-vm-keep-vdi.sh "$VM"
-    $SCRIPTDIR/run-on-xenserver.sh $SERVERNAME $XSLIB/add-xvdb-to-slave.sh "$VDI"
+    $REMOTELIB/bash.sh root@$SERVERNAME $XSLIB/stop-destroy-vm-keep-vdi.sh "$VM"
+    $REMOTELIB/bash.sh root@$SERVERNAME $XSLIB/add-xvdb-to-slave.sh "$VDI"
 
     echo "xvdb attached to slave VM (Enter to continue)"
     read
 
-    SLAVE_IP=$($SCRIPTDIR/run-on-xenserver.sh $SERVERNAME $XSLIB/get-slave-ip.sh)
-    run_on $SLAVE_IP "$BUILDLIB/enter-jeos-chroot.sh"
+    SLAVE_IP=$($REMOTELIB/bash.sh root@$SERVERNAME $XSLIB/get-slave-ip.sh)
+    $REMOTELIB/bash.sh ubuntu@$SLAVE_IP "$BUILDLIB/enter-jeos-chroot.sh"
 
     echo "Please press Enter as finished with chroot on $SLAVE_IP"
     read
 
-    run_on $SLAVE_IP "$BUILDLIB/quit-jeos-chroot.sh"
-    $SCRIPTDIR/run-on-xenserver.sh $SERVERNAME $XSLIB/detach-xvdb.sh slave
+    $REMOTELIB/bash.sh ubuntu@$SLAVE_IP "$BUILDLIB/quit-jeos-chroot.sh"
+    $REMOTELIB/bash.sh root@$SERVERNAME $XSLIB/detach-xvdb.sh slave
 
     echo "Now you can type quit to exit, or anything else to carry on"
     read COMMAND
