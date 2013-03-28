@@ -15,6 +15,7 @@ SWIFT_HASH="66a3d6b56c1f479c8b4e70ab5c2000f5"
 
 # Use a XenServer image:
 IMAGE_URLS="https://github.com/downloads/citrix-openstack/warehouse/cirros-0.3.0-x86_64-disk.vhd.tgz"
+DEFAULT_IMAGE_NAME="cirros-0.3.0-x86_64-disk"
 
 
 # TEMPEST SETTINGS
