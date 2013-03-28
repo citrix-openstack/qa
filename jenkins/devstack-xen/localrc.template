@@ -94,7 +94,7 @@ UBUNTU_INST_RELEASE=precise
 
 # Use a raw Image:
 IMAGE_URLS="http://copper.eng.hq.xensource.com/builds/raw-cirros-0.3.0-x86_64-disk.img"
-DEFAULT_IMAGE_NAME="raw-cirros-0.3.0-x86_64-disk.img"
+DEFAULT_IMAGE_NAME="raw-cirros"
 
 ACTIVE_TIMEOUT=500
 TERMINATE_TIMEOUT=500
