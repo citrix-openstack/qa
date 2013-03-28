@@ -9,4 +9,5 @@ function on_xenserver
 ssh -q -o Batchmode=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "root@$XENSERVER_HOST" bash -s -- "$@"
 }
 
-cat $SCRIPT_TO_RUN | on_xenserver
+shift 2
+cat $SCRIPT_TO_RUN | on_xenserver "$@"
