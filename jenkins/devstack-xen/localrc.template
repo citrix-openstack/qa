@@ -86,15 +86,15 @@ UBUNTU_INST_RELEASE=precise
 # exercise.sh settings
 #
 # DISABLE Boot from Volume
-# SKIP_EXERCISES="boot_from_volume"
+SKIP_EXERCISES="boot_from_volume"
 
 # Use a XenServer Image:
 # IMAGE_URLS="https://github.com/downloads/citrix-openstack/warehouse/cirros-0.3.0-x86_64-disk.vhd.tgz"
 # DEFAULT_IMAGE_NAME="cirros-0.3.0-x86_64-disk"
 
 # Use a raw Image:
-IMAGE_URLS="http://copper.eng.hq.xensource.com/builds/raw-cirros-0.3.0-x86_64-disk.img"
-DEFAULT_IMAGE_NAME="raw-cirros"
+# IMAGE_URLS="http://copper.eng.hq.xensource.com/builds/raw-cirros-0.3.0-x86_64-disk.img"
+# DEFAULT_IMAGE_NAME="raw-cirros"
 
 ACTIVE_TIMEOUT=500
 TERMINATE_TIMEOUT=500
