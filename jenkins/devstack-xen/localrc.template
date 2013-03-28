@@ -85,7 +85,7 @@ UBUNTU_INST_RELEASE=precise
 # exercise.sh settings
 #
 # boot from volume doesn't yet work on our setup
-SKIP_EXERCISES="boot_from_volume"
+# SKIP_EXERCISES="boot_from_volume"
 ACTIVE_TIMEOUT=500
 TERMINATE_TIMEOUT=500
 
