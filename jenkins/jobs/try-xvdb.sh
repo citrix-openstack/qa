@@ -25,25 +25,25 @@ VDI="${2-$(print_usage_and_die)}"
 
 while true
 do
-    VM=$($REMOTELIB/bash.sh root@$SERVERNAME $XSLIB/start-vm-with-vdi.sh "$VDI")
+    VM=$(cat $XSLIB/start-vm-with-vdi.sh | $REMOTELIB/bash.sh root@$SERVERNAME "$VDI")
 
     echo "VM launched. Please press Enter as finished (temp VM is $VM)"
     read
 
-    $REMOTELIB/bash.sh root@$SERVERNAME $XSLIB/stop-destroy-vm-keep-vdi.sh "$VM"
-    $REMOTELIB/bash.sh root@$SERVERNAME $XSLIB/add-xvdb-to-slave.sh "$VDI"
+    cat $XSLIB/stop-destroy-vm-keep-vdi.sh | $REMOTELIB/bash.sh root@$SERVERNAME "$VM"
+    cat $XSLIB/add-xvdb-to-slave.sh | $REMOTELIB/bash.sh root@$SERVERNAME "$VDI"
 
     echo "xvdb attached to slave VM (Enter to continue)"
     read
 
-    SLAVE_IP=$($REMOTELIB/bash.sh root@$SERVERNAME $XSLIB/get-slave-ip.sh)
-    $REMOTELIB/bash.sh ubuntu@$SLAVE_IP "$BUILDLIB/enter-jeos-chroot.sh"
+    SLAVE_IP=$(cat $XSLIB/get-slave-ip.sh | $REMOTELIB/bash.sh root@$SERVERNAME)
+    cat $BUILDLIB/enter-jeos-chroot.sh | $REMOTELIB/bash.sh ubuntu@$SLAVE_IP
 
     echo "Please press Enter as finished with chroot on $SLAVE_IP"
     read
 
-    $REMOTELIB/bash.sh ubuntu@$SLAVE_IP "$BUILDLIB/quit-jeos-chroot.sh"
-    $REMOTELIB/bash.sh root@$SERVERNAME $XSLIB/detach-xvdb.sh slave
+    cat $BUILDLIB/quit-jeos-chroot.sh | $REMOTELIB/bash.sh ubuntu@$SLAVE_IP
+    cat $XSLIB/detach-xvdb.sh | $REMOTELIB/bash.sh root@$SERVERNAME slave
 
     echo "Now you can type quit to exit, or anything else to carry on"
     read COMMAND

@@ -22,15 +22,15 @@ exit 1
 SERVERNAME="${1-$(print_usage_and_die)}"
 
 echo "Spinning up virtual machine"
-SLAVE_IP=$($REMOTELIB/bash.sh root@$SERVERNAME "$XSLIB/start-slave.sh")
+SLAVE_IP=$(cat "$XSLIB/start-slave.sh" | $REMOTELIB/bash.sh root@$SERVERNAME)
 echo "Starting job on $SLAVE_IP"
 
-$REMOTELIB/bash.sh root@$SERVERNAME $XSLIB/add-extra-hdd.sh slave 10GiB
-$REMOTELIB/bash.sh ubuntu@$SLAVE_IP "$BUILDLIB/prepare-for-jeos.sh"
-$REMOTELIB/bash.sh ubuntu@$SLAVE_IP "$BUILDLIB/enter-jeos-chroot.sh"
-$REMOTELIB/bash.sh ubuntu@$SLAVE_IP "$BUILDLIB/setup-jeos.sh"
-$REMOTELIB/bash.sh ubuntu@$SLAVE_IP "$BUILDLIB/quit-jeos-chroot.sh"
-VDI=$($REMOTELIB/bash.sh root@$SERVERNAME $XSLIB/detach-xvdb.sh slave)
+cat $XSLIB/add-extra-hdd.sh | $REMOTELIB/bash.sh root@$SERVERNAME slave 10GiB
+cat $BUILDLIB/prepare-for-jeos.sh | $REMOTELIB/bash.sh ubuntu@$SLAVE_IP 
+cat $BUILDLIB/enter-jeos-chroot.sh | $REMOTELIB/bash.sh ubuntu@$SLAVE_IP 
+cat $BUILDLIB/setup-jeos.sh | $REMOTELIB/bash.sh ubuntu@$SLAVE_IP 
+cat $BUILDLIB/quit-jeos-chroot.sh | $REMOTELIB/bash.sh ubuntu@$SLAVE_IP 
+VDI=$(cat $XSLIB/detach-xvdb.sh | $REMOTELIB/bash.sh root@$SERVERNAME slave)
 
 echo "VDI is: $VDI"
 echo "Job finished on $SLAVE_IP"
