@@ -13,9 +13,6 @@ XENAPI_PASSWORD=%XenServerPassword%
 # As swift is enabled by default, we need a hash for it:
 SWIFT_HASH="66a3d6b56c1f479c8b4e70ab5c2000f5"
 
-# Use a XenServer image:
-IMAGE_URLS="https://github.com/downloads/citrix-openstack/warehouse/cirros-0.3.0-x86_64-disk.vhd.tgz"
-DEFAULT_IMAGE_NAME="cirros-0.3.0-x86_64-disk"
 
 
 # TEMPEST SETTINGS
@@ -88,8 +85,17 @@ UBUNTU_INST_RELEASE=precise
 #
 # exercise.sh settings
 #
-# boot from volume doesn't yet work on our setup
+# DISABLE Boot from Volume
 # SKIP_EXERCISES="boot_from_volume"
+
+# Use a XenServer Image:
+# IMAGE_URLS="https://github.com/downloads/citrix-openstack/warehouse/cirros-0.3.0-x86_64-disk.vhd.tgz"
+# DEFAULT_IMAGE_NAME="cirros-0.3.0-x86_64-disk"
+
+# Use a raw Image:
+IMAGE_URLS="http://copper.eng.hq.xensource.com/builds/raw-cirros-0.3.0-x86_64-disk.img"
+DEFAULT_IMAGE_NAME="raw-cirros-0.3.0-x86_64-disk.img"
+
 ACTIVE_TIMEOUT=500
 TERMINATE_TIMEOUT=500
 
