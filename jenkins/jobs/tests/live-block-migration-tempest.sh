@@ -4,7 +4,8 @@ set -exu
 cd tempest
 
 # Apply the patch
-git fetch https://review.openstack.org/openstack/tempest refs/changes/09/25609/1 && git cherry-pick FETCH_HEAD || true
+#git fetch https://review.openstack.org/openstack/tempest refs/changes/09/25609/1 && git cherry-pick FETCH_HEAD || true
+git fetch https://review.openstack.org/openstack/tempest refs/changes/09/25609/3 && git cherry-pick FETCH_HEAD || true
 
 sed -i \
 -e 's/^live_migration_available.*/live_migration_available = True/g' \
