@@ -28,4 +28,5 @@ cp ../../localrc .
 #
 # Install VM
 #
+cd tools/xen
 ./install_os_domU.sh
