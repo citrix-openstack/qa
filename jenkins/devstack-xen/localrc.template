@@ -48,24 +48,24 @@ VOLUME_BACKING_FILE_SIZE=10000M
 # MGMT network params
 MGT_IP="dhcp"
 MGT_NETMASK=255.255.255.0
-MGT_BR=xenbr0
-MGT_VLAN=-1
-MGT_DEV=eth0
+#XXX MGT_BR=xenbr0
+#XXX MGT_VLAN=-1
+#XXX MGT_DEV=eth0
 
 # Public network
 PUB_IP=172.24.4.10
 PUB_NETMASK=255.255.255.0
-PUB_BR=xenbr1
-PUB_VLAN=-1
-PUB_DEV=eth1
+#XXX PUB_BR=xenbr1
+#XXX PUB_VLAN=-1
+#XXX PUB_DEV=eth1
 
 # VM network params
 VM_IP=10.255.255.255
 VM_NETMASK=255.255.255.0
-VM_BR=""
-VM_VLAN=%XenServerVmVlan%
-VM_DEV=eth1
-FLAT_NETWORK_BRIDGE="vmbr"
+#XXX VM_BR=""
+#XXX VM_VLAN=%XenServerVmVlan%
+#XXX VM_DEV=eth1
+#XXX FLAT_NETWORK_BRIDGE="vmbr"
 
 # Expose OpenStack Services on the management network
 HOST_IP_IFACE="eth2"
