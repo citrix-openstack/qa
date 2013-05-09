@@ -26,9 +26,6 @@ ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "root@$Server" "
 # $XenServerVmVlan - Vlan ID
 # $XenServerPassword - Password for your XenServer
 
-# $MirrorHttpHostname (default:archive.ubuntu.com)- Ubuntu mirror to use
-# $MirrorHttpDirectory (default: /ubuntu) - directory within the http mirror
-# $MirrorHttpProxy (default: <empty>) - http proxy to use
 # $DevStackURL (optional) - URL of the devstack zip file
 # $CleanTemplates (default:false) - If true, clean the templates
 #
@@ -43,9 +40,6 @@ Server="$Server"
 XenServerVmVlan="$XenServerVmVlan"
 XenServerPassword="$XenServerPassword"
 
-MirrorHttpHostname=${MirrorHttpHostname-"archive.ubuntu.com"}
-MirrorHttpDirectory=${MirrorHttpDirectory-"/ubuntu"}
-MirrorHttpProxy=${MirrorHttpProxy-""}
 DevStackURL=${DevStackURL-"https://github.com/openstack-dev/devstack/zipball/master"}
 CleanTemplates="${CleanTemplates-false}"
 
@@ -124,4 +118,4 @@ echo "** end of localrc file **"
 scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$thisdir/on-host-install.sh" "root@$Server:$SCRIPT_TMP_DIR"
 scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$GENERATED_LOCALRC" "root@$Server:$SCRIPT_TMP_DIR/localrc"
 rm $GENERATED_LOCALRC
-ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "root@$Server" "$SCRIPT_TMP_DIR/on-host-install.sh" "${DevStackURL}" "${MirrorHttpHostname}" "${MirrorHttpDirectory}" "${MirrorHttpProxy}"
+ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "root@$Server" "$SCRIPT_TMP_DIR/on-host-install.sh" "${DevStackURL}"

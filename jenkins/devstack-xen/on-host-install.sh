@@ -10,9 +10,6 @@ set -eux
 # Get Arguments
 #
 DevStackURL=$1
-MirrorHttpHostname=$2
-MirrorHttpDirectory=$3
-MirrorHttpProxy=${4-""}
 
 DhcpTimeout=120
 
@@ -27,17 +24,6 @@ wget --output-document=devstack.zip --no-check-certificate $DevStackURL
 unzip -o devstack.zip -d ./devstack
 cd devstack/*/
 cp ../../localrc .
-
-#
-# Prepare preseed
-#
-cd tools/xen
-sed -ie "s,\(d-i mirror/http/hostname string\).*,\1 ${MirrorHttpHostname},g" devstackubuntupreseed.cfg
-sed -ie "s,\(d-i mirror/http/proxy string\).*,\1 ${MirrorHttpProxy},g" devstackubuntupreseed.cfg
-sed -ie "s,\(d-i mirror/http/directory string\).*,\1 ${MirrorHttpDirectory},g" devstackubuntupreseed.cfg
-
-# Additional DHCP timeout
-sed -ie "s,#\(d-i netcfg/dhcp_timeout string\).*,\1 ${DhcpTimeout},g" devstackubuntupreseed.cfg
 
 #
 # Install VM

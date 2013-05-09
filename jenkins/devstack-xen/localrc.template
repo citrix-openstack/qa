@@ -74,6 +74,10 @@ HOST_IP_IFACE="eth2"
 UBUNTU_INST_RELEASE="precise"
 UBUNTU_INST_IFACE="eth2"
 
+# Use a custom repository, and a proxy
+UBUNTU_INST_HTTP_HOSTNAME="mirror.anl.gov"
+UBUNTU_INST_HTTP_DIRECTORY="/pub/ubuntu"
+UBUNTU_INST_HTTP_PROXY="http://gold.eng.hq.xensource.com:8000"
 
 #
 # exercise.sh settings

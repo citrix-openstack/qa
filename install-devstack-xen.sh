@@ -174,15 +174,9 @@ set -x
 # $XenServerVmVlan - Vlan ID
 # $XenServerPassword - Password for your XenServer
 
-# $MirrorHttpHostname (default:archive.ubuntu.com)- Ubuntu mirror to use
-# $MirrorHttpDirectory (default: /ubuntu) - directory within the http mirror
-# $MirrorHttpProxy (default: <empty>) - http proxy to use
 # $DevStackURL (optional) - URL of the devstack zip file
 # $CleanTemplates (default:false) - If true, clean the templates
 
-MirrorHttpHostname=${MirrorHttpHostname-"archive.ubuntu.com"}
-MirrorHttpDirectory=${MirrorHttpDirectory-"/ubuntu"}
-MirrorHttpProxy=${MirrorHttpProxy-""}
 DevStackURL=${DevStackURL-"https://github.com/openstack-dev/devstack/zipball/master"}
 CleanTemplates="${CleanTemplates-false}"
 DhcpTimeout=120
@@ -240,9 +234,6 @@ mv $SCRIPT_TMP_DIR/tmpunzip/* $SCRIPT_TMP_DIR/devstack
 rm -rf $SCRIPT_TMP_DIR/tmpunzip
 
 preseedcfg=$SCRIPT_TMP_DIR/devstack/tools/xen/devstackubuntupreseed.cfg
-sed -ie "s,\(d-i mirror/http/hostname string\).*,\1 ${MirrorHttpHostname},g" \$preseedcfg
-sed -ie "s,\(d-i mirror/http/proxy string\).*,\1 ${MirrorHttpProxy},g" \$preseedcfg
-sed -ie "s,\(d-i mirror/http/directory string\).*,\1 ${MirrorHttpDirectory},g" \$preseedcfg
 # Additional DHCP timeout
 sed -ie "s,#\(d-i netcfg/dhcp_timeout string\).*,\1 ${DhcpTimeout},g" \$preseedcfg
 
