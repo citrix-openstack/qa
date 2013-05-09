@@ -67,19 +67,12 @@ VM_VLAN=%XenServerVmVlan%
 VM_DEV=eth1
 FLAT_NETWORK_BRIDGE="vmbr"
 
-# XenAPI is on mangement network
-HOST_IP_IFACE=eth2
+# Expose OpenStack Services on the management network
+HOST_IP_IFACE="eth2"
 
-
-#
-# DevStack XenServer tools settings
-#
-NETINSTALLIP="dhcp"
-NETINSTALL_IFACE=eth2
-NAMESERVERS=""
-NETMAST=""
-GATEWAY=""
-UBUNTU_INST_RELEASE=precise
+# OpenStack VM Settings
+UBUNTU_INST_RELEASE="precise"
+UBUNTU_INST_IFACE="eth2"
 
 
 #
