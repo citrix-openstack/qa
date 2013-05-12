@@ -13,8 +13,6 @@ XENAPI_PASSWORD=%XenServerPassword%
 # As swift is enabled by default, we need a hash for it:
 SWIFT_HASH="66a3d6b56c1f479c8b4e70ab5c2000f5"
 
-
-
 # TEMPEST SETTINGS
 #
 # Need to be set, otherwise image resize fails (TODO: bug)
@@ -48,24 +46,14 @@ VOLUME_BACKING_FILE_SIZE=10000M
 # MGMT network params
 MGT_IP="dhcp"
 MGT_NETMASK=255.255.255.0
-#XXX MGT_BR=xenbr0
-#XXX MGT_VLAN=-1
-#XXX MGT_DEV=eth0
 
 # Public network
 PUB_IP=172.24.4.10
 PUB_NETMASK=255.255.255.0
-#XXX PUB_BR=xenbr1
-#XXX PUB_VLAN=-1
-#XXX PUB_DEV=eth1
 
 # VM network params
 VM_IP=10.255.255.255
 VM_NETMASK=255.255.255.0
-#XXX VM_BR=""
-#XXX VM_VLAN=%XenServerVmVlan%
-#XXX VM_DEV=eth1
-#XXX FLAT_NETWORK_BRIDGE="vmbr"
 
 # Expose OpenStack Services on the management network
 HOST_IP_IFACE="eth2"
