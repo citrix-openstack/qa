@@ -92,6 +92,9 @@ Q_PLUGIN=openvswitch
 MULTI_HOST=False
 ENABLED_SERVICES+=,tempest,quantum,q-svc,q-agt,q-dhcp,q-l3,q-meta,-n-net
 
+# Disable security groups
+Q_USE_SECGROUP=False
+
 # Workaround
 os_VENDOR="Some value"
 
