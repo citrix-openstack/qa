@@ -12,16 +12,63 @@ A simple script to setup a XenServer installation with Quantum.
 positional arguments:
  XENSERVER_IP     The IP address of the XenServer
  XENSERVER_PASS   The root password for the XenServer
+ GITHUB_USER      The github user to use for temporary branches
 
 An example run:
 
-./$0 10.219.10.25 mypassword
+./$0 10.219.10.25 mypassword citrix-openstack
 EOF
 exit 1
 }
 
 XENSERVER_IP="${1-$(print_usage_and_die)}"
 XENSERVER_PASS="${2-$(print_usage_and_die)}"
+GITHUB_USER="${3-$(print_usage_and_die)}"
+
+function create_branch() {
+    local source_repo
+    local target_repo
+    local branchname
+
+    source_repo="$1"
+    target_repo="$2"
+    branchname="$3"
+
+    local tmpdir
+
+    branchname=$(date +%s)
+
+    tmpdir=$(mktemp -d)
+    (
+        cd $tmpdir
+        git clone "$source_repo" repo
+        cd repo
+        git checkout -b "$branchname"
+        git remote add target_repo "$target_repo"
+
+        ( echo "set -exu"; cat ) | bash -s --
+        git push target_repo "$branchname"
+    )
+    rm -rf "$tmpdir"
+}
+
+# Create custom devstack branch
+devstack_branch=$(date +%s)
+create_branch \
+    "https://github.com/openstack-dev/devstack.git" \
+    "git@github.com:$GITHUB_USER/devstack.git" \
+    "$devstack_branch" << EOF
+git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/92/28692/6 && git cherry-pick FETCH_HEAD
+EOF
+
+# Create custom quantum branch
+quantum_branch=$(date +%s)
+create_branch \
+    "https://github.com/openstack/quantum.git" \
+    "git@github.com:$GITHUB_USER/quantum.git" \
+    "$quantum_branch" << EOF
+git fetch https://review.openstack.org/openstack/quantum refs/changes/22/15022/13 && git cherry-pick FETCH_HEAD
+EOF
 
 ssh -q \
     -o Batchmode=yes \
@@ -29,10 +76,10 @@ ssh -q \
     -o UserKnownHostsFile=/dev/null \
     "root@$XENSERVER_IP" bash -s -- << EOF
 set -exu
-rm -rf devstack-ovsint
-wget -qO - https://github.com/citrix-openstack/devstack/archive/ovsint.tar.gz |
+rm -rf "devstack-$devstack_branch"
+wget -qO - https://github.com/$GITHUB_USER/devstack/archive/$devstack_branch.tar.gz |
     tar -xzf -
-cd devstack-ovsint
+cd "devstack-$devstack_branch"
 
 cat << LOCALRC_CONTENT_ENDS_HERE > localrc
 # Passwords
@@ -52,7 +99,6 @@ DEFAULT_INSTANCE_TYPE="m1.small"
 EXTRA_OPTS=("xenapi_disable_agent=True")
 API_RATE_LIMIT=False
 VIRT_DRIVER=xenserver
-XEN_FIREWALL_DRIVER=nova.virt.firewall.NoopFirewallDriver
 
 # Cinder settings
 VOLUME_BACKING_FILE_SIZE=10000M
@@ -86,11 +132,11 @@ XENAPI_CONNECTION_URL="http://$XENSERVER_IP"
 VNCSERVER_PROXYCLIENT_ADDRESS="$XENSERVER_IP"
 
 # Custom branches
-QUANTUM_REPO=https://github.com/citrix-openstack/quantum.git
-QUANTUM_BRANCH=ovsint
+QUANTUM_REPO=https://github.com/$GITHUB_USER/quantum.git
+QUANTUM_BRANCH=$quantum_branch
 Q_PLUGIN=openvswitch
 MULTI_HOST=False
-ENABLED_SERVICES+=,tempest,quantum,q-svc,q-agt,q-dhcp,q-l3,q-meta,-n-net
+ENABLED_SERVICES+=,tempest,quantum,q-svc,q-agt,q-dhcp,q-l3,q-meta,q-domua,-n-net
 
 # Disable security groups
 Q_USE_SECGROUP=False
@@ -102,6 +148,10 @@ os_VENDOR="Some value"
 UBUNTU_INST_HTTP_HOSTNAME="mirror.anl.gov"
 UBUNTU_INST_HTTP_DIRECTORY="/pub/ubuntu"
 UBUNTU_INST_HTTP_PROXY="http://gold.eng.hq.xensource.com:8000"
+
+# With XenServer single box install, VLANs need to be enabled
+ENABLE_TENANT_VLANS="True"
+OVS_VLAN_RANGES="physnet1:1000:1024"
 
 LOCALRC_CONTENT_ENDS_HERE
 
