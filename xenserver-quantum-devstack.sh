@@ -59,6 +59,7 @@ create_branch \
     "git@github.com:$GITHUB_USER/devstack.git" \
     "$devstack_branch" << EOF
 git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/92/28692/6 && git cherry-pick FETCH_HEAD
+git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/16/30416/1 && git cherry-pick FETCH_HEAD
 EOF
 
 # Create custom quantum branch
