@@ -58,8 +58,9 @@ create_branch \
     "https://github.com/openstack-dev/devstack.git" \
     "git@github.com:$GITHUB_USER/devstack.git" \
     "$devstack_branch" << EOF
-git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/92/28692/6 && git cherry-pick FETCH_HEAD
-git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/16/30416/1 && git cherry-pick FETCH_HEAD
+git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/16/30416/3 && git cherry-pick FETCH_HEAD
+git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/03/30703/1 && git cherry-pick FETCH_HEAD
+git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/23/30723/1 && git cherry-pick FETCH_HEAD
 EOF
 
 # Create custom quantum branch
@@ -68,7 +69,7 @@ create_branch \
     "https://github.com/openstack/quantum.git" \
     "git@github.com:$GITHUB_USER/quantum.git" \
     "$quantum_branch" << EOF
-git fetch https://review.openstack.org/openstack/quantum refs/changes/22/15022/13 && git cherry-pick FETCH_HEAD
+git fetch https://review.openstack.org/openstack/quantum refs/changes/45/30745/2 && git cherry-pick FETCH_HEAD
 EOF
 
 ssh -q \
@@ -153,6 +154,8 @@ UBUNTU_INST_HTTP_PROXY="http://gold.eng.hq.xensource.com:8000"
 # With XenServer single box install, VLANs need to be enabled
 ENABLE_TENANT_VLANS="True"
 OVS_VLAN_RANGES="physnet1:1000:1024"
+
+# CLEAN_TEMPLATES=true
 
 LOCALRC_CONTENT_ENDS_HERE
 
