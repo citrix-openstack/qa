@@ -25,11 +25,14 @@ RABBIT_PASSWORD=citrix
 GUEST_PASSWORD=citrix
 # IMPORTANT: The following must be set to your dom0 root password!
 XENAPI_PASSWORD=%XenServerPassword%
+# As swift is enabled by default, we need a hash for it:
+SWIFT_HASH="66a3d6b56c1f479c8b4e70ab5c2000f5"
 
 # TEMPEST SETTINGS
 #
 # Need to be set, otherwise image resize fails (TODO: bug)
 DEFAULT_INSTANCE_TYPE="m1.small"
+
 
 #
 # Compute settings
@@ -38,15 +41,18 @@ MULTI_HOST=true
 # our image doesn't have the agent
 EXTRA_OPTS=("xenapi_disable_agent=True")
 OSDOMU_MEM_MB=4096
+#FIXME - see LP 1102964 XEN_FIREWALL_DRIVER=nova.virt.xenapi.firewall.Dom0IptablesFirewallDriver
 # turn off rate limit to help tempest
 API_RATE_LIMIT=False
 VIRT_DRIVER=xenserver
+
 
 #
 # Volume settings
 #
 # make tempest pass by having bigger volume file
 VOLUME_BACKING_FILE_SIZE=10000M
+
 
 #
 # Networking settings
@@ -55,45 +61,47 @@ VOLUME_BACKING_FILE_SIZE=10000M
 # MGMT network params
 MGT_IP="dhcp"
 MGT_NETMASK=255.255.255.0
-MGT_BR=xenbr0
-MGT_VLAN=-1
-MGT_DEV=eth0
+
 
 # Public network
 PUB_IP=172.24.4.10
 PUB_NETMASK=255.255.255.0
-PUB_BR=xenbr1
-PUB_VLAN=-1
-PUB_DEV=eth1
+
 
 # VM network params
 VM_IP=10.255.255.255
 VM_NETMASK=255.255.255.0
-VM_BR=""
-VM_VLAN=%XenServerVmVlan%
-VM_DEV=eth1
-FLAT_NETWORK_BRIDGE="vmbr"
 
-# XenAPI is on mangement network
-HOST_IP_IFACE=eth2
 
-#
-# DevStack XenServer tools settings
-#
-NETINSTALLIP="dhcp"
-NETINSTALL_IFACE=eth2
-NAMESERVERS=""
-NETMAST=""
-GATEWAY=""
-UBUNTU_INST_RELEASE=precise
+# Expose OpenStack Services on the management network
+HOST_IP_IFACE="eth2"
+
+# OpenStack VM Settings
+UBUNTU_INST_RELEASE="precise"
+UBUNTU_INST_IFACE="eth2"
+
+# Use a custom repository, and a proxy
+#UBUNTU_INST_HTTP_HOSTNAME="mirror.anl.gov"
+#UBUNTU_INST_HTTP_DIRECTORY="/pub/ubuntu"
+#UBUNTU_INST_HTTP_PROXY="http://gold.eng.hq.xensource.com:8000"
 
 #
 # exercise.sh settings
 #
-# boot from volume doesn't yet work on our setup
+# DISABLE Boot from Volume
 SKIP_EXERCISES="boot_from_volume"
+
+# Use a XenServer Image:
+# IMAGE_URLS="https://github.com/downloads/citrix-openstack/warehouse/cirros-0.3.0-x86_64-disk.vhd.tgz"
+# DEFAULT_IMAGE_NAME="cirros-0.3.0-x86_64-disk"
+
+# Use a raw Image:
+# IMAGE_URLS="http://copper.eng.hq.xensource.com/builds/raw-cirros-0.3.0-x86_64-disk.img"
+# DEFAULT_IMAGE_NAME="raw-cirros"
+
 ACTIVE_TIMEOUT=500
 TERMINATE_TIMEOUT=500
+
 
 #
 # DevStack settings
@@ -106,6 +114,8 @@ ENABLED_SERVICES+=,tempest,
 # XenServer settings
 #
 OSDOMU_VDI_GB=40
+
+VERBOSE=False
 EOF
 }
 
