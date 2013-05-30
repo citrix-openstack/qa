@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eux
+set -eu
 
 function print_usage_and_die
 {
@@ -16,7 +16,7 @@ positional arguments:
 
 An example run:
 
-./$0 10.219.10.25 mypassword citrix-openstack
+$0 10.219.10.25 mypassword citrix-openstack
 EOF
 exit 1
 }
@@ -24,6 +24,8 @@ exit 1
 XENSERVER_IP="${1-$(print_usage_and_die)}"
 XENSERVER_PASS="${2-$(print_usage_and_die)}"
 GITHUB_USER="${3-$(print_usage_and_die)}"
+
+set -eux
 
 function create_branch() {
     local source_repo
@@ -60,6 +62,7 @@ create_branch \
     "$devstack_branch" << EOF
 git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/16/30416/3 && git cherry-pick FETCH_HEAD
 git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/03/30703/1 && git cherry-pick FETCH_HEAD
+git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/35/31035/3 && git cherry-pick FETCH_HEAD
 EOF
 
 # Create custom quantum branch
@@ -142,19 +145,42 @@ ENABLED_SERVICES+=,tempest,quantum,q-svc,q-agt,q-dhcp,q-l3,q-meta,q-domua,-n-net
 # Disable security groups
 Q_USE_SECGROUP=False
 
-# Workaround
-os_VENDOR="Some value"
+# With XenServer single box install, VLANs need to be enabled
+ENABLE_TENANT_VLANS="True"
+OVS_VLAN_RANGES="physnet1:1000:1024"
+
+# CLEAN_TEMPLATES=true
 
 # Citrix specific settings to speed up Ubuntu install (Remove them)
 UBUNTU_INST_HTTP_HOSTNAME="mirror.anl.gov"
 UBUNTU_INST_HTTP_DIRECTORY="/pub/ubuntu"
 UBUNTU_INST_HTTP_PROXY="http://gold.eng.hq.xensource.com:8000"
 
-# With XenServer single box install, VLANs need to be enabled
-ENABLE_TENANT_VLANS="True"
-OVS_VLAN_RANGES="physnet1:1000:1024"
-
-# CLEAN_TEMPLATES=true
+# Citrix settings (Remove them)
+CEILOMETER_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/ceilometer.git
+CEILOMETERCLIENT_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/python-ceilometerclient.git
+CINDER_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/cinder.git
+CINDERCLIENT_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/python-cinderclient.git
+NOVA_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/nova.git
+SWIFT_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/swift.git
+SWIFT3_REPO=git://gold.eng.hq.xensource.com/git/github/fujita/swift3.git
+SWIFTCLIENT_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/python-swiftclient.git
+GLANCE_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/glance.git
+GLANCECLIENT_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/python-glanceclient.git
+KEYSTONE_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/keystone.git
+NOVNC_REPO=git://gold.eng.hq.xensource.com/git/github/kanaka/noVNC.git
+HORIZON_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/horizon.git
+NOVACLIENT_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/python-novaclient.git
+OPENSTACKCLIENT_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/python-openstackclient.git
+KEYSTONECLIENT_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/python-keystoneclient.git
+QUANTUMCLIENT_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/python-quantumclient.git
+TEMPEST_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/tempest.git
+HEAT_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/heat.git
+HEATCLIENT_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/python-heatclient.git
+RYU_REPO=git://gold.eng.hq.xensource.com/git/github/osrg/ryu.git
+BM_IMAGE_BUILD_REPO=git://gold.eng.hq.xensource.com/git/github/stackforge/diskimage-builder.git
+BM_POSEUR_REPO=git://gold.eng.hq.xensource.com/git/github/tripleo/bm_poseur.git
+NOVA_ZIPBALL_URL="http://gold.eng.hq.xensource.com/gitweb/?p=openstack/nova.git;a=snapshot;h=refs/heads/master"
 
 LOCALRC_CONTENT_ENDS_HERE
 
