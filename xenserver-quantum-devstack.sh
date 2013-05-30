@@ -151,6 +151,8 @@ OVS_VLAN_RANGES="physnet1:1000:1024"
 
 # CLEAN_TEMPLATES=true
 
+Q_USE_DEBUG_COMMAND=True
+
 # Citrix specific settings to speed up Ubuntu install (Remove them)
 UBUNTU_INST_HTTP_HOSTNAME="mirror.anl.gov"
 UBUNTU_INST_HTTP_DIRECTORY="/pub/ubuntu"
