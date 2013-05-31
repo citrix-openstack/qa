@@ -126,6 +126,9 @@ OSDOMU_VDI_GB=40
 ACTIVE_TIMEOUT=500
 TERMINATE_TIMEOUT=500
 
+# Increase boot timeout for quantum tests:
+BOOT_TIMEOUT=500
+
 # DevStack settings
 LOGFILE=/tmp/devstack/log/stack.log
 SCREEN_LOGDIR=/tmp/devstack/log/
