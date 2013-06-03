@@ -30,6 +30,7 @@ VHROOT="$TEMPDIR/vh"
 ssh -q \
     -o Batchmode=yes \
     -o UserKnownHostsFile=/dev/null \
+    -o StrictHostKeyChecking=no \
     "root@$XENSERVER" bash -s -- << EOF
 xe vm-uninstall vm="$VMNAME" force=true | true
 EOF
