@@ -70,7 +70,7 @@ create_branch \
     "https://github.com/openstack/quantum.git" \
     "git@github.com:$GITHUB_USER/quantum.git" \
     "$quantum_branch" << EOF
-git fetch https://review.openstack.org/openstack/quantum refs/changes/77/31077/1 && git cherry-pick FETCH_HEAD
+git fetch https://review.openstack.org/openstack/quantum refs/changes/77/31077/2 && git cherry-pick FETCH_HEAD
 EOF
 
 ssh -q \
