@@ -6,7 +6,7 @@ function print_usage_and_quit
 cat << USAGE >&2
 usage: $0 ISOURL XENSERVER
 
-Re-master an Ubuntu iso file for unattended operation.
+Install a virtual hypervisor connected to "home" network (DHCP)
 
 Positional arguments:
   ISOURL    - An url containing the original XenServer iso
