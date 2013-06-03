@@ -54,3 +54,4 @@ ssh -q \
 xe vm-start vm="$VMNAME"
 EOF
 
+rm -rf "$TEMPDIR"
