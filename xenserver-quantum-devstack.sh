@@ -60,7 +60,6 @@ create_branch \
     "https://github.com/openstack-dev/devstack.git" \
     "git@github.com:$GITHUB_USER/devstack.git" \
     "$devstack_branch" << EOF
-git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/35/31035/4 && git cherry-pick FETCH_HEAD
 git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/77/31177/3 && git cherry-pick FETCH_HEAD
 EOF
 
