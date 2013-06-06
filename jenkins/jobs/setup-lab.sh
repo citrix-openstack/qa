@@ -39,3 +39,5 @@ $THISDIR/create-virtual-hypervisor.sh \
     "VH1" \
     "stuffa" \
     "$DEVBOX_IP"
+
+echo "Setup finished. Gateway for your lab is: $DEVBOX_IP"

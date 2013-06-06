@@ -8,6 +8,7 @@ usage: $0 ISOURL XENSERVER VMNAME NETNAME SSHKEY
 Install a DHCP enabled virtual hypervisor on XENSERVER with the name VMNAME.
  - one network interface, connected to NETNAME network on XENSERVER.
  - to connect to XENSERVER, SSHKEY will be used
+ - the given ssh key could be used later to access the virtual hypervisor
 
 Positional arguments:
   ISOURL    - An url containing the original XenServer iso
