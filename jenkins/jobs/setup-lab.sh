@@ -22,14 +22,15 @@ set -x
 THISDIR=$(cd $(dirname $(readlink -f "$0")) && pwd)
 XSLIB=$(cd $(dirname $(readlink -f "$0")) && cd xslib && pwd)
 REMOTELIB=$(cd $(dirname $(readlink -f "$0")) && cd remote && pwd)
+NETNAME="stuffa"
 
 
 "$REMOTELIB/bash.sh" "root@$XENSERVER" << EOF
 set -eux
-[ ! -z "\$(xe network-list name-label=stuffa --minimal)" ] || xe network-create name-label=stuffa
+[ ! -z "\$(xe network-list name-label=$NETNAME --minimal)" ] || xe network-create name-label=$NETNAME
 EOF
 
-$THISDIR/create-devbox.sh $XENSERVER stuffa
+$THISDIR/create-devbox.sh $XENSERVER $NETNAME
 
 DEVBOX_IP=$(cat "$XSLIB/get-slave-ip.sh" | "$REMOTELIB/bash.sh" "$XENSERVER")
 
@@ -37,7 +38,7 @@ $THISDIR/create-virtual-hypervisor.sh \
     "$ISOURL" \
     "$XENSERVER" \
     "VH1" \
-    "stuffa" \
+    "$NETNAME" \
     "$DEVBOX_IP"
 
 echo "Setup finished. Gateway for your lab is: $DEVBOX_IP"
