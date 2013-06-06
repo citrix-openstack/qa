@@ -46,7 +46,7 @@ ssh -q \
 }
 
 on_xenserver << EOF
-xe vm-uninstall vm="$VMNAME" force=true | true
+xe vm-uninstall vm="$VMNAME" force=true || true
 EOF
 
 git clone git://github.com/matelakat/virtual-hypervisor.git "$VHROOT"
@@ -65,8 +65,8 @@ ssh-keyscan "$XENSERVER" >> ~/.ssh/known_hosts
 $VHROOT/scripts/xs_start_create_vm_with_cdrom.sh \
     "$CUSTOMXSISO" "$XENSERVER" "$NETNAME" "$VMNAME"
 
-vm=$(echo "xe vm-list name-label='$VMNAME' --minimal" | xenserver)
-mac=$(echo "xe vif-list vm-uuid=$vm params=MAC --minimal" | xenserver)
+vm=$(echo "xe vm-list name-label='$VMNAME' --minimal" | on_xenserver)
+mac=$(echo "xe vif-list vm-uuid=$vm params=MAC --minimal" | on_xenserver)
 vhip="192.168.32.10"
 
 # Wipe existing config
