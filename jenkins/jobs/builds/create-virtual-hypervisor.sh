@@ -65,6 +65,24 @@ ssh-keyscan "$XENSERVER" >> ~/.ssh/known_hosts
 $VHROOT/scripts/xs_start_create_vm_with_cdrom.sh \
     "$CUSTOMXSISO" "$XENSERVER" "$NETNAME" "$VMNAME"
 
+vm=$(echo "xe vm-list name-label='$VMNAME' --minimal" | xenserver)
+mac=$(echo "xe vif-list vm-uuid=$vm params=MAC --minimal" | xenserver)
+vhip="192.168.32.10"
+
+# Wipe existing config
+sudo sed /etc/dnsmasq.conf -e "s/.*$vhip.*//g"
+
+# Reserve the IP
+sudo tee -a /etc/dnsmasq.conf << EOF
+dhcp-host=$mac,192.168.32.10
+EOF
+
+# Restart dnsmasq (due to config file changes)
+sudo service dnsmasq restart
+
+# Make a record of that IP
+echo "$vhip" > ~/.vhip
+
 on_xenserver << EOF
 xe vm-start vm="$VMNAME"
 EOF
