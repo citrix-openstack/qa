@@ -71,7 +71,7 @@ mac=$(echo "xe vif-list vm-uuid=$vm params=MAC --minimal" | on_xenserver)
 vhip="192.168.32.10"
 
 # Wipe existing config
-sudo sed /etc/dnsmasq.conf -e "s/.*$vhip.*//g"
+sudo sed -i /etc/dnsmasq.conf -e "s/.*$vhip.*//g"
 
 # Reserve the IP
 sudo tee -a /etc/dnsmasq.conf << EOF
