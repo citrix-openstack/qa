@@ -74,7 +74,7 @@ sudo sed /etc/dnsmasq.conf -e "s/.*$vhip.*//g"
 
 # Reserve the IP
 sudo tee -a /etc/dnsmasq.conf << EOF
-dhcp-host=$mac,192.168.32.10
+dhcp-host=$mac,$vhip
 EOF
 
 # Restart dnsmasq (due to config file changes)
@@ -86,5 +86,19 @@ echo "$vhip" > ~/.vhip
 on_xenserver << EOF
 xe vm-start vm="$VMNAME"
 EOF
+
+# wait till ssh is up on VH
+while ! echo "kk" | nc "$vhip" 22; do
+    sleep 1
+done
+
+# Install sshpass on local system
+sudo apt-get install -qy sshpass
+
+# Store host key
+ssh-keyscan "$vhip" >> ~/.ssh/known_hosts
+
+# Setup passwordless ssh
+sshpass -p 'somepass' ssh-copy-id -i ~/.ssh/id_rsa_devbox.pub "root@$vhip"
 
 rm -rf "$TEMPDIR"
