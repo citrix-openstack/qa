@@ -6,9 +6,9 @@
    quantum.
 
 # `jenkins` Directory
-
 Scripts that are useful for Jenkins jobs:
 
-- Running tests
-- Manage repositories
-- Provide locking
+ - [Jobs](./jenkins/jobs/README.md)
+ - Running tests
+ - Manage repositories
+ - Provide locking
