@@ -61,9 +61,9 @@ create_branch \
     "git@github.com:$GITHUB_USER/devstack.git" \
     "$devstack_branch" << EOF
 # Make dependency on libvirt dynamic
-git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/77/31177/3 && git cherry-pick FETCH_HEAD
+git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/77/31177/4 && git cherry-pick FETCH_HEAD
 # separate disk for cinder volumes
-git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/77/31977/1 && git cherry-pick FETCH_HEAD
+git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/77/31977/11 && git cherry-pick FETCH_HEAD
 EOF
 
 ssh -q \
@@ -168,6 +168,9 @@ BM_POSEUR_REPO=git://gold.eng.hq.xensource.com/git/github/tripleo/bm_poseur.git
 NOVA_ZIPBALL_URL="http://gold.eng.hq.xensource.com/gitweb/?p=openstack/nova.git;a=snapshot;h=refs/heads/master"
 
 XEN_CREATE_DISK_FOR_VOLUMES=True
+
+# Skip boot from volume exercise
+SKIP_EXERCISES="boot_from_volume"
 
 LOCALRC_CONTENT_ENDS_HERE
 
