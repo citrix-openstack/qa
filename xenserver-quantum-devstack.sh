@@ -60,7 +60,10 @@ create_branch \
     "https://github.com/openstack-dev/devstack.git" \
     "git@github.com:$GITHUB_USER/devstack.git" \
     "$devstack_branch" << EOF
-git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/77/31177/3 && git cherry-pick FETCH_HEAD
+# Make dependency on libvirt dynamic
+git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/77/31177/4 && git cherry-pick FETCH_HEAD
+# separate disk for cinder volumes
+git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/77/31977/11 && git cherry-pick FETCH_HEAD
 EOF
 
 # Create custom quantum branch
@@ -69,6 +72,7 @@ create_branch \
     "https://github.com/openstack/quantum.git" \
     "git@github.com:$GITHUB_USER/quantum.git" \
     "$quantum_branch" << EOF
+# xenapi: fix rootwrap
 git fetch https://review.openstack.org/openstack/quantum refs/changes/77/31077/2 && git cherry-pick FETCH_HEAD
 EOF
 
