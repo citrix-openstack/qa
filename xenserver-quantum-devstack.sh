@@ -60,10 +60,8 @@ create_branch \
     "https://github.com/openstack-dev/devstack.git" \
     "git@github.com:$GITHUB_USER/devstack.git" \
     "$devstack_branch" << EOF
-# Make dependency on libvirt dynamic
-git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/77/31177/4 && git cherry-pick FETCH_HEAD
 # separate disk for cinder volumes
-git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/77/31977/11 && git cherry-pick FETCH_HEAD
+git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/77/31977/14 && git cherry-pick FETCH_HEAD
 EOF
 
 # Create custom quantum branch
