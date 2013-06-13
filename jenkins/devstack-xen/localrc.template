@@ -74,8 +74,8 @@ UBUNTU_INST_HTTP_PROXY="http://gold.eng.hq.xensource.com:8000"
 SKIP_EXERCISES="boot_from_volume"
 
 # Use a XenServer Image:
-# IMAGE_URLS="https://github.com/downloads/citrix-openstack/warehouse/cirros-0.3.0-x86_64-disk.vhd.tgz"
-# DEFAULT_IMAGE_NAME="cirros-0.3.0-x86_64-disk"
+IMAGE_URLS="https://github.com/downloads/citrix-openstack/warehouse/cirros-0.3.0-x86_64-disk.vhd.tgz"
+DEFAULT_IMAGE_NAME="cirros-0.3.0-x86_64-disk"
 
 # Use a raw Image:
 # IMAGE_URLS="http://copper.eng.hq.xensource.com/builds/raw-cirros-0.3.0-x86_64-disk.img"
