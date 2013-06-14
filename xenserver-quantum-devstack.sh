@@ -141,12 +141,18 @@ QUANTUM_ZIPBALL_URL="http://gold.eng.hq.xensource.com/git/github/openstack/quant
 LOCALRC_CONTENT_ENDS_HERE
 
 cd tools/xen
-(
 ./install_os_domU.sh
-)
+END_OF_XENSERVER_COMMANDS
 
-# Execute some tests on the devstack installation
-GUEST_IP=\$(. functions && find_ip_by_name DevStackOSDomU 2)
+
+# Run tests
+ssh -q \
+    -o Batchmode=yes \
+    -o StrictHostKeyChecking=no \
+    -o UserKnownHostsFile=/dev/null \
+    "root@$XENSERVER_IP" bash -s -- << END_OF_XENSERVER_COMMANDS
+set -exu
+GUEST_IP=\$(. devstack-master/tools/xen/functions && find_ip_by_name DevStackOSDomU 2)
 ssh -q \
     -o Batchmode=yes \
     -o StrictHostKeyChecking=no \
