@@ -104,6 +104,8 @@ OVS_VLAN_RANGES="physnet1:1000:1024"
 
 Q_USE_DEBUG_COMMAND=True
 
+SKIP_EXERCISES=boot_from_volume,client-env
+
 # Citrix specific settings to speed up Ubuntu install (Remove them)
 UBUNTU_INST_HTTP_HOSTNAME="mirror.anl.gov"
 UBUNTU_INST_HTTP_DIRECTORY="/pub/ubuntu"
@@ -160,9 +162,6 @@ ssh -q \
     "stack@\$GUEST_IP" bash -s -- << END_OF_DEVSTACK_COMMANDS
 set -exu
 cd /opt/stack/devstack/
-mkdir disabled
-mv exercises/* disabled/
-mv disabled/quantum-adv-test.sh exercises/
 
 echo "---- EXERCISE TESTS ----"
 ./exercise.sh
