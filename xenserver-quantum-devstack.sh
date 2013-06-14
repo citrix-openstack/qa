@@ -106,6 +106,10 @@ Q_USE_DEBUG_COMMAND=True
 
 SKIP_EXERCISES=boot_from_volume,client-env
 
+# Use a XenServer Image
+IMAGE_URLS="https://github.com/downloads/citrix-openstack/warehouse/cirros-0.3.0-x86_64-disk.vhd.tgz"
+DEFAULT_IMAGE_NAME="cirros-0.3.0-x86_64-disk"
+
 # Citrix specific settings to speed up Ubuntu install (Remove them)
 UBUNTU_INST_HTTP_HOSTNAME="mirror.anl.gov"
 UBUNTU_INST_HTTP_DIRECTORY="/pub/ubuntu"
