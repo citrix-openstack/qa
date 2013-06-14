@@ -5,9 +5,9 @@ set -eu
 function print_usage_and_die
 {
 cat >&2 << EOF
-usage: $0 XENSERVER_IP XENSERVER_PASS
+usage: $0 XENSERVER_IP XENSERVER_PASS GITHUB_USER
 
-A simple script to setup a XenServer installation with Quantum.
+A simple script to run devstack on XenServer to test devstack changes
 
 positional arguments:
  XENSERVER_IP     The IP address of the XenServer
