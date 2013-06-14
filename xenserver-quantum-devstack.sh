@@ -136,7 +136,7 @@ BM_IMAGE_BUILD_REPO=git://gold.eng.hq.xensource.com/git/github/stackforge/diskim
 BM_POSEUR_REPO=git://gold.eng.hq.xensource.com/git/github/tripleo/bm_poseur.git
 
 NOVA_ZIPBALL_URL="http://gold.eng.hq.xensource.com/git/github/openstack/nova/zipball/master"
-QUANTUM_ZIPBALL_URL="http://gold.eng.hq.xensource.com/git/github/openstack-dev/devstack/zipball/master"
+QUANTUM_ZIPBALL_URL="http://gold.eng.hq.xensource.com/git/github/openstack/quantum/zipball/master"
 
 LOCALRC_CONTENT_ENDS_HERE
 
