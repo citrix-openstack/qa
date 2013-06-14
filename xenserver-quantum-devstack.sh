@@ -7,7 +7,7 @@ function print_usage_and_die
 cat >&2 << EOF
 usage: $0 XENSERVER_IP XENSERVER_PASS
 
-A simple script to setup a XenServer installation with Quantum
+A simple script to test a XenServer devstack with Quantum
 
 positional arguments:
  XENSERVER_IP     The IP address of the XenServer
@@ -29,7 +29,7 @@ ssh -q \
     -o Batchmode=yes \
     -o StrictHostKeyChecking=no \
     -o UserKnownHostsFile=/dev/null \
-    "root@$XENSERVER_IP" bash -s -- << EOF
+    "root@$XENSERVER_IP" bash -s -- << END_OF_XENSERVER_COMMANDS
 set -exu
 rm -rf "devstack-master"
 wget -qO - https://github.com/openstack-dev/devstack/archive/master.tar.gz |
@@ -142,4 +142,26 @@ LOCALRC_CONTENT_ENDS_HERE
 
 cd tools/xen
 ./install_os_domU.sh
-EOF
+
+# Execute some tests on the devstack installation
+GUEST_IP=\$(. functions && find_ip_by_name DevStackOSDomU 2)
+ssh -q \
+    -o Batchmode=yes \
+    -o StrictHostKeyChecking=no \
+    -o UserKnownHostsFile=/dev/null \
+    "stack@\$GUEST_IP" bash -s -- << END_OF_DEVSTACK_COMMANDS
+set -exu
+cd /opt/stack/devstack/
+mkdir disabled
+mv exercises/* disabled/
+mv disabled/quantum-adv-test.sh exercises/
+
+echo "---- EXERCISE TESTS ----"
+./exercise.sh
+
+cd /opt/stack/tempest 
+echo "---- TEMPEST TESTS ----"
+nosetests tempest/scenario/test_network_basic_ops.py
+END_OF_DEVSTACK_COMMANDS
+
+END_OF_XENSERVER_COMMANDS
