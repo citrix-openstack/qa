@@ -127,13 +127,16 @@ NOVACLIENT_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/python-nova
 OPENSTACKCLIENT_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/python-openstackclient.git
 KEYSTONECLIENT_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/python-keystoneclient.git
 QUANTUMCLIENT_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/python-quantumclient.git
+QUANTUM_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/quantum.git
 TEMPEST_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/tempest.git
 HEAT_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/heat.git
 HEATCLIENT_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/python-heatclient.git
 RYU_REPO=git://gold.eng.hq.xensource.com/git/github/osrg/ryu.git
 BM_IMAGE_BUILD_REPO=git://gold.eng.hq.xensource.com/git/github/stackforge/diskimage-builder.git
 BM_POSEUR_REPO=git://gold.eng.hq.xensource.com/git/github/tripleo/bm_poseur.git
-NOVA_ZIPBALL_URL="http://gold.eng.hq.xensource.com/gitweb/?p=openstack/nova.git;a=snapshot;h=refs/heads/master"
+
+NOVA_ZIPBALL_URL="http://gold.eng.hq.xensource.com/git/github/openstack/nova/zipball/master"
+QUANTUM_ZIPBALL_URL="http://gold.eng.hq.xensource.com/git/github/openstack-dev/devstack/zipball/master"
 
 LOCALRC_CONTENT_ENDS_HERE
 
