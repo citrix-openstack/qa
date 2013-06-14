@@ -127,7 +127,6 @@ NOVACLIENT_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/python-nova
 OPENSTACKCLIENT_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/python-openstackclient.git
 KEYSTONECLIENT_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/python-keystoneclient.git
 QUANTUMCLIENT_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/python-quantumclient.git
-QUANTUM_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/quantum.git
 TEMPEST_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/tempest.git
 HEAT_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/heat.git
 HEATCLIENT_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/python-heatclient.git
