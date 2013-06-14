@@ -168,7 +168,7 @@ echo "---- EXERCISE TESTS ----"
 
 cd /opt/stack/tempest 
 echo "---- TEMPEST TESTS ----"
-nosetests tempest/scenario/test_network_basic_ops.py
+nosetests -sv --nologcapture --attr=type=smoke tempest
 END_OF_DEVSTACK_COMMANDS
 
 END_OF_XENSERVER_COMMANDS
