@@ -249,7 +249,7 @@ if [ "\`xe sr-param-get uuid=\$defaultSR param-name=type\`" != "ext" ]; then
     xe pbd-unplug uuid=\$pbd_uuid
     xe sr-destroy uuid=\$defaultSR
 
-    sr_uuid=\`xe sr-create content-type=user host-uuid=\$host_uuid type=ext device-config:device=\$use_device shared=false name-label="Local Storage"\`
+    sr_uuid=\`xe sr-create content-type=user host-uuid=\$host_uuid type=ext device-config:device=\$use_device shared=false name-label="Local storage"\`
     pool_uuid=\`xe pool-list minimal=true\`
     xe pool-param-set default-SR=\$sr_uuid uuid=\$pool_uuid
     xe pool-param-set suspend-image-SR=\$sr_uuid uuid=\$pool_uuid
