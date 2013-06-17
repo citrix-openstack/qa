@@ -5,36 +5,75 @@ set -eu
 function print_usage_and_die
 {
 cat >&2 << EOF
-usage: $0 XENSERVER_IP XENSERVER_PASS
+usage: $0 XENSERVER_IP XENSERVER_PASS GITHUB_USER
 
-A simple script to test a XenServer devstack with Quantum
+A simple script to run devstack on XenServer to test devstack changes
 
 positional arguments:
  XENSERVER_IP     The IP address of the XenServer
  XENSERVER_PASS   The root password for the XenServer
+ GITHUB_USER      The github user to use for temporary branches
 
 An example run:
 
-$0 10.219.10.25 mypassword
+$0 10.219.10.25 mypassword citrix-openstack
 EOF
 exit 1
 }
 
 XENSERVER_IP="${1-$(print_usage_and_die)}"
 XENSERVER_PASS="${2-$(print_usage_and_die)}"
+GITHUB_USER="${3-$(print_usage_and_die)}"
 
 set -eux
+
+function create_branch() {
+    local source_repo
+    local target_repo
+    local branchname
+
+    source_repo="$1"
+    target_repo="$2"
+    branchname="$3"
+
+    local tmpdir
+
+    branchname=$(date +%s)
+
+    tmpdir=$(mktemp -d)
+    (
+        cd $tmpdir
+        git clone "$source_repo" repo
+        cd repo
+        git checkout -b "$branchname"
+        git remote add target_repo "$target_repo"
+
+        ( echo "set -exu"; cat ) | bash -s --
+        git push target_repo "$branchname"
+    )
+    rm -rf "$tmpdir"
+}
+
+# Create custom devstack branch
+devstack_branch=$(date +%s)
+create_branch \
+    "https://github.com/openstack-dev/devstack.git" \
+    "git@github.com:$GITHUB_USER/devstack.git" \
+    "$devstack_branch" << EOF
+# separate disk for cinder volumes
+git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/77/31977/14 && git cherry-pick FETCH_HEAD
+EOF
 
 ssh -q \
     -o Batchmode=yes \
     -o StrictHostKeyChecking=no \
     -o UserKnownHostsFile=/dev/null \
-    "root@$XENSERVER_IP" bash -s -- << END_OF_XENSERVER_COMMANDS
+    "root@$XENSERVER_IP" bash -s -- << EOF
 set -exu
-rm -rf "devstack-master"
-wget -qO - https://github.com/openstack-dev/devstack/archive/master.tar.gz |
+rm -rf "devstack-$devstack_branch"
+wget -qO - https://github.com/$GITHUB_USER/devstack/archive/$devstack_branch.tar.gz |
     tar -xzf -
-cd "devstack-master"
+cd "devstack-$devstack_branch"
 
 cat << LOCALRC_CONTENT_ENDS_HERE > localrc
 # Passwords
@@ -89,26 +128,10 @@ VERBOSE=False
 XENAPI_CONNECTION_URL="http://$XENSERVER_IP"
 VNCSERVER_PROXYCLIENT_ADDRESS="$XENSERVER_IP"
 
-Q_PLUGIN=openvswitch
+# Custom branches
 MULTI_HOST=False
-ENABLED_SERVICES+=,tempest,quantum,q-svc,q-agt,q-dhcp,q-l3,q-meta,q-domua,-n-net
-
-# Disable security groups
-Q_USE_SECGROUP=False
-
-# With XenServer single box install, VLANs need to be enabled
-ENABLE_TENANT_VLANS="True"
-OVS_VLAN_RANGES="physnet1:1000:1024"
 
 # CLEAN_TEMPLATES=true
-
-Q_USE_DEBUG_COMMAND=True
-
-SKIP_EXERCISES=boot_from_volume,client-env
-
-# Use a XenServer Image
-IMAGE_URLS="https://github.com/downloads/citrix-openstack/warehouse/cirros-0.3.0-x86_64-disk.vhd.tgz"
-DEFAULT_IMAGE_NAME="cirros-0.3.0-x86_64-disk"
 
 # Citrix specific settings to speed up Ubuntu install (Remove them)
 UBUNTU_INST_HTTP_HOSTNAME="mirror.anl.gov"
@@ -140,39 +163,13 @@ HEATCLIENT_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/python-heat
 RYU_REPO=git://gold.eng.hq.xensource.com/git/github/osrg/ryu.git
 BM_IMAGE_BUILD_REPO=git://gold.eng.hq.xensource.com/git/github/stackforge/diskimage-builder.git
 BM_POSEUR_REPO=git://gold.eng.hq.xensource.com/git/github/tripleo/bm_poseur.git
+NOVA_ZIPBALL_URL="http://gold.eng.hq.xensource.com/gitweb/?p=openstack/nova.git;a=snapshot;h=refs/heads/master"
 
-NOVA_ZIPBALL_URL="http://gold.eng.hq.xensource.com/git/github/openstack/nova/zipball/master"
-QUANTUM_ZIPBALL_URL="http://gold.eng.hq.xensource.com/git/github/openstack/quantum/zipball/master"
+# Skip boot from volume exercise
+SKIP_EXERCISES="boot_from_volume"
 
 LOCALRC_CONTENT_ENDS_HERE
 
 cd tools/xen
 ./install_os_domU.sh
-END_OF_XENSERVER_COMMANDS
-
-
-# Run tests
-ssh -q \
-    -o Batchmode=yes \
-    -o StrictHostKeyChecking=no \
-    -o UserKnownHostsFile=/dev/null \
-    "root@$XENSERVER_IP" bash -s -- << END_OF_XENSERVER_COMMANDS
-set -exu
-GUEST_IP=\$(. devstack-master/tools/xen/functions && find_ip_by_name DevStackOSDomU 2)
-ssh -q \
-    -o Batchmode=yes \
-    -o StrictHostKeyChecking=no \
-    -o UserKnownHostsFile=/dev/null \
-    "stack@\$GUEST_IP" bash -s -- << END_OF_DEVSTACK_COMMANDS
-set -exu
-cd /opt/stack/devstack/
-
-echo "---- EXERCISE TESTS ----"
-./exercise.sh
-
-cd /opt/stack/tempest 
-echo "---- TEMPEST TESTS ----"
-nosetests -sv --nologcapture --attr=type=smoke tempest
-END_OF_DEVSTACK_COMMANDS
-
-END_OF_XENSERVER_COMMANDS
+EOF
