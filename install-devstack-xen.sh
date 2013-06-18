@@ -28,6 +28,11 @@ XENAPI_PASSWORD=%XenServerPassword%
 # As swift is enabled by default, we need a hash for it:
 SWIFT_HASH="66a3d6b56c1f479c8b4e70ab5c2000f5"
 
+# Use a combination of openstack master and citrix-openstack citrix-fixes
+# May not be instantly up to date with openstack master
+NOVA_REPO=https://github.com/citrix-openstack/nova.git
+NOVA_BRANCH=build
+
 # TEMPEST SETTINGS
 #
 # Need to be set, otherwise image resize fails (TODO: bug)
@@ -41,7 +46,7 @@ MULTI_HOST=true
 # our image doesn't have the agent
 EXTRA_OPTS=("xenapi_disable_agent=True")
 OSDOMU_MEM_MB=4096
-#FIXME - see LP 1102964 XEN_FIREWALL_DRIVER=nova.virt.xenapi.firewall.Dom0IptablesFirewallDriver
+XEN_FIREWALL_DRIVER=nova.virt.xenapi.firewall.Dom0IptablesFirewallDriver
 # turn off rate limit to help tempest
 API_RATE_LIMIT=False
 VIRT_DRIVER=xenserver
@@ -187,8 +192,11 @@ set -x
 # $DevStackURL (optional) - URL of the devstack zip file
 # $CleanTemplates (default:false) - If true, clean the templates
 
-DevStackURL=${DevStackURL-"https://github.com/openstack-dev/devstack/zipball/master"}
-CleanTemplates="${CleanTemplates-false}"
+# The citrix-openstack/devstack/build repository is slightly behind (up to a day) trunk
+# but incorporates some fixes that may not have been committed to trunk yet from 
+# citrix-openstack/devstack/citrix-fixes.
+DevStackURL=${DevStackURL-"https://github.com/citrix-openstack/devstack/zipball/build"}
+CleanTemplates="${CleanTemplates-true}"
 DhcpTimeout=120
 
 #
@@ -223,6 +231,7 @@ SCRIPT_TMP_DIR=/tmp/jenkins_test
 
 cat > $tmpdir/install_devstack.sh <<EOF
 #!/bin/bash
+set -eux
 
 # Verify the host is suitable for devstack
 defaultSR=\`xe pool-list params=default-SR minimal=true\`
@@ -230,7 +239,21 @@ if [ "\`xe sr-param-get uuid=\$defaultSR param-name=type\`" != "ext" ]; then
     echo ""
     echo "ERROR: The xenserver host must have an EXT3 SR as the default SR"
     echo ""
-    exit 1
+    echo "Trying to replace the LVM SR with an EXT SR"
+
+    pbd_uuid=\`xe pbd-list sr-uuid=\$defaultSR minimal=true\`
+    host_uuid=\`xe pbd-param-get uuid=\$pbd_uuid param-name=host-uuid\`
+    use_device=\`xe pbd-param-get uuid=\$pbd_uuid param-name=device-config param-key=device\`
+
+    # Destroy the existing SR
+    xe pbd-unplug uuid=\$pbd_uuid
+    xe sr-destroy uuid=\$defaultSR
+
+    sr_uuid=\`xe sr-create content-type=user host-uuid=\$host_uuid type=ext device-config:device=\$use_device shared=false name-label="Local storage"\`
+    pool_uuid=\`xe pool-list minimal=true\`
+    xe pool-param-set default-SR=\$sr_uuid uuid=\$pool_uuid
+    xe pool-param-set suspend-image-SR=\$sr_uuid uuid=\$pool_uuid
+    xe sr-param-add uuid=\$sr_uuid param-name=other-config i18n-key=local-storage
 fi
 
 rm -rf $SCRIPT_TMP_DIR
