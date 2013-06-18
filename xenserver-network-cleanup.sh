@@ -61,7 +61,7 @@ create_branch \
     "git@github.com:$GITHUB_USER/devstack.git" \
     "$devstack_branch" << EOF
 # xenapi: Get rid of internal xapi interface
-git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/24/33424/1 && git cherry-pick FETCH_HEAD
+git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/24/33424/3 && git cherry-pick FETCH_HEAD
 EOF
 
 ssh -q \
@@ -160,3 +160,30 @@ LOCALRC_CONTENT_ENDS_HERE
 cd tools/xen
 ./install_os_domU.sh
 EOF
+
+# Run tests
+ssh -q \
+    -o Batchmode=yes \
+    -o StrictHostKeyChecking=no \
+    -o UserKnownHostsFile=/dev/null \
+    "root@$XENSERVER_IP" bash -s -- << END_OF_XENSERVER_COMMANDS
+set -exu
+GUEST_IP=\$(. devstack-master/tools/xen/functions && find_ip_by_name DevStackOSDomU 0)
+ssh -q \
+    -o Batchmode=yes \
+    -o StrictHostKeyChecking=no \
+    -o UserKnownHostsFile=/dev/null \
+    "stack@\$GUEST_IP" bash -s -- << END_OF_DEVSTACK_COMMANDS
+set -exu
+cd /opt/stack/devstack/
+
+echo "---- EXERCISE TESTS ----"
+./exercise.sh
+
+cd /opt/stack/tempest 
+echo "---- TEMPEST TESTS ----"
+nosetests -sv --nologcapture --attr=type=smoke tempest
+END_OF_DEVSTACK_COMMANDS
+
+END_OF_XENSERVER_COMMANDS
+
