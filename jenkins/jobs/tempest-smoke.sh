@@ -22,6 +22,6 @@ exit 1
 SERVERNAME="${1-$(print_usage_and_die)}"
 
 
-$SCRIPTDIR/run-on-xenserver.sh $SERVERNAME $XSDIR/configure_for_resize.sh
-$SCRIPTDIR/run-on-devstack.sh $SERVERNAME $TESTDIR/setup_for_tempest.sh
+# $SCRIPTDIR/run-on-xenserver.sh $SERVERNAME $XSDIR/configure_for_resize.sh
+# $SCRIPTDIR/run-on-devstack.sh $SERVERNAME $TESTDIR/setup_for_tempest.sh
 $SCRIPTDIR/run-on-devstack.sh $SERVERNAME $TESTDIR/run_tempest_smoke.sh
