@@ -29,7 +29,11 @@ export Server=$Server1
 # Export GUEST_IP
 #
 GUEST_NAME=${GUEST_NAME:-"DevStackOSDomU"} # TODO - pull from config
-export GUEST_IP=$(ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$Server1" "xe vm-list --minimal name-label=$GUEST_NAME params=networks | sed -ne 's,^.*2/ip: \([0-9.]*\).*$,\1,p'")
+export GUEST_IP=$(ssh \
+    -o StrictHostKeyChecking=no \
+    -o UserKnownHostsFile=/dev/null \
+    "$Server1" \
+    "xe vm-list --minimal name-label=$GUEST_NAME params=networks | sed -ne 's,^.*0/ip: \([0-9.]*\).*$,\1,p'")
 if [ -z "$GUEST_IP" ]
 then
   echo "Failed to find IP address of DevStack DomU on $Server1"
