@@ -61,7 +61,7 @@ create_branch \
     "git@github.com:$GITHUB_USER/devstack.git" \
     "$devstack_branch" << EOF
 # separate disk for cinder volumes
-git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/77/31977/17 && git cherry-pick FETCH_HEAD
+git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/77/31977/18 && git cherry-pick FETCH_HEAD
 EOF
 
 ssh -q \
