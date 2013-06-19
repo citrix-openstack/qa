@@ -61,7 +61,7 @@ create_branch \
     "git@github.com:$GITHUB_USER/devstack.git" \
     "$devstack_branch" << EOF
 # separate disk for cinder volumes
-git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/77/31977/14 && git cherry-pick FETCH_HEAD
+git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/77/31977/16 && git cherry-pick FETCH_HEAD
 EOF
 
 ssh -q \
@@ -132,6 +132,9 @@ VNCSERVER_PROXYCLIENT_ADDRESS="$XENSERVER_IP"
 MULTI_HOST=False
 
 # CLEAN_TEMPLATES=true
+
+XEN_XVDB_SIZE_GB=10
+VOLUME_BACKING_DEVICE=/dev/xvdb
 
 # Citrix specific settings to speed up Ubuntu install (Remove them)
 UBUNTU_INST_HTTP_HOSTNAME="mirror.anl.gov"
