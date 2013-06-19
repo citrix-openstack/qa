@@ -18,7 +18,7 @@ thisdir=$(dirname $(readlink -f "$0"))
 # Find IP address of master
 #
 GUEST_NAME=${GUEST_NAME:-"DevStackOSDomU"} # TODO - pull from config or params, + share with exercise.sh
-GUEST_IP=$(xe vm-list --minimal name-label=$GUEST_NAME params=networks | sed -ne 's,^.*2/ip: \([0-9.]*\).*$,\1,p')
+GUEST_IP=$(xe vm-list --minimal name-label=$GUEST_NAME params=networks | sed -ne 's,^.*0/ip: \([0-9.]*\).*$,\1,p')
 if [ -z "$GUEST_IP" ]
 then
   echo "Failed to find IP address of DevStack DomU"
