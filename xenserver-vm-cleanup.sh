@@ -170,7 +170,7 @@ ssh -q \
     -o UserKnownHostsFile=/dev/null \
     "root@$XENSERVER_IP" bash -s -- << END_OF_XENSERVER_COMMANDS
 set -exu
-GUEST_IP=\$(. devstack-master/tools/xen/functions && find_ip_by_name DevStackOSDomU 0)
+GUEST_IP=\$(. "devstack-$devstack_branch/tools/xen/functions" && find_ip_by_name DevStackOSDomU 0)
 ssh -q \
     -o Batchmode=yes \
     -o StrictHostKeyChecking=no \
