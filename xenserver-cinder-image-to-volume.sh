@@ -167,9 +167,6 @@ BM_IMAGE_BUILD_REPO=git://gold.eng.hq.xensource.com/git/github/stackforge/diskim
 BM_POSEUR_REPO=git://gold.eng.hq.xensource.com/git/github/tripleo/bm_poseur.git
 NOVA_ZIPBALL_URL="http://gold.eng.hq.xensource.com/gitweb/?p=openstack/nova.git;a=snapshot;h=refs/heads/master"
 
-# Skip boot from volume exercise
-SKIP_EXERCISES="boot_from_volume"
-
 LOCALRC_CONTENT_ENDS_HERE
 
 cd tools/xen
