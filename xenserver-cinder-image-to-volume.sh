@@ -66,6 +66,8 @@ git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/57/33
 git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/24/33424/4 && git cherry-pick FETCH_HEAD
 # xenapi: cleanup VM Installation
 git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/32/33632/3 && git cherry-pick FETCH_HEAD
+# xenapi: Add qemu-utils as a cinder dependency
+git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/03/34003/2 && git cherry-pick FETCH_HEAD
 EOF
 
 # Create custom cinder branch
