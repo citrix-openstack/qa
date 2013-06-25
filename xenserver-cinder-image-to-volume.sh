@@ -141,7 +141,7 @@ VNCSERVER_PROXYCLIENT_ADDRESS="$XENSERVER_IP"
 MULTI_HOST=False
 
 # Skip boot from volume exercise
-# SKIP_EXERCISES="boot_from_volume"
+SKIP_EXERCISES="boot_from_volume"
 
 # Citrix specific settings to speed up Ubuntu install (Remove them)
 UBUNTU_INST_HTTP_HOSTNAME="mirror.anl.gov"
