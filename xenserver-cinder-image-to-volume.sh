@@ -84,7 +84,7 @@ ssh -q \
     -o Batchmode=yes \
     -o StrictHostKeyChecking=no \
     -o UserKnownHostsFile=/dev/null \
-    "root@$XENSERVER_IP" bash -s -- << EOF
+    "root@$XENSERVER_IP" bash -s -- << END_OF_XENSERVER_COMMANDS
 set -exu
 rm -rf "devstack-$devstack_branch"
 wget -qO - https://github.com/$GITHUB_USER/devstack/archive/$devstack_branch.tar.gz |
@@ -151,8 +151,7 @@ UBUNTU_INST_HTTP_PROXY="http://gold.eng.hq.xensource.com:8000"
 # Citrix settings (Remove them)
 CEILOMETER_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/ceilometer.git
 CEILOMETERCLIENT_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/python-ceilometerclient.git
-CINDER_REPO=git://github.com/$GITHUB_USER/cinder.git
-CINDER_BRANCH=$cinder_branch
+CINDER_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/cinder.git
 CINDERCLIENT_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/python-cinderclient.git
 NOVA_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/nova.git
 SWIFT_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/swift.git
@@ -174,13 +173,18 @@ HEATCLIENT_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/python-heat
 RYU_REPO=git://gold.eng.hq.xensource.com/git/github/osrg/ryu.git
 BM_IMAGE_BUILD_REPO=git://gold.eng.hq.xensource.com/git/github/stackforge/diskimage-builder.git
 BM_POSEUR_REPO=git://gold.eng.hq.xensource.com/git/github/tripleo/bm_poseur.git
-NOVA_ZIPBALL_URL="http://gold.eng.hq.xensource.com/gitweb/?p=openstack/nova.git;a=snapshot;h=refs/heads/master"
+NOVA_ZIPBALL_URL="http://gold.eng.hq.xensource.com/git/github/openstack/nova/zipball/master"
+QUANTUM_ZIPBALL_URL="http://gold.eng.hq.xensource.com/git/github/openstack/quantum/zipball/master"
+
+# Custom branches
+CINDER_REPO=git://github.com/$GITHUB_USER/cinder.git
+CINDER_BRANCH=$cinder_branch
 
 LOCALRC_CONTENT_ENDS_HERE
 
 cd tools/xen
 ./install_os_domU.sh
-EOF
+END_OF_XENSERVER_COMMANDS
 
 # Run tests
 ssh -q \
@@ -207,4 +211,3 @@ nosetests -sv --nologcapture --attr=type=smoke tempest
 END_OF_DEVSTACK_COMMANDS
 
 END_OF_XENSERVER_COMMANDS
-
