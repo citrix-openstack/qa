@@ -56,7 +56,7 @@ function create_branch() {
 }
 
 # Create custom devstack branch
-devstack_branch=$(date +%s)
+devstack_branch="refs/builds/$(date +%s)"
 create_branch \
     "https://github.com/openstack-dev/devstack.git" \
     "git@github.com:$GITHUB_USER/devstack.git" \
@@ -72,7 +72,7 @@ git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/03/34
 EOF
 
 # Create custom cinder branch
-cinder_branch=$(date +%s)
+cinder_branch="refs/builds/$(date +%s)"
 create_branch \
     "https://github.com/openstack/cinder.git" \
     "git@github.com:$GITHUB_USER/cinder.git" \
