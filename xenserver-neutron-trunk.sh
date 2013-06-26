@@ -114,40 +114,6 @@ SKIP_EXERCISES=boot_from_volume,client-env
 IMAGE_URLS="https://github.com/downloads/citrix-openstack/warehouse/cirros-0.3.0-x86_64-disk.vhd.tgz"
 DEFAULT_IMAGE_NAME="cirros-0.3.0-x86_64-disk"
 
-# Citrix specific settings to speed up Ubuntu install (Remove them)
-UBUNTU_INST_HTTP_HOSTNAME="mirror.anl.gov"
-UBUNTU_INST_HTTP_DIRECTORY="/pub/ubuntu"
-UBUNTU_INST_HTTP_PROXY="http://gold.eng.hq.xensource.com:8000"
-
-# Citrix settings (Remove them)
-CEILOMETER_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/ceilometer.git
-CEILOMETERCLIENT_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/python-ceilometerclient.git
-CINDER_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/cinder.git
-CINDERCLIENT_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/python-cinderclient.git
-NOVA_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/nova.git
-SWIFT_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/swift.git
-SWIFT3_REPO=git://gold.eng.hq.xensource.com/git/github/fujita/swift3.git
-SWIFTCLIENT_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/python-swiftclient.git
-GLANCE_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/glance.git
-GLANCECLIENT_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/python-glanceclient.git
-KEYSTONE_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/keystone.git
-NOVNC_REPO=git://gold.eng.hq.xensource.com/git/github/kanaka/noVNC.git
-HORIZON_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/horizon.git
-NOVACLIENT_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/python-novaclient.git
-OPENSTACKCLIENT_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/python-openstackclient.git
-KEYSTONECLIENT_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/python-keystoneclient.git
-QUANTUMCLIENT_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/python-quantumclient.git
-QUANTUM_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/quantum.git
-TEMPEST_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/tempest.git
-HEAT_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/heat.git
-HEATCLIENT_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/python-heatclient.git
-RYU_REPO=git://gold.eng.hq.xensource.com/git/github/osrg/ryu.git
-BM_IMAGE_BUILD_REPO=git://gold.eng.hq.xensource.com/git/github/stackforge/diskimage-builder.git
-BM_POSEUR_REPO=git://gold.eng.hq.xensource.com/git/github/tripleo/bm_poseur.git
-
-NOVA_ZIPBALL_URL="http://gold.eng.hq.xensource.com/git/github/openstack/nova/zipball/master"
-QUANTUM_ZIPBALL_URL="http://gold.eng.hq.xensource.com/git/github/openstack/quantum/zipball/master"
-
 LOCALRC_CONTENT_ENDS_HERE
 
 cd tools/xen
