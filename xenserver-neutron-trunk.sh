@@ -7,7 +7,7 @@ function print_usage_and_die
 cat >&2 << EOF
 usage: $0 XENSERVER_IP XENSERVER_PASS
 
-A simple script to test a XenServer devstack with Quantum
+A simple script to test a XenServer devstack with Neutron
 
 positional arguments:
  XENSERVER_IP     The IP address of the XenServer
