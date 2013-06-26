@@ -86,6 +86,7 @@ ssh -q \
     -o UserKnownHostsFile=/dev/null \
     "root@$XENSERVER_IP" bash -s -- << END_OF_XENSERVER_COMMANDS
 set -exu
+xe-toolstack-restart
 rm -rf "devstack-$devstack_branch"
 wget -qO - https://github.com/$GITHUB_USER/devstack/archive/$devstack_branch.tar.gz |
     tar -xzf -
