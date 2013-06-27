@@ -63,11 +63,13 @@ create_branch \
 # Create the /images directory used by the resize functionality.
 git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/57/33257/2 && git cherry-pick FETCH_HEAD
 # xenapi: Cleanup networking
-git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/24/33424/4 && git cherry-pick FETCH_HEAD
+# git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/24/33424/4 && git cherry-pick FETCH_HEAD
 # xenapi: cleanup VM Installation
 git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/32/33632/3 && git cherry-pick FETCH_HEAD
 # xenapi: Add qemu-utils as a cinder dependency
 git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/03/34003/2 && git cherry-pick FETCH_HEAD
+# boot_from_volume: get rid of --image
+git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/61/34761/1 && git cherry-pick FETCH_HEAD
 EOF
 
 # Create custom cinder branch
@@ -77,7 +79,7 @@ create_branch \
     "git@github.com:$GITHUB_USER/cinder.git" \
     "$cinder_branch" << EOF
 # xenapi: implement xenserver image to volume
-git fetch https://review.openstack.org/openstack/cinder refs/changes/36/34336/2 && git cherry-pick FETCH_HEAD
+git fetch https://review.openstack.org/openstack/cinder refs/changes/36/34336/3 && git cherry-pick FETCH_HEAD
 EOF
 
 ssh -q \
@@ -141,7 +143,7 @@ VNCSERVER_PROXYCLIENT_ADDRESS="$XENSERVER_IP"
 MULTI_HOST=False
 
 # Skip boot from volume exercise
-SKIP_EXERCISES="boot_from_volume"
+# SKIP_EXERCISES="boot_from_volume"
 
 # Citrix specific settings to speed up Ubuntu install (Remove them)
 UBUNTU_INST_HTTP_HOSTNAME="mirror.anl.gov"

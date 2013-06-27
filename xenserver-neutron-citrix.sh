@@ -64,7 +64,7 @@ create_branch \
 # Create the /images directory used by the resize functionality.
 git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/57/33257/2 && git cherry-pick FETCH_HEAD
 # xenapi: Cleanup networking
-git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/24/33424/4 && git cherry-pick FETCH_HEAD
+# git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/24/33424/4 && git cherry-pick FETCH_HEAD
 # xenapi: cleanup VM Installation
 git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/32/33632/3 && git cherry-pick FETCH_HEAD
 # xenapi: Add qemu-utils as a cinder dependency
@@ -78,7 +78,7 @@ create_branch \
     "git@github.com:$GITHUB_USER/cinder.git" \
     "$cinder_branch" << EOF
 # xenapi: implement xenserver image to volume
-git fetch https://review.openstack.org/openstack/cinder refs/changes/36/34336/2 && git cherry-pick FETCH_HEAD
+git fetch https://review.openstack.org/openstack/cinder refs/changes/36/34336/3 && git cherry-pick FETCH_HEAD
 EOF
 
 ssh -q \
