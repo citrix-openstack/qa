@@ -61,7 +61,7 @@ create_branch \
     "git@github.com:$GITHUB_USER/devstack.git" \
     "$devstack_branch" << EOF
 # Create the /images directory used by the resize functionality.
-git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/57/33257/2 && git cherry-pick FETCH_HEAD
+git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/57/33257/3 && git cherry-pick FETCH_HEAD
 # xenapi: Cleanup networking
 # git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/24/33424/4 && git cherry-pick FETCH_HEAD
 # xenapi: cleanup VM Installation
