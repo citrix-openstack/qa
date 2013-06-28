@@ -38,8 +38,6 @@ function create_branch() {
 
     local tmpdir
 
-    branchname=$(date +%s)
-
     tmpdir=$(mktemp -d)
     (
         cd $tmpdir
@@ -54,12 +52,13 @@ function create_branch() {
     rm -rf "$tmpdir"
 }
 
+build_branch="xsi2v-$(date +%s)"
+
 # Create custom devstack branch
-devstack_branch=$(date +%s)
 create_branch \
     "https://github.com/openstack-dev/devstack.git" \
     "git@github.com:$GITHUB_USER/devstack.git" \
-    "$devstack_branch" << EOF
+    "$build_branch" << EOF
 # xenapi: cleanup VM Installation
 git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/32/33632/3 && git cherry-pick FETCH_HEAD
 # xenapi: Add qemu-utils as a cinder dependency
@@ -69,11 +68,10 @@ git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/61/34
 EOF
 
 # Create custom cinder branch
-cinder_branch=$(date +%s)
 create_branch \
     "https://github.com/openstack/cinder.git" \
     "git@github.com:$GITHUB_USER/cinder.git" \
-    "$cinder_branch" << EOF
+    "$build_branch" << EOF
 # xenapi: implement xenserver image to volume
 git fetch https://review.openstack.org/openstack/cinder refs/changes/36/34336/3 && git cherry-pick FETCH_HEAD
 EOF
@@ -84,10 +82,10 @@ ssh -q \
     -o UserKnownHostsFile=/dev/null \
     "root@$XENSERVER_IP" bash -s -- << END_OF_XENSERVER_COMMANDS
 set -exu
-rm -rf "devstack-$devstack_branch"
-wget -qO - https://github.com/$GITHUB_USER/devstack/archive/$devstack_branch.tar.gz |
+rm -rf "devstack-$build_branch"
+wget -qO - https://github.com/$GITHUB_USER/devstack/archive/$build_branch.tar.gz |
     tar -xzf -
-cd "devstack-$devstack_branch"
+cd "devstack-$build_branch"
 
 cat << LOCALRC_CONTENT_ENDS_HERE > localrc
 # Passwords
@@ -176,7 +174,7 @@ QUANTUM_ZIPBALL_URL="http://gold.eng.hq.xensource.com/git/github/openstack/quant
 
 # Custom branches
 CINDER_REPO=git://github.com/$GITHUB_USER/cinder.git
-CINDER_BRANCH=$cinder_branch
+CINDER_BRANCH=$build_branch
 
 LOCALRC_CONTENT_ENDS_HERE
 
@@ -191,7 +189,7 @@ ssh -q \
     -o UserKnownHostsFile=/dev/null \
     "root@$XENSERVER_IP" bash -s -- << END_OF_XENSERVER_COMMANDS
 set -exu
-GUEST_IP=\$(. "devstack-$devstack_branch/tools/xen/functions" && find_ip_by_name DevStackOSDomU 0)
+GUEST_IP=\$(. "devstack-$build_branch/tools/xen/functions" && find_ip_by_name DevStackOSDomU 0)
 ssh -q \
     -o Batchmode=yes \
     -o StrictHostKeyChecking=no \

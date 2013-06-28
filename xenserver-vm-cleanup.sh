@@ -38,8 +38,6 @@ function create_branch() {
 
     local tmpdir
 
-    branchname=$(date +%s)
-
     tmpdir=$(mktemp -d)
     (
         cd $tmpdir
@@ -54,12 +52,13 @@ function create_branch() {
     rm -rf "$tmpdir"
 }
 
+build_branch="vmcleanup-$(date +%s)"
+
 # Create custom devstack branch
-devstack_branch=$(date +%s)
 create_branch \
     "https://github.com/openstack-dev/devstack.git" \
     "git@github.com:$GITHUB_USER/devstack.git" \
-    "$devstack_branch" << EOF
+    "$build_branch" << EOF
 # xenapi: cleanup VM Installation
 git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/32/33632/3 && git cherry-pick FETCH_HEAD
 EOF
@@ -70,10 +69,10 @@ ssh -q \
     -o UserKnownHostsFile=/dev/null \
     "root@$XENSERVER_IP" bash -s -- << EOF
 set -exu
-rm -rf "devstack-$devstack_branch"
-wget -qO - https://github.com/$GITHUB_USER/devstack/archive/$devstack_branch.tar.gz |
+rm -rf "devstack-$build_branch"
+wget -qO - https://github.com/$GITHUB_USER/devstack/archive/$build_branch.tar.gz |
     tar -xzf -
-cd "devstack-$devstack_branch"
+cd "devstack-$build_branch"
 
 cat << LOCALRC_CONTENT_ENDS_HERE > localrc
 # Passwords
@@ -166,7 +165,7 @@ ssh -q \
     -o UserKnownHostsFile=/dev/null \
     "root@$XENSERVER_IP" bash -s -- << END_OF_XENSERVER_COMMANDS
 set -exu
-GUEST_IP=\$(. "devstack-$devstack_branch/tools/xen/functions" && find_ip_by_name DevStackOSDomU 0)
+GUEST_IP=\$(. "devstack-$build_branch/tools/xen/functions" && find_ip_by_name DevStackOSDomU 0)
 ssh -q \
     -o Batchmode=yes \
     -o StrictHostKeyChecking=no \
