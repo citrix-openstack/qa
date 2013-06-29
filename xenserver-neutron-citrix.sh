@@ -74,13 +74,13 @@ git fetch https://review.openstack.org/openstack/cinder refs/changes/36/34336/3 
 EOF
 
 # Create custom neutron branch
-create_branch \
-    "https://github.com/openstack/quantum.git" \
-    "git@github.com:$GITHUB_USER/quantum.git" \
-    "$build_branch" << EOF
-# fix rootwrap default config
-git fetch https://review.openstack.org/openstack/quantum refs/changes/02/34902/3 && git cherry-pick FETCH_HEAD
-EOF
+# create_branch \
+#     "https://github.com/openstack/quantum.git" \
+#     "git@github.com:$GITHUB_USER/quantum.git" \
+#     "$build_branch" << EOF
+# # fix rootwrap default config
+# git fetch https://review.openstack.org/openstack/quantum refs/changes/02/34902/3 && git cherry-pick FETCH_HEAD
+# EOF
 
 ssh -q \
     -o Batchmode=yes \
@@ -197,9 +197,9 @@ QUANTUM_ZIPBALL_URL="http://gold.eng.hq.xensource.com/git/github/openstack/quant
 CINDER_REPO=git://github.com/$GITHUB_USER/cinder.git
 CINDER_BRANCH=$build_branch
 
-QUANTUM_REPO=git://github.com/$GITHUB_USER/quantum.git
-QUANTUM_BRANCH=$build_branch
-QUANTUM_ZIPBALL_URL="https://github.com/$GITHUB_USER/quantum/archive/$build_branch.zip"
+# QUANTUM_REPO=git://github.com/$GITHUB_USER/quantum.git
+# QUANTUM_BRANCH=$build_branch
+# QUANTUM_ZIPBALL_URL="https://github.com/$GITHUB_USER/quantum/archive/$build_branch.zip"
 
 LOCALRC_CONTENT_ENDS_HERE
 
