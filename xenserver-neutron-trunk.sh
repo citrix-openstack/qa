@@ -59,17 +59,9 @@ EXTRA_OPTS=("xenapi_disable_agent=True")
 API_RATE_LIMIT=False
 VIRT_DRIVER=xenserver
 
-# Cinder settings
-VOLUME_BACKING_FILE_SIZE=10000M
-
-# Networking
-MGT_IP="dhcp"
-
-PUB_IP=172.24.4.10
-PUB_NETMASK=255.255.255.0
-
-# Expose OpenStack services on management interface
-HOST_IP_IFACE=eth2
+# Use a XenServer Image
+IMAGE_URLS="https://github.com/downloads/citrix-openstack/warehouse/cirros-0.3.0-x86_64-disk.vhd.tgz"
+DEFAULT_IMAGE_NAME="cirros-0.3.0-x86_64-disk"
 
 # OpenStack VM settings
 OSDOMU_MEM_MB=4096
@@ -93,8 +85,13 @@ VERBOSE=False
 XENAPI_CONNECTION_URL="http://$XENSERVER_IP"
 VNCSERVER_PROXYCLIENT_ADDRESS="$XENSERVER_IP"
 
-Q_PLUGIN=openvswitch
 MULTI_HOST=False
+
+# Skip boot from volume exercise
+SKIP_EXERCISES=boot_from_volume,client-env
+
+# Quantum specific
+Q_PLUGIN=openvswitch
 ENABLED_SERVICES+=,tempest,quantum,q-svc,q-agt,q-dhcp,q-l3,q-meta,q-domua,-n-net
 
 # Disable security groups
@@ -107,12 +104,6 @@ OVS_VLAN_RANGES="physnet1:1000:1024"
 # CLEAN_TEMPLATES=true
 
 Q_USE_DEBUG_COMMAND=True
-
-SKIP_EXERCISES=boot_from_volume,client-env
-
-# Use a XenServer Image
-IMAGE_URLS="https://github.com/downloads/citrix-openstack/warehouse/cirros-0.3.0-x86_64-disk.vhd.tgz"
-DEFAULT_IMAGE_NAME="cirros-0.3.0-x86_64-disk"
 
 LOCALRC_CONTENT_ENDS_HERE
 
