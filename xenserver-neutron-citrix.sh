@@ -63,7 +63,7 @@ create_branch \
 # xenapi: cleanup VM Installation
 git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/32/33632/3 && git cherry-pick FETCH_HEAD
 # Use xe network-attach
-git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/71/35471/1 && git cherry-pick FETCH_HEAD
+git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/71/35471/2 && git cherry-pick FETCH_HEAD
 EOF
 
 # Create custom cinder branch
