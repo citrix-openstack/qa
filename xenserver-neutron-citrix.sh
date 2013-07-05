@@ -66,14 +66,14 @@ git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/32/33
 git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/71/35471/2 && git cherry-pick FETCH_HEAD
 EOF
 
-# Create custom cinder branch
-create_branch \
-    "https://github.com/openstack/cinder.git" \
-    "git@github.com:$GITHUB_USER/cinder.git" \
-    "$build_branch" << EOF
-# xenapi: implement xenserver image to volume
-git fetch https://review.openstack.org/openstack/cinder refs/changes/36/34336/3 && git cherry-pick FETCH_HEAD
-EOF
+# # Create custom cinder branch
+# create_branch \
+#     "https://github.com/openstack/cinder.git" \
+#     "git@github.com:$GITHUB_USER/cinder.git" \
+#     "$build_branch" << EOF
+# # xenapi: implement xenserver image to volume
+# git fetch https://review.openstack.org/openstack/cinder refs/changes/36/34336/3 && git cherry-pick FETCH_HEAD
+# EOF
 
 # Create custom neutron branch
 # create_branch \
@@ -196,8 +196,8 @@ NOVA_ZIPBALL_URL="http://gold.eng.hq.xensource.com/git/github/openstack/nova/zip
 QUANTUM_ZIPBALL_URL="http://gold.eng.hq.xensource.com/git/github/openstack/quantum/zipball/master"
 
 # Custom branches
-CINDER_REPO=git://github.com/$GITHUB_USER/cinder.git
-CINDER_BRANCH=$build_branch
+# CINDER_REPO=git://github.com/$GITHUB_USER/cinder.git
+# CINDER_BRANCH=$build_branch
 
 # QUANTUM_REPO=git://github.com/$GITHUB_USER/quantum.git
 # QUANTUM_BRANCH=$build_branch
