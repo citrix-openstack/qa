@@ -54,6 +54,15 @@ function create_branch() {
 
 build_branch="xsi2v-$(date +%s)"
 
+# Create custom tempest branch
+create_branch \
+    "https://github.com/openstack/tempest.git" \
+    "git@github.com:$GITHUB_USER/tempest.git" \
+    "$build_branch" << EOF
+# Disable minDisk checking
+git fetch https://review.openstack.org/openstack/tempest refs/changes/41/35841/1 && git cherry-pick FETCH_HEAD
+EOF
+
 # Create custom devstack branch
 create_branch \
     "https://github.com/openstack-dev/devstack.git" \
@@ -173,6 +182,10 @@ QUANTUM_ZIPBALL_URL="http://gold.eng.hq.xensource.com/git/github/openstack/quant
 # Custom branches
 # CINDER_REPO=git://github.com/$GITHUB_USER/cinder.git
 # CINDER_BRANCH=$build_branch
+
+
+TEMPEST_REPO=git://github.com/$GITHUB_USER/tempest.git
+TEMPEST_BRANCH=$build_branch
 
 LOCALRC_CONTENT_ENDS_HERE
 
