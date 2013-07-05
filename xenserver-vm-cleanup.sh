@@ -86,7 +86,7 @@ XENAPI_PASSWORD="$XENSERVER_PASS"
 SWIFT_HASH="66a3d6b56c1f479c8b4e70ab5c2000f5"
 
 # Tempest
-DEFAULT_INSTANCE_TYPE="m1.small"
+DEFAULT_INSTANCE_TYPE="m1.tiny"
 
 # Compute settings
 EXTRA_OPTS=("xenapi_disable_agent=True")
