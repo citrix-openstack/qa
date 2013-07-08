@@ -63,7 +63,7 @@ create_branch \
 # xenapi: cleanup VM Installation
 git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/32/33632/3 && git cherry-pick FETCH_HEAD
 # Use xe network-attach
-git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/71/35471/2 && git cherry-pick FETCH_HEAD
+git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/71/35471/3 && git cherry-pick FETCH_HEAD
 EOF
 
 # # Create custom cinder branch
@@ -76,13 +76,13 @@ EOF
 # EOF
 
 # Create custom neutron branch
-# create_branch \
-#     "https://github.com/openstack/quantum.git" \
-#     "git@github.com:$GITHUB_USER/quantum.git" \
-#     "$build_branch" << EOF
-# # fix rootwrap default config
-# git fetch https://review.openstack.org/openstack/quantum refs/changes/02/34902/3 && git cherry-pick FETCH_HEAD
-# EOF
+create_branch \
+    "https://github.com/openstack/neutron.git" \
+    "git@github.com:$GITHUB_USER/neutron.git" \
+    "$build_branch" << EOF
+# xenapi - rename quantum to neutron
+git fetch https://review.openstack.org/openstack/neutron refs/changes/39/36039/2 && git cherry-pick FETCH_HEAD
+EOF
 
 ssh -q \
     -o Batchmode=yes \
@@ -130,7 +130,7 @@ OSDOMU_VDI_GB=40
 ACTIVE_TIMEOUT=500
 TERMINATE_TIMEOUT=500
 
-# Increase boot timeout for quantum tests:
+# Increase boot timeout for neutron tests:
 BOOT_TIMEOUT=500
 
 # DevStack settings
@@ -149,7 +149,7 @@ SKIP_EXERCISES="boot_from_volume"
 
 # Quantum specific
 Q_PLUGIN=openvswitch
-ENABLED_SERVICES+=,tempest,quantum,q-svc,q-agt,q-dhcp,q-l3,q-meta,q-domua,-n-net
+ENABLED_SERVICES+=,tempest,neutron,q-svc,q-agt,q-dhcp,q-l3,q-meta,q-domua,-n-net
 
 # Disable security groups
 Q_USE_SECGROUP=False
@@ -184,8 +184,8 @@ HORIZON_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/horizon.git
 NOVACLIENT_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/python-novaclient.git
 OPENSTACKCLIENT_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/python-openstackclient.git
 KEYSTONECLIENT_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/python-keystoneclient.git
-QUANTUMCLIENT_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/python-quantumclient.git
-QUANTUM_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/quantum.git
+NEUTRONCLIENT_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/python-neutronclient.git
+NEUTRON_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/neutron
 TEMPEST_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/tempest.git
 HEAT_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/heat.git
 HEATCLIENT_REPO=git://gold.eng.hq.xensource.com/git/github/openstack/python-heatclient.git
@@ -193,15 +193,15 @@ RYU_REPO=git://gold.eng.hq.xensource.com/git/github/osrg/ryu.git
 BM_IMAGE_BUILD_REPO=git://gold.eng.hq.xensource.com/git/github/stackforge/diskimage-builder.git
 BM_POSEUR_REPO=git://gold.eng.hq.xensource.com/git/github/tripleo/bm_poseur.git
 NOVA_ZIPBALL_URL="http://gold.eng.hq.xensource.com/git/github/openstack/nova/zipball/master"
-QUANTUM_ZIPBALL_URL="http://gold.eng.hq.xensource.com/git/github/openstack/quantum/zipball/master"
+NEUTRONT_ZIPBALL_URL="http://gold.eng.hq.xensource.com/git/github/openstack/neutron/zipball/master"
 
 # Custom branches
 # CINDER_REPO=git://github.com/$GITHUB_USER/cinder.git
 # CINDER_BRANCH=$build_branch
 
-# QUANTUM_REPO=git://github.com/$GITHUB_USER/quantum.git
-# QUANTUM_BRANCH=$build_branch
-# QUANTUM_ZIPBALL_URL="https://github.com/$GITHUB_USER/quantum/archive/$build_branch.zip"
+NEUTRON_REPO=git://github.com/$GITHUB_USER/neutron.git
+NEUTRON_BRANCH=$build_branch
+NEUTRON_ZIPBALL_URL="https://github.com/$GITHUB_USER/neutron/archive/$build_branch.zip"
 
 LOCALRC_CONTENT_ENDS_HERE
 
