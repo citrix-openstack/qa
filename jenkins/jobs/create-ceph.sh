@@ -40,6 +40,8 @@ sudo apt-get install -qy ceph
 HOSTNAME="\$(hostname -s)"
 IPADDRESS="\$(ifconfig eth0 | sed -ne 's/^.*inet addr:\([^ ]*\) .*$/\1/p')"
 
+sudo sed -i "1i\$IPADDRESS \$HOSTNAME" /etc/hosts
+
 sudo tee /etc/ceph/ceph.conf <<EOT
 
 [osd]
