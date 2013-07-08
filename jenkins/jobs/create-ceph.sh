@@ -25,7 +25,7 @@ set -x
 
 SLAVE_IP=$(cat $XSLIB/start-slave.sh | "$REMOTELIB/bash.sh" "root@$XENSERVERNAME")
 
-"$REMOTELIB/bash.sh" "ubuntu@$SLAVE_IP" << END_OF_ROUTER_SETUP
+"$REMOTELIB/bash.sh" "ubuntu@$SLAVE_IP" << END_OF_CEPH_SETUP
 set -eux
 
 export DEBIAN_FRONTEND=noninteractive
@@ -80,6 +80,6 @@ done
 
 sudo ceph osd pool create testpool
 
-END_OF_ROUTER_SETUP
+END_OF_CEPH_SETUP
 
 echo "Ceph installed on $SLAVE_IP"
