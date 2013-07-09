@@ -54,6 +54,15 @@ function create_branch() {
 
 build_branch="xsi2v-$(date +%s)"
 
+# Create custom nova branch
+create_branch \
+    "https://github.com/openstack/nova" \
+    "git@github.com:$GITHUB_USER/nova" \
+    "$build_branch" << EOF
+# xenapi: Tidy up Popen calls to avoid command injection attacks
+git fetch https://review.openstack.org/openstack/nova refs/changes/80/34580/10 && git cherry-pick FETCH_HEAD
+EOF
+
 # Create custom tempest branch
 create_branch \
     "https://github.com/openstack/tempest.git" \
@@ -68,8 +77,6 @@ create_branch \
     "https://github.com/openstack-dev/devstack.git" \
     "git@github.com:$GITHUB_USER/devstack.git" \
     "$build_branch" << EOF
-# xenapi: cleanup VM Installation
-git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/32/33632/3 && git cherry-pick FETCH_HEAD
 # boot_from_volume: get rid of --image
 git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/61/34761/1 && git cherry-pick FETCH_HEAD
 EOF
@@ -186,6 +193,10 @@ QUANTUM_ZIPBALL_URL="http://gold.eng.hq.xensource.com/git/github/openstack/quant
 
 TEMPEST_REPO=git://github.com/$GITHUB_USER/tempest.git
 TEMPEST_BRANCH=$build_branch
+
+NOVA_REPO=git://github.com/$GITHUB_USER/nova.git
+NOVA_BRANCH=$build_branch
+NOVA_ZIPBALL_URL="http://github.com/$GITHUB_USER/nova/archive/$build_branch.zip"
 
 LOCALRC_CONTENT_ENDS_HERE
 
