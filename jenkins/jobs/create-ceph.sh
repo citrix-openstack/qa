@@ -33,33 +33,37 @@ sudo apt-get -qy update
 sudo apt-get -qy dist-upgrade
 
 wget -q -O- 'https://ceph.com/git/?p=ceph.git;a=blob_plain;f=keys/release.asc' | sudo apt-key add -
-echo deb http://ceph.com/debian-argonaut/ \$(lsb_release -sc) main | sudo tee /etc/apt/sources.list.d/ceph.list
+echo deb http://ceph.com/debian-cuttlefish/ \$(lsb_release -sc) main | sudo tee /etc/apt/sources.list.d/ceph.list
 sudo apt-get -qy update 
 sudo apt-get install -qy ceph
 
-HOSTNAME="\$(hostname -s)"
-IPADDRESS="\$(ifconfig eth0 | sed -ne 's/^.*inet addr:\([^ ]*\) .*$/\1/p')"
+CEPH_HOST="\$(hostname -s)"
+CEPH_IP="\$(ifconfig eth0 | sed -ne 's/^.*inet addr:\([^ ]*\) .*$/\1/p')"
 
-sudo sed -i "1i\$IPADDRESS \$HOSTNAME" /etc/hosts
+sudo sed -i "1i\$CEPH_IP \$CEPH_HOST" /etc/hosts
 
 sudo tee /etc/ceph/ceph.conf <<EOT
+[global]
+        auth cluster required = none
+        auth service required = none
+        auth client required = none
 
 [osd]
         osd journal size = 1000
         filestore xattr use omap = true
 
 [mon.a]
-        host = \$HOSTNAME
-        mon addr = \$IPADDRESS:6789
+        host = \$CEPH_HOST
+        mon addr = \$CEPH_IP:6789
 
 [osd.0]
-        host = \$HOSTNAME
+        host = \$CEPH_HOST
 
 [osd.1]
-        host = \$HOSTNAME
+        host = \$CEPH_HOST
 
 [mds.a]
-        host = \$HOSTNAME
+        host = \$CEPH_HOST
 EOT
 
 sudo mkdir -p /var/lib/ceph/osd/ceph-0
@@ -80,8 +84,11 @@ while [ "HEALTH_OK" != "\$(sudo ceph health)" ]; do
     sleep 1
 done
 
-sudo ceph osd pool create testpool
+sudo ceph osd pool create volumes 8
+sudo ceph osd pool create images 8
 
+sudo ceph auth get-or-create client.volumes mon 'allow r' osd 'allow class-read object_prefix rbd_children, allow rwx pool=volumes, allow rx pool=images' -o /etc/ceph/client.volumes.keyring
+sudo ceph auth get-or-create client.images mon 'allow r' osd 'allow class-read object_prefix rbd_children, allow rwx pool=images' -o /etc/ceph/client.images.keyring
 END_OF_CEPH_SETUP
 
 echo "Ceph installed on $SLAVE_IP"
