@@ -117,8 +117,8 @@ API_RATE_LIMIT=False
 VIRT_DRIVER=xenserver
 
 # Use a XenServer Image:
-IMAGE_URLS="https://github.com/downloads/citrix-openstack/warehouse/cirros-0.3.0-x86_64-disk.vhd.tgz"
-DEFAULT_IMAGE_NAME="cirros-0.3.0-x86_64-disk"
+# IMAGE_URLS="https://github.com/downloads/citrix-openstack/warehouse/cirros-0.3.0-x86_64-disk.vhd.tgz"
+# DEFAULT_IMAGE_NAME="cirros-0.3.0-x86_64-disk"
 
 # OpenStack VM settings
 OSDOMU_MEM_MB=4096
