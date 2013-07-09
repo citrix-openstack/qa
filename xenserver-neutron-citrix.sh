@@ -61,7 +61,7 @@ create_branch \
     "git@github.com:$GITHUB_USER/devstack.git" \
     "$build_branch" << EOF
 # Use xe network-attach
-git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/71/35471/3 && git cherry-pick FETCH_HEAD
+git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/71/35471/5 && git cherry-pick FETCH_HEAD
 EOF
 
 # # Create custom cinder branch
