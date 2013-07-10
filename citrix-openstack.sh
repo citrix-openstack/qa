@@ -68,8 +68,8 @@ create_branch \
     "https://github.com/openstack/tempest.git" \
     "git@github.com:$GITHUB_USER/tempest.git" \
     "$build_branch" << EOF
-# Disable minDisk checking
-git fetch https://review.openstack.org/openstack/tempest refs/changes/41/35841/1 && git cherry-pick FETCH_HEAD
+# improve minDisk checking
+git fetch https://review.openstack.org/openstack/tempest refs/changes/41/35841/2 && git cherry-pick FETCH_HEAD
 EOF
 
 # Create custom devstack branch
