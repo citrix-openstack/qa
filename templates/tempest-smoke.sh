@@ -26,14 +26,19 @@ DEVSTACK_TGZ="https://github.com/openstack-dev/devstack/archive/master.tar.gz"
 
 set -eux
 
-ssh -q \
-    -o Batchmode=yes \
-    -o StrictHostKeyChecking=no \
-    -o UserKnownHostsFile=/dev/null \
-    "root@$XENSERVER_IP" bash -s -- << END_OF_XENSERVER_COMMANDS
+function remote_bash() {
+    ssh -q \
+        -o Batchmode=yes \
+        -o StrictHostKeyChecking=no \
+        -o UserKnownHostsFile=/dev/null \
+        "root@$XENSERVER_IP" bash -s --
+}
+
+TMPDIR=$(echo "mktemp -d" | remote_bash)
+
+remote_bash << END_OF_XENSERVER_COMMANDS
 set -exu
-TMPDIR=\$(mktemp -d)
-cd \$TMPDIR
+cd $TMPDIR
 
 wget -qO - "$DEVSTACK_TGZ" |
     tar -xzf -
@@ -100,13 +105,12 @@ cd tools/xen
 END_OF_XENSERVER_COMMANDS
 
 # Run tests
-ssh -q \
-    -o Batchmode=yes \
-    -o StrictHostKeyChecking=no \
-    -o UserKnownHostsFile=/dev/null \
-    "root@$XENSERVER_IP" bash -s -- << END_OF_XENSERVER_COMMANDS
+remote_bash << END_OF_XENSERVER_COMMANDS
 set -exu
-GUEST_IP=\$(. "devstack-$build_branch/tools/xen/functions" && find_ip_by_name DevStackOSDomU 0)
+cd $TMPDIR
+cd devstack*
+
+GUEST_IP=\$(. "tools/xen/functions" && find_ip_by_name DevStackOSDomU 0)
 ssh -q \
     -o Batchmode=yes \
     -o StrictHostKeyChecking=no \
