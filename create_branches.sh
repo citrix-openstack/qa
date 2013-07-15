@@ -134,6 +134,74 @@ function create_build_branch() {
     done
 }
 
-BRANCH_NAME="$1"
+function clone_status_repo() {
+    local srcrepo
+    local ldir
+
+    srcrepo="$1"
+    ldir="$2"
+
+
+if ! [ -d "$ldir" ]; then
+    git clone "$STATUS_REPO" "$ldir"
+fi
+}
+
+function pull_status_repo() {
+    local ldir
+
+    ldir="$1"
+
+    (
+        cd "$ldir"
+        git pull
+    )
+}
+
+function write_latest_branch() {
+    local ldir
+
+    ldir="$1"
+
+    cat > "$ldir/latest_branch"
+}
+
+function read_latest_branch() {
+    local ldir
+
+    ldir="$1"
+
+    cat "$ldir/latest_branch"
+}
+
+function push_status_repo() {
+    local ldir
+
+    ldir="$1"
+
+    (
+        cd "$ldir"
+        git commit -am "Automatic update"
+        git push
+    )
+}
+
 assert_no_new_repos
+
+BRANCH_NAME="build-$(date +%s)"
+
+    
+clone_status_repo "git://gold.eng.hq.xensource.com/git/internal/builds/status.git" status
+
+pull_status_repo status
+
+PREV_BRANCH=$(read_latest_branch)
+
 create_build_branch "$BRANCH_NAME"
+
+if [ -z "$PREV_BRANCH" ]; then
+    echo "$BRANCH_NAME" | write_latest_branch status
+    push_status_repo status
+fi
+
+
