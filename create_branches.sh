@@ -110,6 +110,18 @@ function var_name() {
     echo "$varname"
 }
 
+function repo_name() {
+    local repo
+
+    repo="$1"
+
+    local reponame
+
+    reponame=$(echo "$repo" | cut -d" " -f 3)
+
+    echo "$reponame"
+}
+
 function create_build_branch() {
     local branch
     local repo
@@ -124,7 +136,7 @@ function create_build_branch() {
             set -e
             cd "$varname"
 
-            git fetch origin || true # Ignore fetch errors
+            git fetch -q origin || true # Ignore fetch errors
             git checkout origin/master -B "$branch"
             if ! git remote -v | grep -q "^build"; then
                 git remote add build $(dst_repo "$repo")
@@ -132,6 +144,33 @@ function create_build_branch() {
             git push build "$branch"
         )
     done
+}
+
+function branches_differ() {
+    local branch1
+    local branch2
+
+    branch1="$1"
+    branch2="$2"
+
+    local reponame
+    local varname
+    local result
+
+    result=0
+
+    generate_repos | while read repo; do
+        varname=$(var_name "$repo")
+        reponame=$(repo_name "$repo")
+
+        cd "$varname"
+        if [ git diff --quiet "$branch1" "$branch2" ]; then
+            echo "$reponame Updated"
+            result=1
+        fi
+    done
+
+    return "$result"
 }
 
 function clone_status_repo() {
@@ -202,4 +241,9 @@ create_build_branch "$BRANCH_NAME"
 if [ -z "$PREV_BRANCH" ]; then
     echo "$BRANCH_NAME" | write_latest_branch status
     push_status_repo status
+else
+    if branches_differ "$PREV_BRANCH" "$BRANCH_NAME"; then
+        echo "$BRANCH_NAME" | write_latest_branch status
+        push_status_repo status
+    fi
 fi
