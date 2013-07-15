@@ -155,23 +155,23 @@ function branches_differ() {
 
     local reponame
     local varname
-    local no_difference
+    local result
 
-    no_difference=1
+    result=1
 
     generate_repos | while read repo; do
         varname=$(var_name "$repo")
         reponame=$(repo_name "$repo")
 
         cd "$varname"
-        if git diff --quiet "$branch1" "$branch2"; then
+        if ! git diff --quiet "$branch1" "$branch2"; then
             echo "$reponame Updated"
-            no_difference=0
+            result=0
         fi
         cd ..
     done
 
-    return "$no_difference"
+    return $result
 }
 
 function clone_status_repo() {
