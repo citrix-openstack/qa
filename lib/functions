@@ -109,6 +109,18 @@ function var_name() {
     echo "$varname"
 }
 
+function branch_name() {
+    local repo
+
+    repo="$1"
+
+    local varname
+
+    varname=$(var_name "$repo")
+
+    echo "$varname" | sed -e 's/_REPO/_BRANCH/g'
+}
+
 function repo_name() {
     local repo
 

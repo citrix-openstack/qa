@@ -1,0 +1,4 @@
+# Set ubuntu mirror and proxy
+UBUNTU_INST_HTTP_HOSTNAME="mirror.anl.gov"
+UBUNTU_INST_HTTP_DIRECTORY="/pub/ubuntu"
+UBUNTU_INST_HTTP_PROXY="http://gold.eng.hq.xensource.com:8000"
