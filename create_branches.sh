@@ -195,7 +195,7 @@ clone_status_repo "git://gold.eng.hq.xensource.com/git/internal/builds/status.gi
 
 pull_status_repo status
 
-PREV_BRANCH=$(read_latest_branch)
+PREV_BRANCH=$(read_latest_branch status)
 
 create_build_branch "$BRANCH_NAME"
 
