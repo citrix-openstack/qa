@@ -143,7 +143,7 @@ function clone_status_repo() {
 
 
 if ! [ -d "$ldir" ]; then
-    git clone "$STATUS_REPO" "$ldir"
+    git clone "$srcrepo" "$ldir"
 fi
 }
 
