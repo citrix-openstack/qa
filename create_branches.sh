@@ -164,7 +164,7 @@ function branches_differ() {
         reponame=$(repo_name "$repo")
 
         cd "$varname"
-        if [ git diff --quiet "$branch1" "$branch2" ]; then
+        if git diff --quiet "$branch1" "$branch2"; then
             echo "$reponame Updated"
             result=1
         fi
