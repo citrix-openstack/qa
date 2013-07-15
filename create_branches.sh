@@ -146,7 +146,7 @@ function create_build_branch() {
     done
 }
 
-function branches_differ() {
+function print_updated_repos() {
     local branch1
     local branch2
 
@@ -155,9 +155,6 @@ function branches_differ() {
 
     local reponame
     local varname
-    local result
-
-    result=1
 
     generate_repos | while read repo; do
         varname=$(var_name "$repo")
@@ -165,13 +162,10 @@ function branches_differ() {
 
         cd "$varname"
         if ! git diff --quiet "$branch1" "$branch2"; then
-            echo "$reponame Updated"
-            result=0
+            echo "$reponame"
         fi
         cd ..
     done
-
-    return $result
 }
 
 function clone_status_repo() {
@@ -243,7 +237,7 @@ if [ -z "$PREV_BRANCH" ]; then
     echo "$BRANCH_NAME" | write_latest_branch status
     push_status_repo status
 else
-    if branches_differ "$PREV_BRANCH" "$BRANCH_NAME"; then
+    if ! print_updated_repos "$PREV_BRANCH" "$BRANCH_NAME" | diff -u /dev/null -; then
         echo "$BRANCH_NAME" | write_latest_branch status
         push_status_repo status
     fi
