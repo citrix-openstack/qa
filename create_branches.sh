@@ -137,7 +137,7 @@ function create_build_branch() {
             cd "$varname"
 
             git fetch -q origin || true # Ignore fetch errors
-            git checkout origin/master -B "$branch"
+            git checkout --quiet origin/master -B "$branch"
             if ! git remote -v | grep -q "^build"; then
                 git remote add build $(dst_repo "$repo")
             fi
