@@ -141,7 +141,7 @@ function create_build_branch() {
             if ! git remote -v | grep -q "^build"; then
                 git remote add build $(dst_repo "$repo")
             fi
-            git push build "$branch"
+            git push --quiet build "$branch"
         )
     done
 }
