@@ -203,5 +203,3 @@ if [ -z "$PREV_BRANCH" ]; then
     echo "$BRANCH_NAME" | write_latest_branch status
     push_status_repo status
 fi
-
-
