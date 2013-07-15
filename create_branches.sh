@@ -1,5 +1,5 @@
 #!/bin/bash
-set -eu
+set -eux
 
 function repo_lines() {
 wget -qO - https://raw.github.com/openstack-dev/devstack/master/stackrc |
@@ -136,7 +136,7 @@ function create_build_branch() {
             set -e
             cd "$varname"
 
-            git fetch -q origin || true # Ignore fetch errors
+            git fetch origin || true # Ignore fetch errors
             git checkout origin/master -B "$branch"
             if ! git remote -v | grep -q "^build"; then
                 git remote add build $(dst_repo "$repo")
