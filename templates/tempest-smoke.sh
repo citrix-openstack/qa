@@ -59,6 +59,9 @@ SWIFT_HASH="66a3d6b56c1f479c8b4e70ab5c2000f5"
 XEN_XVDB_SIZE_GB=10
 VOLUME_BACKING_DEVICE=/dev/xvdb
 
+# Do not use secure delete
+CINDER_SECURE_DELETE=False
+
 # Tempest
 DEFAULT_INSTANCE_TYPE="m1.tiny"
 
@@ -67,9 +70,13 @@ EXTRA_OPTS=("xenapi_disable_agent=True")
 API_RATE_LIMIT=False
 VIRT_DRIVER=xenserver
 
-# Use a XenServer Image:
-# IMAGE_URLS="https://github.com/downloads/citrix-openstack/warehouse/cirros-0.3.0-x86_64-disk.vhd.tgz"
-# DEFAULT_IMAGE_NAME="cirros-0.3.0-x86_64-disk"
+# Use a XenServer Image and the standard one
+# The XenServer image is faster, however tempest requires the uec files
+IMAGE_URLS="\
+https://github.com/downloads/citrix-openstack/warehouse/cirros-0.3.0-x86_64-disk.vhd.tgz,\
+http://download.cirros-cloud.net/0.3.1/cirros-0.3.1-x86_64-uec.tar.gz"
+
+DEFAULT_IMAGE_NAME="cirros-0.3.0-x86_64-disk"
 
 # OpenStack VM settings
 OSDOMU_MEM_MB=4096
@@ -79,7 +86,7 @@ OSDOMU_VDI_GB=40
 ACTIVE_TIMEOUT=500
 TERMINATE_TIMEOUT=500
 
-# Increase boot timeout for quantum tests:
+# Increase boot timeout for neutron tests:
 BOOT_TIMEOUT=500
 
 # DevStack settings
