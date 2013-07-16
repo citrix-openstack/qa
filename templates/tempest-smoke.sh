@@ -12,6 +12,8 @@ A simple script to use devstack to setup an OpenStack, and run tests on it.
 positional arguments:
  XENSERVER_IP     The IP address of the XenServer
  XENSERVER_PASS   The root password for the XenServer
+ TEST_TYPE        Type of the tests to run. One of [none, smoke, full]
+                  defaults to none
 
 An example run on github's trunk:
 
@@ -23,6 +25,7 @@ exit 1
 XENSERVER_IP="${1-$(print_usage_and_die)}"
 XENSERVER_PASS="${2-$(print_usage_and_die)}"
 DEVSTACK_TGZ="https://github.com/openstack-dev/devstack/archive/master.tar.gz"
+TEST_TYPE="${3-none}"
 
 set -eux
 
@@ -111,6 +114,10 @@ cd tools/xen
 ./install_os_domU.sh
 END_OF_XENSERVER_COMMANDS
 
+if [ "$TEST_TYPE" == "none" ]; then
+    exit 0
+fi
+
 # Run tests
 remote_bash << END_OF_XENSERVER_COMMANDS
 set -exu
@@ -124,14 +131,17 @@ ssh -q \
     -o UserKnownHostsFile=/dev/null \
     "stack@\$GUEST_IP" bash -s -- << END_OF_DEVSTACK_COMMANDS
 set -exu
-cd /opt/stack/devstack/
 
-echo "---- EXERCISE TESTS ----"
+cd /opt/stack/devstack/
 ./exercise.sh
 
 cd /opt/stack/tempest 
-echo "---- TEMPEST TESTS ----"
-nosetests -sv --nologcapture --attr=type=smoke tempest
+if [ "$TEST_TYPE" == "smoke" ]; then
+    nosetests -sv --nologcapture --attr=type=smoke tempest
+elif [ "$TEST_TYPE" == "full" ] then
+    nosetests -sv tempest/api tempest/scenario tempest/thirdparty tempest/cli
+fi
+
 END_OF_DEVSTACK_COMMANDS
 
 END_OF_XENSERVER_COMMANDS
