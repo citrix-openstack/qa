@@ -106,6 +106,8 @@ MULTI_HOST=False
 # Skip boot from volume exercise
 SKIP_EXERCISES="boot_from_volume"
 
+ENABLED_SERVICES=g-api,g-reg,key,n-api,n-crt,n-obj,n-cpu,n-sch,horizon,mysql,rabbit,sysstat,tempest,s-proxy,s-account,s-container,s-object,cinder,c-api,c-vol,c-sch,n-cond,heat,h-api,h-api-cfn,h-api-cw,h-eng,n-net
+
 # Additional Localrc parameters here
 
 LOCALRC_CONTENT_ENDS_HERE
