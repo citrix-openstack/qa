@@ -138,7 +138,7 @@ cd /opt/stack/devstack/
 cd /opt/stack/tempest 
 if [ "$TEST_TYPE" == "smoke" ]; then
     nosetests -sv --nologcapture --attr=type=smoke tempest
-elif [ "$TEST_TYPE" == "full" ] then
+elif [ "$TEST_TYPE" == "full" ]; then
     nosetests -sv tempest/api tempest/scenario tempest/thirdparty tempest/cli
 fi
 
