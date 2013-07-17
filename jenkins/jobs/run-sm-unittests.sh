@@ -25,10 +25,18 @@ set -x
 
 SLAVE_IP=$(cat $XSLIB/start-slave.sh | "$REMOTELIB/bash.sh" "root@$XENSERVERNAME")
 
-"$REMOTELIB/bash.sh" "ubuntu@$SLAVE_IP" << END_OF_CEPH_SETUP
+"$REMOTELIB/bash.sh" "ubuntu@$SLAVE_IP" << END_OF_SM_TESTING
 set -eux
 
 export DEBIAN_FRONTEND=noninteractive
 sudo apt-get -qy update
 sudo apt-get -qy dist-upgrade
-END_OF_CEPH_SETUP
+sudo apt-get -qy install git
+
+git clone https://github.com/matelakat/sm --branch CA-110453 sm
+
+sudo bash sm/tools/install_prerequisites.sh
+
+sm/tools/setup_env.sh
+sm/tools/run_tests.sh
+END_OF_SM_TESTING
