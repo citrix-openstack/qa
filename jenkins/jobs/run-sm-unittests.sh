@@ -4,7 +4,6 @@ set -eu
 
 REMOTELIB=$(cd $(dirname $(readlink -f "$0")) && cd remote && pwd)
 XSLIB=$(cd $(dirname $(readlink -f "$0")) && cd xslib && pwd)
-TESTLIB=$(cd $(dirname $(readlink -f "$0")) && cd tests && pwd)
 
 function print_usage_and_die
 {
