@@ -14,7 +14,7 @@ pull_status_repo status
 
 PREV_BRANCH=$(read_latest_branch status)
 
-create_build_branch "$BRANCH_NAME"
+create_local_build_branch "$BRANCH_NAME"
 
 if [ -z "$PREV_BRANCH" ]; then
     echo "$BRANCH_NAME" | write_latest_branch status

@@ -133,7 +133,7 @@ function repo_name() {
     echo "$reponame"
 }
 
-function create_build_branch() {
+function create_local_build_branch() {
     local branch
     local repo
     local varname
