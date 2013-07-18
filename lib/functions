@@ -133,6 +133,47 @@ function repo_name() {
     echo "$reponame"
 }
 
+function init_non_existing_repos() {
+    local repo
+    local varname
+
+    generate_repos | while read repo; do
+        varname=$(var_name "$repo")
+        [ -d "$varname" ] || git init "$varname"
+    done
+}
+
+function add_build_remote() {
+    local repo
+    local varname
+
+    generate_repos | while read repo; do
+        varname=$(var_name "$repo")
+        (
+            cd "$varname"
+            if ! git remote -v | grep -q "^build"; then
+                git remote add build $(dst_repo "$repo")
+            fi
+        )
+    done
+}
+
+function with_all_repos() {
+    local args
+    local repo
+    local varname
+
+    args="$@"
+
+    generate_repos | while read repo; do
+        varname=$(var_name "$repo")
+        (
+            cd "$varname"
+            $@
+        )
+    done
+}
+
 function create_local_build_branch() {
     local branch
     local repo
