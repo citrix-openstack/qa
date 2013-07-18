@@ -34,8 +34,8 @@ sudo apt-get -qy install git
 
 git clone https://github.com/matelakat/sm --branch CA-110453 sm
 
-sudo bash sm/tools/install_prerequisites.sh
+sudo bash sm/tests/install_prerequisites_for_python_unittests.sh
 
-sm/tools/setup_env.sh
-sm/tools/run_tests.sh
+sm/tests/setup_env_for_python_unittests.sh
+sm/tests/run_python_unittests.sh
 END_OF_SM_TESTING
