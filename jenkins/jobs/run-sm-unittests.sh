@@ -32,7 +32,7 @@ sudo apt-get -qy update
 sudo apt-get -qy dist-upgrade
 sudo apt-get -qy install git
 
-git clone https://github.com/matelakat/sm --branch CA-110453 sm
+git clone https://github.com/matelakat/sm --branch CA-110453-fixedup sm
 
 sudo bash sm/tests/install_prerequisites_for_python_unittests.sh
 
