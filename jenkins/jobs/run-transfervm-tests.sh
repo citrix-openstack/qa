@@ -30,9 +30,11 @@ set -eux
 export DEBIAN_FRONTEND=noninteractive
 sudo apt-get -qy update
 sudo apt-get -qy dist-upgrade
-sudo apt-get -qy install git
+sudo apt-get -qy install git make
 
 git clone https://github.com/matelakat/transfervm transfervm
+cd transfervm
+make clean
 END_OF_TVM_TESTS
 
 echo "$SLAVE_IP"
