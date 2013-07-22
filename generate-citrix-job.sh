@@ -10,7 +10,8 @@ usage: $0 BRANCH_NAME [SETUP_TYPE]
 Generate a test script to the standard output
 
 positional arguments:
- BRANCH_NAME      Name of the branch to be used
+ BRANCH_NAME      Name of the branch to be used, use latest to use the latest
+                  branch
  SETUP_TYPE       Type of setup, one of [nova-network, neutron] defaults to
                   nova-network
 
@@ -29,6 +30,9 @@ TEMPLATE_NAME="$THIS_DIR/templates/tempest-smoke.sh"
 BRANCH_NAME="${1-$(print_usage_and_die)}"
 SETUP_TYPE="${2-"nova-network"}"
 
+if [ "$BRANCH_NAME" == "latest" ]; then
+    BRANCH_NAME=$(wget -qO - "http://gold.eng.hq.xensource.com/gitweb/?p=internal/builds/status.git;a=blob_plain;f=latest_branch;hb=HEAD")
+fi
 
 EXTENSION_POINT="^# Additional Localrc parameters here$"
 EXTENSIONS=$(mktemp)
