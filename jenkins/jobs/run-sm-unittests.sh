@@ -34,9 +34,9 @@ sudo apt-get -qy install git
 
 git clone https://github.com/matelakat/sm --branch CA-110453-fixedup sm
 
-sudo bash sm/tests/install_prerequisites_for_python_unittests.sh
+sudo USE_PYTHON24="yes" bash sm/tests/install_prerequisites_for_python_unittests.sh
 
-sm/tests/setup_env_for_python_unittests.sh
+USE_PYTHON24="yes" sm/tests/setup_env_for_python_unittests.sh
 sm/tests/run_python_unittests.sh
 END_OF_SM_TEST_PY24
 
@@ -52,8 +52,8 @@ sudo apt-get -qy install git
 
 git clone https://github.com/matelakat/sm --branch CA-110453-fixedup sm
 
-sudo USE_UPSTREAM_PYTHON="yes" bash sm/tests/install_prerequisites_for_python_unittests.sh
+sudo bash sm/tests/install_prerequisites_for_python_unittests.sh
 
-USE_UPSTREAM_PYTHON="yes" sm/tests/setup_env_for_python_unittests.sh
+sm/tests/setup_env_for_python_unittests.sh
 sm/tests/run_python_unittests.sh
 END_OF_SM_TEST_UPSTERAM_PY
