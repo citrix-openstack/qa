@@ -24,7 +24,7 @@ set -x
 
 SLAVE_IP=$(cat $XSLIB/start-slave.sh | "$REMOTELIB/bash.sh" "root@$XENSERVERNAME")
 
-"$REMOTELIB/bash.sh" "ubuntu@$SLAVE_IP" << END_OF_SM_TESTING
+"$REMOTELIB/bash.sh" "ubuntu@$SLAVE_IP" << END_OF_SM_TEST_PY24
 set -eux
 
 export DEBIAN_FRONTEND=noninteractive
@@ -38,4 +38,22 @@ sudo bash sm/tests/install_prerequisites_for_python_unittests.sh
 
 sm/tests/setup_env_for_python_unittests.sh
 sm/tests/run_python_unittests.sh
-END_OF_SM_TESTING
+END_OF_SM_TEST_PY24
+
+SLAVE_IP=$(cat $XSLIB/start-slave.sh | "$REMOTELIB/bash.sh" "root@$XENSERVERNAME")
+
+"$REMOTELIB/bash.sh" "ubuntu@$SLAVE_IP" << END_OF_SM_TEST_UPSTERAM_PY
+set -eux
+
+export DEBIAN_FRONTEND=noninteractive
+sudo apt-get -qy update
+sudo apt-get -qy dist-upgrade
+sudo apt-get -qy install git
+
+git clone https://github.com/matelakat/sm --branch CA-110453-fixedup sm
+
+sudo USE_UPSTREAM_PYTHON="yes" bash sm/tests/install_prerequisites_for_python_unittests.sh
+
+USE_UPSTREAM_PYTHON="yes" sm/tests/setup_env_for_python_unittests.sh
+sm/tests/run_python_unittests.sh
+END_OF_SM_TEST_UPSTERAM_PY
