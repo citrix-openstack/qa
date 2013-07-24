@@ -43,4 +43,6 @@ if [ "$UPDATED" == "yes" ]; then
     git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/44/38444/2 && git cherry-pick FETCH_HEAD
     cd ..
     with_all_repos git push --tags --quiet build "$CITRIX_BRANCH_NAME"
+else
+    echo "No changes detected since last run"
 fi
