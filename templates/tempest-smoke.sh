@@ -110,6 +110,9 @@ ENABLED_SERVICES=g-api,g-reg,key,n-api,n-crt,n-obj,n-cpu,n-sch,horizon,mysql,rab
 
 XEN_FIREWALL_DRIVER=nova.virt.xenapi.firewall.Dom0IptablesFirewallDriver
 
+# 9 Gigabyte for object store
+SWIFT_LOOPBACK_DISK_SIZE=9000000
+
 # Additional Localrc parameters here
 
 LOCALRC_CONTENT_ENDS_HERE
