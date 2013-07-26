@@ -37,5 +37,6 @@ fi
 if [ "$UPDATED" == "yes" ]; then
     exit 0
 else
+    echo "No changes detected, exit code is 1"
     exit 1
 fi
