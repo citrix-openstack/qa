@@ -18,16 +18,18 @@ create_local_build_branch "$BRANCH_NAME"
 
 UPDATED="no"
 
-if [ -z "$PREV_BRANCH" ]; then
-    with_all_repos git push --tags --quiet build "$BRANCH_NAME"
+function perform_update() {
     echo "$BRANCH_NAME" | write_latest_branch status
     push_status_repo status
     UPDATED="yes"
+}
+
+if [ -z "$PREV_BRANCH" ]; then
+    with_all_repos git push --tags --quiet build "$BRANCH_NAME"
+    perform_update
 else
     if ! print_updated_repos "$PREV_BRANCH" "$BRANCH_NAME" | diff -u /dev/null -; then
         with_all_repos git push --tags --quiet build "$BRANCH_NAME"
-        echo "$BRANCH_NAME" | write_latest_branch status
-        push_status_repo status
-        UPDATED="yes"
+        perform_update
     fi
 fi
