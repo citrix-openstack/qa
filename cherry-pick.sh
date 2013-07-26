@@ -9,7 +9,7 @@ LATEST_BRANCH=$(wget -qO - "http://gold.eng.hq.xensource.com/gitweb/?p=internal/
 
 ./create_workspace.sh
 ./with_all_repos.sh git fetch build
-./with_all_repos.sh git reset --hard
+./with_all_repos.sh "git reset --hard || true"
 ./with_all_repos.sh git checkout "build/$LATEST_BRANCH" -B $CITRIX_BRANCH_NAME
 
 
