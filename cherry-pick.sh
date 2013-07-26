@@ -5,7 +5,11 @@ set -eux
 . lib/functions
 
 CITRIX_BRANCH_NAME="$1"
-LATEST_BRANCH=$(wget -qO - "http://gold.eng.hq.xensource.com/gitweb/?p=internal/builds/status.git;a=blob_plain;f=latest_branch;hb=HEAD")
+LATEST_BRANCH=${2:-latest}
+
+if [ "$LATEST_BRANCH" = "latest" ]; then
+    LATEST_BRANCH=$(wget -qO - "http://gold.eng.hq.xensource.com/gitweb/?p=internal/builds/status.git;a=blob_plain;f=latest_branch;hb=HEAD")
+fi
 
 ./create_workspace.sh
 ./with_all_repos.sh git fetch build
