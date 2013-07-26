@@ -4,7 +4,7 @@ set -eux
 
 . lib/functions
 
-CITRIX_BRANCH_NAME="ctx-$(date +%s)"
+CITRIX_BRANCH_NAME="$1"
 LATEST_BRANCH=$(wget -qO - "http://gold.eng.hq.xensource.com/gitweb/?p=internal/builds/status.git;a=blob_plain;f=latest_branch;hb=HEAD")
 
 ./create_workspace.sh
