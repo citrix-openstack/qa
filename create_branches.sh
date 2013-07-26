@@ -33,3 +33,9 @@ else
         perform_update
     fi
 fi
+
+if [ "$UPDATED" == "yes" ]; then
+    exit 0
+else
+    exit 1
+fi
