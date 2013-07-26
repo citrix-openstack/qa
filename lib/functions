@@ -158,6 +158,21 @@ function add_build_remote() {
     done
 }
 
+function add_origin_remote() {
+    local repo
+    local varname
+
+    generate_repos | while read repo; do
+        varname=$(var_name "$repo")
+        (
+            cd "$varname"
+            if ! git remote -v | grep -q "^origin"; then
+                git remote add origin $(source_repo "$repo")
+            fi
+        )
+    done
+}
+
 function with_all_repos() {
     local args
     local repo

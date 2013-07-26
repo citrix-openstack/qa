@@ -31,18 +31,3 @@ else
         UPDATED="yes"
     fi
 fi
-
-
-if [ "$UPDATED" == "yes" ]; then
-    CITRIX_BRANCH_NAME="ctx-$(date +%s)"
-    create_local_build_branch "$CITRIX_BRANCH_NAME"
-    cd NOVA_REPO
-    git fetch https://review.openstack.org/openstack/nova refs/changes/41/38441/1 && git cherry-pick FETCH_HEAD
-    cd ..
-    cd DEVSTACK_REPO
-    git fetch https://review.openstack.org/openstack-dev/devstack refs/changes/44/38444/3 && git cherry-pick FETCH_HEAD
-    cd ..
-    with_all_repos git push --tags --quiet build "$CITRIX_BRANCH_NAME"
-else
-    echo "No changes detected since last run"
-fi

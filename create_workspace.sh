@@ -11,4 +11,5 @@ assert_no_new_repos
     cd .workspace
     init_non_existing_repos
     add_build_remote
+    add_origin_remote
 )
