@@ -26,7 +26,7 @@ SLAVE_IP=$(cat $XSLIB/start-slave.sh |
     "$REMOTELIB/bash.sh" "root@$SERVERNAME")
 
 echo "Starting job on $SLAVE_IP"
-cat "$BUILDLIB/builds/devstack-xva/build.sh" |
+cat "$BUILDLIB/devstack-xva/build.sh" |
     "$REMOTELIB/bash.sh" "ubuntu@$SLAVE_IP"
 
 echo "Copying build result to copper"
