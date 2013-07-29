@@ -4,7 +4,7 @@ set -o xtrace
 
 export DEBIAN_FRONTEND=noninteractive
 apt-get update
-apt-get install netbase ifupdown net-tools isc-dhcp-client linux-generic grub lsb-release psmisc screen curl linux-image-`uname -r` linux-headers-`uname -r` -y --force-yes
+apt-get install netbase ifupdown net-tools isc-dhcp-client grub lsb-release psmisc screen curl linux-image-`uname -r` linux-headers-`uname -r` -y --force-yes
 apt-get upgrade -y
 apt-get dist-upgrade -y
 update-grub -y
@@ -70,9 +70,11 @@ echo OFFLINE=true >> /opt/stack/devstack/localrc
 #git clone https://github.com/openstack/python-swiftclient.git /opt/stack/python-swiftclient
 git clone https://github.com/openstack/tempest.git /opt/stack/tempest
 
-echo "deb mirror://mirrors.ubuntu.com/mirrors.txt precise main restricted universe multiverse" > /etc/apt/sources.list
-echo "deb mirror://mirrors.ubuntu.com/mirrors.txt precise-updates main restricted universe multiverse" >> /etc/apt/sources.list
-echo "deb mirror://mirrors.ubuntu.com/mirrors.txt precise-backports main restricted universe multiverse" >> /etc/apt/sources.list
-echo "deb mirror://mirrors.ubuntu.com/mirrors.txt precise-security main restricted universe multiverse" >> /etc/apt/sources.list
-#apt-get update
+echo "deb http://archive.ubuntu.com/ubuntu/ precise main universe" > /etc/apt/sources.list
+echo "deb http://archive.ubuntu.com/ubuntu/ precise-security main universe" >> /etc/apt/sources.list
+echo "deb http://archive.ubuntu.com/ubuntu/ precise-updates main universe" >> /etc/apt/sources.list
+echo "deb-src http://archive.ubuntu.com/ubuntu/ precise main universe" >> /etc/apt/sources.list
+echo "deb-src http://archive.ubuntu.com/ubuntu/ precise-security main universe" >> /etc/apt/sources.list
+echo "deb-src http://bs.archive.ubuntu.com/ubuntu/ precise-updates main universe" >> /etc/apt/sources.list
+apt-get update
 apt-get clean

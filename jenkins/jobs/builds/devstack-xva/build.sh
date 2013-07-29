@@ -18,6 +18,7 @@ fi
 
 mkdir -p $TEMPDIRECTORY
 
+echo 'Acquire::http::Proxy "http://apt.eng.hq.xensource.com:3142";' > /etc/apt/apt.conf.d/02proxy
 DEBIAN_FRONTEND=noninteractive apt-get install git curl -y
 
 if [ ! -d $BAREDIRECTORY ];
@@ -49,9 +50,10 @@ then
    
    cp /etc/resolv.conf $TARGETDIRECTORY/etc/resolv.conf
    cp /etc/mtab $TARGETDIRECTORY/etc/mtab
+   #echo 'Acquire::http::Proxy "http://apt.eng.hq.xensource.com:3142";' > $TARGETDIRECTORY/etc/apt/apt.conf.d/02proxy
    cp /etc/apt/sources.list $TARGETDIRECTORY/etc/apt/sources.list
    chmod 1777 $TARGETDIRECTORY/tmp
-   echo `hostname` " 127.0.0.1 #temporary" > $TARGETDIRECTORY/etc/hostname
+   echo "127.0.0.1 " `hostname` " #temporary" >> $TARGETDIRECTORY/etc/hosts
    if [ ! -f xe-guest-utilities_6.1.0-1033_amd64.deb ];
    then
        curl -o $TEMPDIRECTORY/xe-guest-utilities_6.1.0-1033_amd64.deb -L https://github.com/downloads/citrix-openstack/warehouse/xe-guest-utilities_6.1.0-1033_amd64.deb
@@ -76,10 +78,11 @@ then
    
    cp -f $SCRIPTDIRECTORY/build-inside-chroot.sh $TARGETDIRECTORY/tmp/
    chroot $TARGETDIRECTORY/ /tmp/build-inside-chroot.sh
-   rm $TARGETDIRECTORY/tmp/build-inside-chroot.sh
+   rm -f $TARGETDIRECTORY/tmp/build-inside-chroot.sh
    
-   rm $TARGETDIRECTORY/etc/resolv.conf
-   rm $TARGETDIRECTORY/etc/mtab
+   rm -f $TARGETDIRECTORY/etc/resolv.conf
+   rm -f $TARGETDIRECTORY/etc/mtab
+   #rm -f $TARGETDIRECTORY/etc/apt/apt.conf.d/02proxy
    sed -i '/#temporary/d' $TARGETDIRECTORY/etc/hosts
    
    umount $TARGETDIRECTORY/proc/
@@ -91,7 +94,7 @@ then
    rm -rf $TARGETDIRECTORY/dev/*
 fi
 
-rm output.xva
+rm -f output.xva
 if [ ! -f output.xva ];
 then
    if [ ! -f mkxva ];
@@ -105,4 +108,4 @@ then
    $TEMPDIRECTORY/mkxva $TARGETDIRECTORY $SCRIPTDIRECTORY/xva.xml $TEMPTARGETDIRECTORY output.xva
    rm -rf $TEMPTARGETDIRECTORY/
 fi
-
+exit 0
