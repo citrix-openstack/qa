@@ -189,6 +189,20 @@ function with_all_repos() {
     done
 }
 
+function reset_repos() {
+    local args
+    local repo
+    local varname
+
+    generate_repos | while read repo; do
+        varname=$(var_name "$repo")
+        (
+            cd "$varname"
+            git reset --hard || true
+        )
+    done
+}
+
 function create_local_build_branch() {
     local branch
     local repo

@@ -11,13 +11,12 @@ if [ "$LATEST_BRANCH" = "latest" ]; then
     LATEST_BRANCH=$(wget -qO - "http://gold.eng.hq.xensource.com/gitweb/?p=internal/builds/status.git;a=blob_plain;f=latest_branch;hb=HEAD")
 fi
 
-function resetrepo() {
-    git reset --hard || true
-}
-
 ./create_workspace.sh
 ./with_all_repos.sh git fetch build
-./with_all_repos.sh resetrepo
+(
+    cd .workspace
+    reset_repos
+)
 ./with_all_repos.sh git checkout "build/$LATEST_BRANCH" -B $CITRIX_BRANCH_NAME
 
 
