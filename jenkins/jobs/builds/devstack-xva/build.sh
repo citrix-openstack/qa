@@ -9,6 +9,7 @@ TARGETDIRECTORY=$TEMPDIRECTORY/target
 TEMPTARGETDIRECTORY=$TEMPDIRECTORY/temp-target
 DEVSTACKDIRECTORY=$TEMPDIRECTORY/devstack
 INITIALPWD=`pwd`
+SCRIPTDIRECTORY="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 if [[ $EUID -ne 0 ]]; then
    echo "This script must be run as root" 1>&2
@@ -73,7 +74,7 @@ then
    mv build_xva.sh.bak build_xva.sh
    cd $INITIALPWD 
    
-   cp -f build-inside-chroot.sh $TARGETDIRECTORY/tmp/
+   cp -f $SCRIPTDIRECTORY/build-inside-chroot.sh $TARGETDIRECTORY/tmp/
    chroot $TARGETDIRECTORY/ /tmp/build-inside-chroot.sh
    rm $TARGETDIRECTORY/tmp/build-inside-chroot.sh
    
@@ -101,7 +102,7 @@ then
       sed -i".bak" 's/size_kb=$((2 \* $size_kb))/size_kb=$((300000 + $size_kb))/g' $TEMPDIRECTORY/mkxva
    fi
    mkdir -p $TEMPTARGETDIRECTORY
-   $TEMPDIRECTORY/mkxva $TARGETDIRECTORY xva.xml $TEMPTARGETDIRECTORY output.xva
+   $TEMPDIRECTORY/mkxva $TARGETDIRECTORY $SCRIPTDIRECTORY/xva.xml $TEMPTARGETDIRECTORY output.xva
    rm -rf $TEMPTARGETDIRECTORY/
 fi
 
