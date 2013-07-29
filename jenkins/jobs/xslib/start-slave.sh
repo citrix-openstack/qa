@@ -3,6 +3,9 @@ set -eux
 
 NETWORKING="0=xenbr0,${1:-}"
 
+SLAVENAME="${2:-slave}"
+FRESHSLAVE="${SLAVENAME}-fresh"
+
 function resolve_to_network() {
     local name_or_bridge
     local result
@@ -47,6 +50,9 @@ function setup_networking() {
 
     IFS=","
     for netconfig in $network_configs; do
+        if [ "$netconfig" == "none" ]; then
+            continue
+        fi
         device=$(echo $netconfig | cut -d"=" -f 1)
         netname=$(echo $netconfig | cut -d"=" -f 2)
 
@@ -59,22 +65,24 @@ function setup_networking() {
     unset IFS
 }
 
-if [ -z "$(xe snapshot-list name-label=slave-fresh --minimal)" ]
+if [ -z "$(xe snapshot-list name-label="$FRESHSLAVE" --minimal)" ]
 then
-    xe vm-uninstall vm=slave force=true || true
+    xe vm-uninstall vm="$SLAVENAME" force=true || true
     mkdir -p /mnt/exported-vms
 
     mount -t nfs copper.eng.hq.xensource.com:/exported-vms /mnt/exported-vms
     VM=$(xe vm-import filename=/mnt/exported-vms/slave.xva)
     umount /mnt/exported-vms
 
-    xe vm-snapshot vm=slave new-name-label=slave-fresh > /dev/null
+    xe vm-param-set uuid="$VM" name-label="$SLAVENAME"
+
+    xe vm-snapshot vm="$SLAVENAME" new-name-label="$FRESHSLAVE" > /dev/null
 fi
 
-SNAP=$(xe snapshot-list name-label=slave-fresh --minimal)
+SNAP=$(xe snapshot-list name-label="$FRESHSLAVE" --minimal)
 xe snapshot-revert snapshot-uuid=$SNAP
 
-VM=$(xe vm-list name-label=slave --minimal)
+VM=$(xe vm-list name-label="$SLAVENAME" --minimal)
 
 wipe_networking $VM
 setup_networking $VM "$NETWORKING"
