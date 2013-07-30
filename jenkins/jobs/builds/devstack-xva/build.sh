@@ -97,15 +97,16 @@ fi
 rm -f output.xva
 if [ ! -f output.xva ];
 then
-   if [ ! -f mkxva ];
+   if [ ! -f $TEMPDIRECTORY/mkxva ];
    then
       curl -o $TEMPDIRECTORY/mkxva https://raw.github.com/xenserver/transfervm/master/transfervm/mkxva
       chmod 755 $TEMPDIRECTORY/mkxva
       sed -i".bak" 's/#!\/bin\/sh/#!\/usr\/bin\/env bash/g' $TEMPDIRECTORY/mkxva
-      sed -i".bak" 's/size_kb=$((2 \* $size_kb))/size_kb=$((300000 + $size_kb))/g' $TEMPDIRECTORY/mkxva
+      #sed -i".bak" 's/size_kb=$((2 \* $size_kb))/size_kb=$((300000 + $size_kb))/g' $TEMPDIRECTORY/mkxva
+      sed -i".bak" 's/xvda/Ref:4/g' $TEMPDIRECTORY/mkxva
    fi
    mkdir -p $TEMPTARGETDIRECTORY
-   $TEMPDIRECTORY/mkxva $TARGETDIRECTORY $SCRIPTDIRECTORY/xva.xml $TEMPTARGETDIRECTORY output.xva
+   $TEMPDIRECTORY/mkxva $TARGETDIRECTORY $SCRIPTDIRECTORY/ova.xml $TEMPTARGETDIRECTORY output.xva
    rm -rf $TEMPTARGETDIRECTORY/
 fi
 exit 0

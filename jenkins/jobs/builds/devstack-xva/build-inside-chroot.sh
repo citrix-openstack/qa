@@ -10,10 +10,18 @@ apt-get dist-upgrade -y
 update-grub -y
 
 sed -e "s/tty1/hvc0/g" /etc/init/tty1.conf > /etc/init/hvc0.conf
+
 echo "ubuntu" > /etc/hostname
-echo "127.0.0.1 ubuntu" >> etc/hosts
+echo "127.0.0.1 ubuntu" >> /etc/hosts
+echo 'interface "eth3" {' >> /etc/dhcp/dhclient.conf
+echo '    supersede new-routers "";' >> /etc/dhcp/dhclient.conf
+echo '}' >> /etc/dhcp/dhclient.conf
+echo 'auto eth3' >> /etc/network/interfaces
+echo 'iface eth3 inet dhcp' >> /etc/network/interfaces
+
 echo "proc /proc proc nodev,noexec,nosuid 0 0" > /etc/fstab
 echo "/dev/xvda / ext3 errors=remount-ro 0 1" >> /etc/fstab
+
 sed -i 's/root=.* ro /root=\/dev\/xvda ro console=hvc0 /g' /boot/grub/menu.lst
 
 echo "start on mounted MOUNTPOINT=/" > /etc/init/resize2fs.conf
@@ -41,10 +49,11 @@ echo SERVICE_PASSWORD=$GUEST_PASSWORD >> /opt/stack/devstack/localrc
 echo SERVICE_TOKEN=$GUEST_PASSWORD >> /opt/stack/devstack/localrc
 echo USE_SCREEN=FALSE >> /opt/stack/devstack/localrc
 echo VIRT_DRIVER=xenserver >> /opt/stack/devstack/localrc
-echo XENAPI_CONNECTION_URL=https://127.0.0.1 >> /opt/stack/devstack/localrc
+echo XENAPI_CONNECTION_URL=https://169.254.0.1 >> /opt/stack/devstack/localrc
 echo XENAPI_USER=root  >> /opt/stack/devstack/localrc
-echo XENAPI_PASSWORD=password >> /opt/stack/devstack/localrc
+echo XENAPI_PASSWORD=xenroot >> /opt/stack/devstack/localrc
 chown stack /opt/stack/devstack/localrc
+
 su stack /opt/stack/run.sh
 if [ ! "$(pgrep -f /usr/local/bin/keystone-all)" ]
 then
@@ -68,7 +77,10 @@ echo OFFLINE=true >> /opt/stack/devstack/localrc
 #git clone https://github.com/openstack/python-novaclient.git /opt/stack/python-novaclient
 #git clone https://github.com/openstack/python-openstackclient.git /opt/stack/python-openstackclient
 #git clone https://github.com/openstack/python-swiftclient.git /opt/stack/python-swiftclient
+# Workaround as Devstack aborts a bit to early inside the chroot
 git clone https://github.com/openstack/tempest.git /opt/stack/tempest
+cd /opt/stack/tempest
+python setup.py develop
 
 echo "deb http://archive.ubuntu.com/ubuntu/ precise main universe" > /etc/apt/sources.list
 echo "deb http://archive.ubuntu.com/ubuntu/ precise-security main universe" >> /etc/apt/sources.list
