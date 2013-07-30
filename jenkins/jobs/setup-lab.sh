@@ -23,6 +23,7 @@ THISDIR=$(cd $(dirname $(readlink -f "$0")) && pwd)
 XSLIB=$(cd $(dirname $(readlink -f "$0")) && cd xslib && pwd)
 REMOTELIB=$(cd $(dirname $(readlink -f "$0")) && cd remote && pwd)
 NETNAME="stuffa"
+DEVBOX_NAME="devbox"
 
 
 "$REMOTELIB/bash.sh" "root@$XENSERVER" << EOF
@@ -30,9 +31,9 @@ set -eux
 [ ! -z "\$(xe network-list name-label=$NETNAME --minimal)" ] || xe network-create name-label=$NETNAME
 EOF
 
-$THISDIR/create-devbox.sh $XENSERVER $NETNAME
+$THISDIR/create-devbox.sh $XENSERVER $NETNAME $DEVBOX_NAME
 
-DEVBOX_IP=$(cat "$XSLIB/get-slave-ip.sh" | "$REMOTELIB/bash.sh" "$XENSERVER")
+DEVBOX_IP=$(cat "$XSLIB/get-slave-ip.sh" | "$REMOTELIB/bash.sh" "$XENSERVER" "$DEVBOX_NAME")
 
 $THISDIR/create-virtual-hypervisor.sh \
     "$ISOURL" \
