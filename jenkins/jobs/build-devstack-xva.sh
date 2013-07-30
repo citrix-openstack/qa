@@ -40,8 +40,7 @@ EOLI
 chmod 755 build.sh
 chmod 755 build-inside-chroot.sh
 sudo ./build.sh
-exit
-exit
+kill `pidof "sshd: ubuntu@notty"`
 EOL
 
 echo "Copying build result to copper"

@@ -18,7 +18,7 @@ sed -i 's/root=.* ro /root=\/dev\/xvda ro console=hvc0 /g' /boot/grub/menu.lst
 
 echo "start on mounted MOUNTPOINT=/" > /etc/init/resize2fs.conf
 echo "exec /sbin/resize2fs /dev/xvda" >> /etc/init/resize2fs.conf 
-echo "exec rm -f /etc/init/resize2fs.conf" >> /etc/init/resize2fs.conf
+echo "#exec rm -f /etc/init/resize2fs.conf" >> /etc/init/resize2fs.conf
 
 cd /tmp/
 # Run prepare_guest.sh
