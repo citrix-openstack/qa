@@ -4,6 +4,8 @@ set -eux
 
 . lib/functions
 
+assert_no_new_repos
+
 ACTION="$@"
 
 (

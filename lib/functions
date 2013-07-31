@@ -56,6 +56,8 @@ NOVACLIENT_REPO openstack python-novaclient.git github
 NOVA_REPO openstack nova.git github
 NOVNC_REPO kanaka noVNC.git github
 OPENSTACKCLIENT_REPO openstack python-openstackclient.git github
+OSLOCFG_REPO openstack oslo.config.git github
+OSLOMSG_REPO openstack oslo.messaging.git github
 PBR_REPO openstack-dev pbr.git github
 RYU_REPO osrg ryu.git github
 SPICE_REPO spice spice-html5.git anongit
