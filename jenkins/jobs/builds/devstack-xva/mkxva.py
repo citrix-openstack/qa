@@ -2,7 +2,7 @@
 
 # Tool to package an XVA with an existing ova.xml
 # This is a reduced version of http://www-archive.xenproject.org/files/xva/xva.py
-# from David Markey <david.markey@citrix.com>, Citrix Systems.
+# which was originally created by David Markey <david.markey@citrix.com>.
 # Author: Robert Breker <robert.breker@citrix.com>, Citrix Systems.
 # Licence: GNU LESSER GENERAL PUBLIC LICENSE V3, http://www.gnu.org/licenses/lgpl-3.0.txt
 # THIS SOFTWARE COMES WITH ABSOLUTELY NO WARRANTY! USE AT YOUR OWN RISK!

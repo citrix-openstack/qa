@@ -47,7 +47,7 @@ fi
 #rm -rf $TARGETDIRECTORY
 if [ ! -d $TARGETDIRECTORY ];
 then
-   cp -r $BAREDIRECTORY $TARGETDIRECTORY
+   cp -ax $BAREDIRECTORY $TARGETDIRECTORY
    
    mount -t proc proc $TARGETDIRECTORY/proc/
    mount -t sysfs sys $TARGETDIRECTORY/sys/
@@ -107,12 +107,13 @@ then
 
    mkdir -p $MOUNTPOINT
    mount -o loop $STAGINGFS $MOUNTPOINT
-   cp -r $TARGETDIRECTORY $MOUNTPOINT
+   cp -ax $TARGETDIRECTORY/* $MOUNTPOINT/
    umount $MOUNTPOINT
    rmdir $MOUNTPOINT
 
    ./mkxva.py --output_path $OUTPUT --ova_xml_path ova.xml --disk_path $STAGINGFS --disk_reference "Ref:84"
-
    rm -f $STAGINGFS
+   gzip -9 $OUTPUT
+   mv $OUTPUT.gz $OUTPUT
 fi
 exit 0

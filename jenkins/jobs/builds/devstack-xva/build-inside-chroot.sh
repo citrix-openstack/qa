@@ -10,24 +10,34 @@ apt-get dist-upgrade -y
 update-grub -y
 
 sed -e "s/tty1/hvc0/g" /etc/init/tty1.conf > /etc/init/hvc0.conf
-
+sed -i 's/root=.* ro /root=\/dev\/xvda ro console=hvc0 /g' /boot/grub/menu.lst
 echo "ubuntu" > /etc/hostname
 echo "127.0.0.1 ubuntu" >> /etc/hosts
-echo 'interface "eth3" {' >> /etc/dhcp/dhclient.conf
-echo '    supersede new-routers "";' >> /etc/dhcp/dhclient.conf
-echo '}' >> /etc/dhcp/dhclient.conf
-echo 'auto eth3' >> /etc/network/interfaces
-echo 'iface eth3 inet dhcp' >> /etc/network/interfaces
 
-echo "proc /proc proc nodev,noexec,nosuid 0 0" > /etc/fstab
-echo "/dev/xvda / ext3 errors=remount-ro 0 1" >> /etc/fstab
+cat <<EOL >> /etc/network/interfaces
+auto eth3
+iface eth3 inet dhcp
+EOL
 
-sed -i 's/root=.* ro /root=\/dev\/xvda ro console=hvc0 /g' /boot/grub/menu.lst
+cat <<EOL > /etc/dhcp/dhclient-enter-hooks.d/disable-default-route
+# Stop the host internal network (eth3) from supplying us with a default route
+if [ ${interface}=="eth3" ];
+then
+    unset new_routers
+fi
+EOL
 
+cat <<EOL > /etc/fstab
+proc /proc proc nodev,noexec,nosuid 0 0"
+/dev/xvda / ext3 errors=remount-ro 0 1"
+EOL
+
+cat <<EOL > /etc/init/resize2fs.conf
 echo "start on mounted MOUNTPOINT=/" > /etc/init/resize2fs.conf
 echo "exec /sbin/resize2fs /dev/xvda" >> /etc/init/resize2fs.conf 
 echo "#exec rm -f /etc/init/resize2fs.conf" >> /etc/init/resize2fs.conf
-exit
+EOL
+
 cd /tmp/
 # Run prepare_guest.sh
 curl -o prepare_guest.sh https://raw.github.com/openstack-dev/devstack/master/tools/xen/prepare_guest.sh
@@ -42,16 +52,43 @@ rm ./prepare_guest.sh
 mkdir -p /var/run/screen
 chmod 0777 /var/run/screen
 
-echo ADMIN_PASSWORD=$GUEST_PASSWORD > /opt/stack/devstack/localrc
-echo MYSQL_PASSWORD=$GUEST_PASSWORD >> /opt/stack/devstack/localrc
-echo RABBIT_PASSWORD=$GUEST_PASSWORD >> /opt/stack/devstack/localrc
-echo SERVICE_PASSWORD=$GUEST_PASSWORD >> /opt/stack/devstack/localrc
-echo SERVICE_TOKEN=$GUEST_PASSWORD >> /opt/stack/devstack/localrc
-echo USE_SCREEN=FALSE >> /opt/stack/devstack/localrc
-echo VIRT_DRIVER=xenserver >> /opt/stack/devstack/localrc
-echo XENAPI_CONNECTION_URL=https://169.254.0.1 >> /opt/stack/devstack/localrc
-echo XENAPI_USER=root  >> /opt/stack/devstack/localrc
-echo XENAPI_PASSWORD=xenroot >> /opt/stack/devstack/localrc
+cat > /opt/stack/devstack/localrc <<EOL
+# Passwords
+MYSQL_PASSWORD=$GUEST_PASSWORD
+SERVICE_TOKEN=$GUEST_PASSWORD
+ADMIN_PASSWORD=$GUEST_PASSWORD
+SERVICE_PASSWORD=$GUEST_PASSWORD
+RABBIT_PASSWORD=$GUEST_PASSWORD
+SWIFT_HASH="66a3d6b56c1f479c8b4e70ab5c2000f5"
+
+# XenAPI parameters
+# NOTE: The following must be set to your XenServer root password
+XENAPI_PASSWORD=my_xenserver_root_password
+XENAPI_CONNECTION_URL="https://169.254.0.1"
+VNCSERVER_PROXYCLIENT_ADDRESS=169.254.0.1
+
+# Do not download the usual images
+IMAGE_URLS=""
+# Explicitly set virt driver here
+VIRT_DRIVER=xenserver
+# Explicitly enable multi-host
+MULTI_HOST=1
+# Give extra time for boot
+ACTIVE_TIMEOUT=45
+USE_SCREEN=FALSE
+=======
+cat <<EOL > /opt/stack/devstack/localrc
+ADMIN_PASSWORD=$GUEST_PASSWORD
+MYSQL_PASSWORD=$GUEST_PASSWORD
+RABBIT_PASSWORD=$GUEST_PASSWORD
+SERVICE_PASSWORD=$GUEST_PASSWORD
+SERVICE_TOKEN=$GUEST_PASSWORD
+USE_SCREEN=FALSE
+VIRT_DRIVER=xenserver
+XENAPI_CONNECTION_URL=https://169.254.0.1
+XENAPI_USER=root
+XENAPI_PASSWORD=xenroot
+EOL
 chown stack /opt/stack/devstack/localrc
 
 su stack /opt/stack/run.sh
@@ -61,7 +98,7 @@ then
 fi
 su stack /opt/stack/devstack/unstack.sh
 sed -i".bak" '/USE_SCREEN=FALSE/d' /opt/stack/devstack/localrc
-echo OFFLINE=true >> /opt/stack/devstack/localrc
+echo 'OFFLINE=true' >> /opt/stack/devstack/localrc
 
 #git clone https://github.com/openstack/glance.git /opt/stack/glance
 #git clone https://github.com/openstack/horizon.git /opt/stack/horizon
@@ -82,11 +119,12 @@ git clone https://github.com/openstack/tempest.git /opt/stack/tempest
 cd /opt/stack/tempest
 python setup.py develop
 
-echo "deb http://archive.ubuntu.com/ubuntu/ precise main universe" > /etc/apt/sources.list
-echo "deb http://archive.ubuntu.com/ubuntu/ precise-security main universe" >> /etc/apt/sources.list
-echo "deb http://archive.ubuntu.com/ubuntu/ precise-updates main universe" >> /etc/apt/sources.list
-echo "deb-src http://archive.ubuntu.com/ubuntu/ precise main universe" >> /etc/apt/sources.list
-echo "deb-src http://archive.ubuntu.com/ubuntu/ precise-security main universe" >> /etc/apt/sources.list
-echo "deb-src http://bs.archive.ubuntu.com/ubuntu/ precise-updates main universe" >> /etc/apt/sources.list
+cat <<EOL > /etc/apt/sources.list
+deb http://archive.ubuntu.com/ubuntu/ precise main universe
+deb http://archive.ubuntu.com/ubuntu/ precise-security main universe
+deb http://archive.ubuntu.com/ubuntu/ precise-updates main universe
+deb-src http://archive.ubuntu.com/ubuntu/ precise main universe
+deb-src http://archive.ubuntu.com/ubuntu/ precise-security main universe
+deb-src http://bs.archive.ubuntu.com/ubuntu/ precise-updates main universe
 apt-get update
 apt-get clean
