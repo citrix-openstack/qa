@@ -34,11 +34,15 @@ EOLI
 cat > "build-inside-chroot.sh" <<"EOLI"
 `cat $BUILDLIB/devstack-xva/build-inside-chroot.sh`
 EOLI
-cat > "xva.xml" <<"EOLI"
+cat > "mkxva.py" <<"EOLI"
+`cat $BUILDLIB/devstack-xva/mkxva.py`
+EOLI
+cat > "ova.xml" <<"EOLI"
 `cat $BUILDLIB/devstack-xva/xva.xml`
 EOLI
 chmod 755 build.sh
 chmod 755 build-inside-chroot.sh
+chmod 755 mkxva.py
 sudo ./build.sh
 kill `pidof "sshd: ubuntu@notty"`
 EOL

@@ -3,11 +3,16 @@
 set -o xtrace
 
 export GUEST_PASSWORD=xenroot
+export FILESYSTEM_SIZE=$((5 * 1024 * 1024))
+OUTPUT=output.xva
+
 TEMPDIRECTORY=temp
 BAREDIRECTORY=$TEMPDIRECTORY/bare
 TARGETDIRECTORY=$TEMPDIRECTORY/target
 TEMPTARGETDIRECTORY=$TEMPDIRECTORY/temp-target
 DEVSTACKDIRECTORY=$TEMPDIRECTORY/devstack
+MOUNTPOINT=$TEMPDIRECTORY/mnt
+STAGINGFS=$TEMPDIRECTORY/stagingsfs
 INITIALPWD=`pwd`
 SCRIPTDIRECTORY="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
@@ -94,19 +99,20 @@ then
    rm -rf $TARGETDIRECTORY/dev/*
 fi
 
-rm -f output.xva
-if [ ! -f output.xva ];
+rm -f $OUTPUT
+if [ ! -f $OUTPUT ];
 then
-   if [ ! -f $TEMPDIRECTORY/mkxva ];
-   then
-      curl -o $TEMPDIRECTORY/mkxva https://raw.github.com/xenserver/transfervm/master/transfervm/mkxva
-      chmod 755 $TEMPDIRECTORY/mkxva
-      sed -i".bak" 's/#!\/bin\/sh/#!\/usr\/bin\/env bash/g' $TEMPDIRECTORY/mkxva
-      #sed -i".bak" 's/size_kb=$((2 \* $size_kb))/size_kb=$((300000 + $size_kb))/g' $TEMPDIRECTORY/mkxva
-      sed -i".bak" 's/xvda/Ref:4/g' $TEMPDIRECTORY/mkxva
-   fi
-   mkdir -p $TEMPTARGETDIRECTORY
-   $TEMPDIRECTORY/mkxva $TARGETDIRECTORY $SCRIPTDIRECTORY/ova.xml $TEMPTARGETDIRECTORY output.xva
-   rm -rf $TEMPTARGETDIRECTORY/
+   dd if=/dev/zero of=$STAGINGFS bs=1k count=0 seek=$FILESYSTEM_SIZE
+   /sbin/mkfs.ext3 -F $STAGINGFS
+
+   mkdir -p $MOUNTPOINT
+   mount -o loop $STAGINGFS $MOUNTPOINT
+   cp -r $TARGETDIRECTORY $MOUNTPOINT
+   umount $MOUNTPOINT
+   rmdir $MOUNTPOINT
+
+   ./mkxva.py --output_path $OUTPUT --ova_xml_path ova.xml --disk_path $STAGINGFS --disk_reference "Ref:84"
+
+   rm -f $STAGINGFS
 fi
 exit 0
