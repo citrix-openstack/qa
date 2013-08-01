@@ -59,6 +59,7 @@ OPENSTACKCLIENT_REPO openstack python-openstackclient.git github
 OSLOCFG_REPO openstack oslo.config.git github
 OSLOMSG_REPO openstack oslo.messaging.git github
 PBR_REPO openstack-dev pbr.git github
+REQUIREMENTS_REPO openstack requirements.git github
 RYU_REPO osrg ryu.git github
 SPICE_REPO spice spice-html5.git anongit
 SWIFT3_REPO fujita swift3.git github
