@@ -4,7 +4,7 @@ set -o xtrace
 
 export DEBIAN_FRONTEND=noninteractive
 apt-get update
-apt-get install netbase ifupdown net-tools isc-dhcp-client grub lsb-release psmisc screen curl linux-image-`uname -r` linux-headers-`uname -r` -y --force-yes
+apt-get install netbase ifupdown net-tools isc-dhcp-client grub lsb-release psmisc screen curl linux-image-`uname -r` linux-headers-`uname -r` aptitude -y --force-yes
 apt-get upgrade -y
 apt-get dist-upgrade -y
 update-grub -y
@@ -19,17 +19,16 @@ auto eth3
 iface eth3 inet dhcp
 EOL
 
-cat <<EOL > /etc/dhcp/dhclient-enter-hooks.d/disable-default-route
+cat <<"EOL" > /etc/dhcp/dhclient-enter-hooks.d/disable-default-route
 # Stop the host internal network (eth3) from supplying us with a default route
-if [ ${interface}=="eth3" ];
-then
+if [ "$interface" = "eth3" ]; then
     unset new_routers
 fi
 EOL
 
 cat <<EOL > /etc/fstab
-proc /proc proc nodev,noexec,nosuid 0 0"
-/dev/xvda / ext3 errors=remount-ro 0 1"
+proc /proc proc nodev,noexec,nosuid 0 0
+/dev/xvda / ext3 errors=remount-ro 0 1
 EOL
 
 cat <<EOL > /etc/init/resize2fs.conf
@@ -97,6 +96,7 @@ then
    echo "Failed to initialize Devstack but that is ok as we don't have a XenServer host to speak to."
 fi
 su stack /opt/stack/devstack/unstack.sh
+
 sed -i".bak" '/USE_SCREEN=FALSE/d' /opt/stack/devstack/localrc
 echo 'OFFLINE=true' >> /opt/stack/devstack/localrc
 
@@ -126,5 +126,6 @@ deb http://archive.ubuntu.com/ubuntu/ precise-updates main universe
 deb-src http://archive.ubuntu.com/ubuntu/ precise main universe
 deb-src http://archive.ubuntu.com/ubuntu/ precise-security main universe
 deb-src http://bs.archive.ubuntu.com/ubuntu/ precise-updates main universe
+EOL
 apt-get update
 apt-get clean
