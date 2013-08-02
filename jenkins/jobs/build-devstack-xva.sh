@@ -28,6 +28,7 @@ SLAVE_IP=$(cat $XSLIB/start-slave.sh |
 
 echo "Starting job on $SLAVE_IP"
 "$REMOTELIB/bash.sh" "ubuntu@$SLAVE_IP" <<_EOL_
+set -o xtrace
 cat > "build.sh" <<"_EOLI_"
 `cat $BUILDLIB/devstack-xva/build.sh`
 _EOLI_
@@ -44,8 +45,7 @@ chmod 755 build.sh
 chmod 755 build-inside-chroot.sh
 chmod 755 mkxva.py
 sudo ./build.sh
-export SSHDPID=`pidof "sshd: ubuntu@notty"`
-kill $SSHDPID
+kill `pidof "sshd: ubuntu@notty"`
 _EOL_
 
 echo "Copying build result to copper"
