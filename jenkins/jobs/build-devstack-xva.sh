@@ -1,7 +1,7 @@
 #!/bin/bash
 
 set -o xtrace
-set -eu
+#set -eu
 
 XSLIB=$(cd $(dirname $(readlink -f "$0")) && cd xslib && pwd)
 BUILDLIB=$(cd $(dirname $(readlink -f "$0")) && cd builds && pwd)
@@ -45,7 +45,7 @@ chmod 755 build.sh
 chmod 755 build-inside-chroot.sh
 chmod 755 mkxva.py
 sudo ./build.sh
-kill `pidof "sshd: ubuntu@notty"`
+pkill -f "sshd: ubuntu@notty"
 _EOL_
 
 echo "Copying build result to copper"
