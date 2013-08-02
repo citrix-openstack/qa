@@ -44,7 +44,8 @@ chmod 755 build.sh
 chmod 755 build-inside-chroot.sh
 chmod 755 mkxva.py
 sudo ./build.sh
-kill `pidof "sshd: ubuntu@notty"`
+export SSHDPID=`pidof "sshd: ubuntu@notty"`
+kill $SSHDPID
 _EOL_
 
 echo "Copying build result to copper"
