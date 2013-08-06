@@ -10,7 +10,7 @@ usage: $0 BRANCH_NAME [SETUP_TYPE]
 Generate a test script to the standard output
 
 positional arguments:
- BRANCH_NAME      Name of the branch to be used, use latest to use the latest
+ BRANCH_NAME      Name of the branch to be used, use 'latest' to use the latest
                   branch
  SETUP_TYPE       Type of setup, one of [nova-network, neutron] defaults to
                   nova-network
