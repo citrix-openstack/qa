@@ -32,7 +32,7 @@ fi
 echo "Updating workspace..."
 ./create_workspace.sh
 echo "Fetch latest changes from build remotes..." 
-# ./with_all_repos.sh git fetch build
+./with_all_repos.sh git fetch build
 echo "Resetting local repositories..."
 ./reset_all_repos.sh
 echo "Checking out branch build/$ORIGINAL_BRANCH to $BUILD_BRANCH_NAME"
