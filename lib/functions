@@ -201,7 +201,7 @@ function reset_repos() {
         varname=$(var_name "$repo")
         (
             cd "$varname"
-            git reset --hard || true
+            git reset --hard || true > /dev/null 2>&1
         )
     done
 }

@@ -6,9 +6,7 @@ set -eu
 
 assert_no_new_repos
 
-ACTION="$@"
-
 (
     cd .workspace
-    with_all_repos "$@"
+    reset_repos
 )
