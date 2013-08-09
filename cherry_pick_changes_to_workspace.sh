@@ -26,6 +26,6 @@ while read change; do
         [ "$?" == "0" ]
     cd ..
 done
-)
 rm "$tmpfile"
+)
 
