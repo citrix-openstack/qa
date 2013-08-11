@@ -119,7 +119,7 @@ SWIFT_LOOPBACK_DISK_SIZE=9000000
 LOCALRC_CONTENT_ENDS_HERE
 
 cd tools/xen
-os_PACKAGE="unknown" ./install_os_domU.sh
+os_PACKAGE="rpm" ./install_os_domU.sh
 END_OF_XENSERVER_COMMANDS
 
 if [ "$TEST_TYPE" == "none" ]; then
