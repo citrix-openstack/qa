@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -o xtrace
+set -eux
 
 # Configure Defaults
 export GUEST_PASSWORD=xenroot
@@ -97,12 +97,12 @@ then
    rm -f $TARGETDIRECTORY/etc/mtab
    #rm -f $TARGETDIRECTORY/etc/apt/apt.conf.d/02proxy
    sed -i '/#temporary/d' $TARGETDIRECTORY/etc/hosts
-   umount $TARGETDIRECTORY/proc/
-   umount -l $TARGETDIRECTORY/proc/
-   umount $TARGETDIRECTORY/sys/
-   umount -l $TARGETDIRECTORY/sys/
-   umount $TARGETDIRECTORY/dev/
-   umount -l $TARGETDIRECTORY/dev/
+   umount $TARGETDIRECTORY/proc/ || true
+   umount -l $TARGETDIRECTORY/proc/ || true
+   umount $TARGETDIRECTORY/sys/ || true
+   umount -l $TARGETDIRECTORY/sys/ || true
+   umount $TARGETDIRECTORY/dev/ || true
+   umount -l $TARGETDIRECTORY/dev/ || true
 fi
 
 # Package the ubuntu system into the xva

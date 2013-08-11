@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -o xtrace
+set -eux
 
 # setup the swap file while we are likely to get contiguous space
 dd if=/dev/zero of=/var/cache/swap bs=1M count=1024
@@ -47,6 +47,7 @@ echo "exec /sbin/resize2fs /dev/xvda" >> /etc/init/resize2fs.conf
 EOL
 
 # Run devstack's prepare_guest.sh
+cp /etc/rc.local /etc/rc.local.preparebackup
 cd /tmp/
 cp /opt/stack/devstack/tools/xen/prepare_guest.sh ./prepare_guest.sh
 sed -i".bak" '/shutdown -h now/d' ./prepare_guest.sh
@@ -88,8 +89,8 @@ EOL
 chown stack -R /opt/stack/devstack
 
 # Run devstack to cache sdependencies (this will fail because of the chroot)
-su stack /opt/stack/run.sh
-su stack /opt/stack/devstack/unstack.sh
+su stack /opt/stack/run.sh || true
+su stack /opt/stack/devstack/unstack.sh || true
 
 # Finish setting up devstack
 sed -i".bak" '/USE_SCREEN=FALSE/d' /opt/stack/devstack/localrc

@@ -1,7 +1,6 @@
 #!/bin/bash
 
-set -o xtrace
-#set -eu
+set -eux
 
 XSLIB=$(cd $(dirname $(readlink -f "$0")) && cd xslib && pwd)
 BUILDLIB=$(cd $(dirname $(readlink -f "$0")) && cd builds && pwd)
@@ -28,11 +27,13 @@ SLAVE_IP=$(cat $XSLIB/start-slave.sh |
 
 echo "Starting job on $SLAVE_IP"
 scp -B -o 'StrictHostKeyChecking no' $BUILDLIB/devstack-xva/*  ubuntu@$SLAVE_IP:~/
+$(
 "$REMOTELIB/bash.sh" "ubuntu@$SLAVE_IP" <<EOL
-set -eux
-sudo ~/build.sh
-pkill -f "sshd: ubuntu@notty"
+    set -eux
+    sudo ~/build.sh
+    pkill -f "sshd: ubuntu@notty"
 EOL
+) || true
 
 echo "Copying build result to copper"
 scp -B -3 -o 'StrictHostKeyChecking no' ubuntu@$SLAVE_IP:~/output.xva \
