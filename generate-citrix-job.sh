@@ -50,7 +50,7 @@ cat "$THIS_DIR/modifications/add-ubuntu-proxy-repos" >> $EXTENSIONS
 NOVA_ZIPBALL_URL="http://gold.eng.hq.xensource.com/git/internal/builds/nova/zipball/$BRANCH_NAME"
 NEUTRON_ZIPBALL_URL="http://gold.eng.hq.xensource.com/git/internal/builds/neutron/zipball/$BRANCH_NAME"
 EOF
-} > "$EXTENSIONS"
+} >> "$EXTENSIONS"
 
 # Configure neutron if needed
 if [ "$SETUP_TYPE" == "neutron" ]; then

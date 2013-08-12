@@ -95,7 +95,7 @@ BOOT_TIMEOUT=500
 # DevStack settings
 LOGFILE=/tmp/devstack/log/stack.log
 SCREEN_LOGDIR=/tmp/devstack/log/
-VERBOSE=False
+#VERBOSE=True
 
 # XenAPI specific
 XENAPI_CONNECTION_URL="http://$XENSERVER_IP"
@@ -119,7 +119,7 @@ SWIFT_LOOPBACK_DISK_SIZE=9000000
 LOCALRC_CONTENT_ENDS_HERE
 
 cd tools/xen
-./install_os_domU.sh
+os_PACKAGE="rpm" ./install_os_domU.sh
 END_OF_XENSERVER_COMMANDS
 
 if [ "$TEST_TYPE" == "none" ]; then
