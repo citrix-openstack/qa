@@ -18,13 +18,16 @@ while read change; do
     user=$(echo "$change" | cut -d"/" -f 1)
     repo=$(echo "$change" | cut -d" " -f 1 | cut -d"/" -f 2)
     changeref=$(echo "$change" | cut -d" " -f 2)
-    repo_record=$(grep "$user $repo" "$tmpfile")
-    [ -n "$repo_record" ]
-    cd $(var_name "$repo_record")
+    if grep -q "$user $repo" "$tmpfile"; then
         echo "[CHERRY-PICK] $change"
-        git fetch $(source_repo "$repo_record") $changeref && git cherry-pick FETCH_HEAD
-        [ "$?" == "0" ]
-    cd ..
+        repo_record=$(grep "$user $repo" "$tmpfile")
+        cd $(var_name "$repo_record")
+            git fetch $(source_repo "$repo_record") $changeref && git cherry-pick FETCH_HEAD
+            [ "$?" == "0" ]
+        cd ..
+    else
+        echo "[SKIPPING] $change"
+    fi
 done
 rm "$tmpfile"
 )
