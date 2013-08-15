@@ -4,10 +4,11 @@ set -eux
 
 # Configure Defaults
 export GUEST_PASSWORD=xenroot
+export GUEST_NAME=ubuntu
 export FILESYSTEM_SIZE=$((5 * 1024 * 1024))
 OUTPUT=output.xva
 OVA=ova.xml
-OVA_VDI_REF="Ref:84"
+OVA_VDI_REF="Ref:24"
 
 # Abort if not root
 if [[ $EUID -ne 0 ]]; then
@@ -55,17 +56,6 @@ if [ ! -d $TARGETDIRECTORY ];
 then
    cp -ax $BAREDIRECTORY $TARGETDIRECTORY
    
-   # Setup basic requirements for chroot
-   mount -t proc proc $TARGETDIRECTORY/proc/
-   mount -t sysfs sys $TARGETDIRECTORY/sys/
-   mount -o bind /dev $TARGETDIRECTORY/dev/
-   cp /etc/resolv.conf $TARGETDIRECTORY/etc/resolv.conf
-   cp /etc/mtab $TARGETDIRECTORY/etc/mtab
-   #echo 'Acquire::http::Proxy "http://apt.eng.hq.xensource.com:3142";' > $TARGETDIRECTORY/etc/apt/apt.conf.d/02proxy
-   cp /etc/apt/sources.list $TARGETDIRECTORY/etc/apt/sources.list
-   chmod 1777 $TARGETDIRECTORY/tmp
-   echo "127.0.0.1 " `hostname` " #temporary" >> $TARGETDIRECTORY/etc/hosts
-
    # Organise build_xva.sh requirements and run it
    if [ ! -f xe-guest-utilities_6.1.0-1033_amd64.deb ];
    then
@@ -83,10 +73,23 @@ then
    export COPYENV=0
    export STAGING_DIR=$INITIALPWD/$TARGETDIRECTORY
    chmod 755 ./build_xva.sh
-   ./build_xva.sh
+   cp $INITIALPWD/$TARGETDIRECTORY/etc/rc.local $INITIALPWD/$TARGETDIRECTORY/etc/rc.local.backup
+   ./build_xva.sh $GUEST_NAME
+   mv $INITIALPWD/$TARGETDIRECTORY/etc/rc.local.backup $INITIALPWD/$TARGETDIRECTORY/etc/rc.local
    mv build_xva.sh.backup build_xva.sh
-   cd $INITIALPWD 
-   
+   cd $INITIALPWD
+
+   # Setup basic requirements for chroot
+   mount -t proc proc $TARGETDIRECTORY/proc/
+   mount -t sysfs sys $TARGETDIRECTORY/sys/
+   mount -o bind /dev $TARGETDIRECTORY/dev/
+   cp /etc/resolv.conf $TARGETDIRECTORY/etc/resolv.conf
+   cp /etc/mtab $TARGETDIRECTORY/etc/mtab
+   #echo 'Acquire::http::Proxy "http://apt.eng.hq.xensource.com:3142";' > $TARGETDIRECTORY/etc/apt/apt.conf.d/02proxy
+   cp /etc/apt/sources.list $TARGETDIRECTORY/etc/apt/sources.list
+   chmod 1777 $TARGETDIRECTORY/tmp
+   echo "127.0.0.1 " `hostname` " #temporary" >> $TARGETDIRECTORY/etc/hosts
+
    # Run build-inside-chroot.sh
    cp -f $SCRIPTDIRECTORY/build-inside-chroot.sh $TARGETDIRECTORY/tmp/
    chroot $TARGETDIRECTORY/ /tmp/build-inside-chroot.sh

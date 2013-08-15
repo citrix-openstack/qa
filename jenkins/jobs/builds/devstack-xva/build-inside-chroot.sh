@@ -24,15 +24,14 @@ update-grub -y
 
 #configure the hvc0 console
 sed -e "s/tty1/hvc0/g" /etc/init/tty1.conf > /etc/init/hvc0.conf
-sed -i 's/root=.* ro /root=\/dev\/xvda ro console=hvc0 /g' /boot/grub/menu.lst
+sed -i 's/root=.* ro /root=\/dev\/xvda ro console=hvc0 splash quiet vt.handoff=7/g' /boot/grub/menu.lst
 
 # setup the network
-echo "ubuntu" > /etc/hostname
-echo "127.0.0.1 ubuntu" >> /etc/hosts
 cat <<EOL >> /etc/network/interfaces
 auto eth3
 iface eth3 inet dhcp
 EOL
+echo "127.0.0.1 $GUEST_NAME" >> /etc/hosts
 cat <<"EOL" > /etc/dhcp/dhclient-enter-hooks.d/disable-default-route
 # Stop the host internal network (eth3) from supplying us with a default route
 if [ "$interface" = "eth3" ]; then
@@ -78,12 +77,18 @@ VNCSERVER_PROXYCLIENT_ADDRESS=169.254.0.1
 
 # Do not download the usual images
 IMAGE_URLS=""
-# Explicitly set virt driver here
+# Explicitly set virt driver
 VIRT_DRIVER=xenserver
 # Explicitly enable multi-host
 MULTI_HOST=1
 # Give extra time for boot
-ACTIVE_TIMEOUT=45
+ACTIVE_TIMEOUT=100
+# Specify the firewall driver
+XEN_FIREWALL_DRIVER=nova.virt.xenapi.firewall.Dom0IptablesFirewallDriver
+# DISABLE Boot from Volume
+SKIP_EXERCISES="boot_from_volume"
+# Specify the size of /opt/stack/data/stack-volumes-backing-file
+VOLUME_BACKING_FILE_SIZE=2GB
 USE_SCREEN=FALSE
 EOL
 chown stack -R /opt/stack/devstack
