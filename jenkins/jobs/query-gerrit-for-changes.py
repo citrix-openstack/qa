@@ -10,15 +10,15 @@ def create_query_expression(owners):
 
 
 def main(args):
-    hostname = "review.openstack.org"
-    port = 29418
+    hostname = args.host
+    port = int(args.port)
     username = args.username
     keyfile = args.keyfile
     owners = args.watched_owners.split(',')
 
     client = paramiko.SSHClient()
     client.load_system_host_keys()
-    client.set_missing_host_key_policy(paramiko.WarningPolicy)
+    client.set_missing_host_key_policy(paramiko.WarningPolicy())
     client.connect(hostname, port=port, username=username, key_filename=keyfile)
     stdin, stdout, stderr = client.exec_command(
         "gerrit query --patch-sets --format=JSON status:open AND %s" %
@@ -58,5 +58,9 @@ if __name__ == "__main__":
     parser.add_argument('keyfile', help='SSH key to use')
     parser.add_argument('watched_owners',
         help='Comma separated list of Owner ids whose changes to be collected')
+    parser.add_argument('--host', default='review.openstack.org',
+        help='Specify a host. default: review.openstack.org')
+    parser.add_argument('--port', default='29418',
+        help='Specify a port. default: 29418')
     args = parser.parse_args()
     main(args)
