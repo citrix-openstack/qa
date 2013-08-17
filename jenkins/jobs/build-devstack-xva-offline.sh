@@ -26,7 +26,7 @@ SLAVE_IP=$(cat $XSLIB/start-slave.sh |
     "$REMOTELIB/bash.sh" "root@$SERVERNAME")
 
 echo "Starting job on $SLAVE_IP"
-scp -B -o 'StrictHostKeyChecking no' $BUILDLIB/devstack-xva/*  ubuntu@$SLAVE_IP:~/
+scp -B -o 'StrictHostKeyChecking no' $BUILDLIB/devstack-xva-offline/*  ubuntu@$SLAVE_IP:~/
 $(
 "$REMOTELIB/bash.sh" "ubuntu@$SLAVE_IP" <<EOL
     set -eux
