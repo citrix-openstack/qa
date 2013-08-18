@@ -17,11 +17,11 @@ xe -s $XENSERVERHOST -u root -pw $XENSERVERPASSWORD vif-plug uuid=$HOSTINTERNALN
 VMIP=$(xe -s $XENSERVERHOST -u root -pw $XENSERVERPASSWORD vm-param-get uuid=$VMUUID param-name=networks | sed -ne 's,^.*0/ip: \([0-9.]*\).*$,\1,p')
 
 # SSH into the VM to finish the preparation
-sshpass -p citrix ssh -q -t -t -o 'StrictHostKeyChecking no' root@$VMIP << "EOF"
+sshpass -p citrix ssh -o 'StrictHostKeyChecking no' root@$VMIP << "EOF"
 set -eux
 
 #stop Devstack
-su stack /opt/stack/devstack/unstack.sh || true
+#su stack /opt/stack/devstack/unstack.sh || true
 
 # setup the network
 cat <<"EOL" >> /etc/network/interfaces
