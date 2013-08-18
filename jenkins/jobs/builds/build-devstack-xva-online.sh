@@ -20,7 +20,9 @@ sed -i '/NOVA_BRANCH/d' install-devstack-xen.sh
 chmod 755 install-devstack-xen.sh
 rm -f $TEMPKEYFILE
 ssh-keygen -t rsa -N "" -f $TEMPKEYFILE
+echo "StrictHostKeyChecking no" > ~/.ssh/config
 sshpass -p $XENSERVERPASSWORD ssh-copy-id -i $TEMPKEYFILE.pub root@$XENSERVERHOST
+rm -f ~/.ssh/config
 ./install-devstack-xen.sh $TEMPKEYFILE $XENSERVERHOST $XENSERVERPASSWORD || true
 
 # Find out the UUID of the VM
