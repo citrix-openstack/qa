@@ -9,7 +9,7 @@ DEVSTACKPASSWORD=$4
 NOVAPLUGINSISO=$5
 
 # Prepare slave requirements
-sudo apt-get install xcp-xe stunnel sshpass
+sudo DEBIAN_FRONTEND=noninteractive apt-get -y install xcp-xe stunnel sshpass
 
 # Install the supplemental pack
 scp $NOVAPLUGINSISO root@"$XENSERVERHOST":~/novaplugins.iso
