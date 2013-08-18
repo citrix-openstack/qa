@@ -13,7 +13,7 @@ sudo DEBIAN_FRONTEND=noninteractive apt-get -y install xcp-xe stunnel sshpass
 
 # Install the supplemental pack
 sshpass -p $XENSERVERPASSWORD scp -o StrictHostKeyChecking=no $NOVAPLUGINSISO root@"$XENSERVERHOST":~/novaplugins.iso
-sshpass -p $XENSERVERPASSWORD ssh -o StrictHostKeyChecking=no root@"$XENSERVERHOST" "echo y | xe-install-supplemental-pack ~/novaplugins.iso"
+sshpass -p $XENSERVERPASSWORD ssh -o StrictHostKeyChecking=no root@"$XENSERVERHOST" "echo y | xe-install-supplemental-pack ~/novaplugins.iso" || true
 sshpass -p $XENSERVERPASSWORD ssh -o StrictHostKeyChecking=no root@"$XENSERVERHOST" "rm -f ~/novaplugins.iso"
 
 # Install the Devstack VM
