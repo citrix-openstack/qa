@@ -17,18 +17,18 @@ xe -s $XENSERVERHOST -u root -pw $XENSERVERPASSWORD vif-plug uuid=$HOSTINTERNALN
 VMIP=$(xe -s $XENSERVERHOST -u root -pw $XENSERVERPASSWORD vm-param-get uuid=$VMUUID param-name=networks | sed -ne 's,^.*0/ip: \([0-9.]*\).*$,\1,p')
 
 # SSH into the VM to finish the preparation
-sshpass -p citrix ssh -o 'StrictHostKeyChecking no' root@$VMIP << "EOF"
+sshpass -p citrix ssh -q -t -t -o 'StrictHostKeyChecking no' root@$VMIP << "EOF"
 set -eux
 
 #stop Devstack
 su stack /opt/stack/devstack/unstack.sh || true
 
 # setup the network
-cat <<EOL >> /etc/network/interfaces
+cat <<"EOL" >> /etc/network/interfaces
 auto eth3
 iface eth3 inet dhcp
 EOL
-echo "127.0.0.1 $GUEST_NAME" >> /etc/hosts
+echo "127.0.0.1 `hostname`" >> /etc/hosts
 cat <<"EOL" > /etc/dhcp/dhclient-enter-hooks.d/disable-default-route
 # Stop the host internal network (eth3) from supplying us with a default route
 if [ "$interface" = "eth3" ]; then
