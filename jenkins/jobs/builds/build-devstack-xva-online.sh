@@ -8,7 +8,7 @@ XENSERVERPASSWORD=$2
 TEMPKEYFILE=$(mktemp)
 
 # Prepare slave requirements
-sudo DEBIAN_FRONTEND=noninteractive apt-get -y install xcp-xe stunnel
+sudo DEBIAN_FRONTEND=noninteractive apt-get -y install xcp-xe stunnel sshpass
 
 rm -f install-devstack-xen.sh || true
 wget https://raw.github.com/citrix-openstack/qa/master/install-devstack-xen.sh
