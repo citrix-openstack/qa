@@ -33,8 +33,10 @@ def main(args):
 
         project = change['project']
 
-
-        return (project, latest_patchset[1])
+        changeref = latest_patchset[1]
+        change_number = changeref.split('/')[4]
+        change_url = "https://review.openstack.org/#/c/%s/" % change_number
+        return (project, changeref, change_url)
 
 
     change_records = []
@@ -46,7 +48,7 @@ def main(args):
 
 
     for change_record in sorted(change_records):
-        sys.stdout.write("%s %s\n" % change_record)
+        sys.stdout.write("%s %s %s\n" % change_record)
 
     client.close()
 
