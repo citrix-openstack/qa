@@ -5,7 +5,7 @@ set -eu
 function print_usage_and_die
 {
 cat >&2 << EOF
-usage: $0 CONFLICT_SCRIPT_DIR
+usage: $0 [CONFLICT_SCRIPT_DIR]
 
 Cherry-pick citrix changes with additional conflict resolution.
 
@@ -20,7 +20,7 @@ exit 1
 . lib/functions
 
 THIS_DIR="$(cd $(dirname $(readlink -f $0)) && pwd)"
-CONFLICT_PATCHES_DIR="${1-$(print_usage_and_die)}"
+CONFLICT_PATCHES_DIR="${1:-}"
 
 echo "Working directory   : [$THIS_DIR]"
 echo "Conflict patches dir: [$CONFLICT_PATCHES_DIR]"
@@ -47,6 +47,10 @@ while read change; do
             if git fetch $(source_repo "$repo_record") $changeref && git cherry-pick FETCH_HEAD; then
                 echo "[CHERRY-PICK-OK]"
             else
+                if [ -z "$CONFLICT_PATCHES_DIR" ]; then
+                    echo "There are no conflict-resolvers."
+                    exit 1
+                fi
                 echo "[CHERRY-PICK-FAIL] Printing diff"
                 git diff
                 resolution_script="$CONFLICT_PATCHES_DIR/$change_number"
