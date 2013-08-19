@@ -41,7 +41,7 @@ def main(args):
 
         changeref = latest_patchset[1]
         change_url = change['url']
-        return (project, changeref, change_url)
+        return (change['createdOn'], project, changeref, change_url)
 
 
     change_records = []
@@ -53,7 +53,7 @@ def main(args):
 
 
     for change_record in sorted(change_records):
-        sys.stdout.write("%s %s %s\n" % change_record)
+        sys.stdout.write("%s %s %s\n" % change_record[1:])
 
     client.close()
 
