@@ -25,7 +25,7 @@ def main(args):
             create_query_expression(owners))
 
 
-    def to_change_line(change):
+    def to_change_record(change):
         if 'patchSets' not in change:
             return
         patchsets = [(int(ps['number']), ps['ref']) for ps in change['patchSets']]
@@ -40,7 +40,7 @@ def main(args):
     proj_refs = []
     for line in stdout.readlines():
         change = json.loads(line)
-        proj_ref = to_change_line(change)
+        proj_ref = to_change_record(change)
         if proj_ref:
             proj_refs.append(proj_ref)
 
