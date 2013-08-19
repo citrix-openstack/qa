@@ -37,16 +37,16 @@ def main(args):
         return (project, latest_patchset[1])
 
 
-    proj_refs = []
+    change_records = []
     for line in stdout.readlines():
         change = json.loads(line)
-        proj_ref = to_change_record(change)
-        if proj_ref:
-            proj_refs.append(proj_ref)
+        change_record = to_change_record(change)
+        if change_record:
+            change_records.append(change_record)
 
 
-    for proj_ref in sorted(proj_refs):
-        sys.stdout.write("%s %s\n" % proj_ref)
+    for change_record in sorted(change_records):
+        sys.stdout.write("%s %s\n" % change_record)
 
     client.close()
 
