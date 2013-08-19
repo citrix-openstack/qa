@@ -3,6 +3,11 @@ import os
 import argparse
 import paramiko
 import json
+import logging
+
+
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 
 def create_query_expression(owners):
@@ -26,6 +31,7 @@ def main(args):
 
 
     def to_change_record(change):
+        logger.DEBUG("Processing change: %s" % change)
         if 'patchSets' not in change:
             return
         patchsets = [(int(ps['number']), ps['ref']) for ps in change['patchSets']]
