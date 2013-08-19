@@ -40,8 +40,7 @@ def main(args):
         project = change['project']
 
         changeref = latest_patchset[1]
-        change_number = changeref.split('/')[3]
-        change_url = "https://review.openstack.org/#/c/%s/" % change_number
+        change_url = change['url']
         return (project, changeref, change_url)
 
 
