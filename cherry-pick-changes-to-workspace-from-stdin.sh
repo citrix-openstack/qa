@@ -19,11 +19,16 @@ while read change; do
     repo=$(echo "$change" | cut -d" " -f 1 | cut -d"/" -f 2)
     changeref=$(echo "$change" | cut -d" " -f 2)
     if grep -q "$user $repo" "$tmpfile"; then
-        echo "[CHERRY-PICK] $change"
+        echo "[CHERRY-PICK-START] $change"
         repo_record=$(grep "$user $repo" "$tmpfile")
         cd $(var_name "$repo_record")
-            git fetch $(source_repo "$repo_record") $changeref && git cherry-pick FETCH_HEAD
-            [ "$?" == "0" ]
+            if git fetch $(source_repo "$repo_record") $changeref && git cherry-pick FETCH_HEAD; then
+                echo "[CHERRY-PICK-OK]"
+            else
+                echo "[CHERRY-PICK-FAIL]"
+                git diff
+                exit 1
+            fi
         cd ..
     else
         echo "[SKIPPING] $change"
