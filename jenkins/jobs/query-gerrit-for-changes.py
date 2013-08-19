@@ -31,7 +31,7 @@ def main(args):
 
 
     def to_change_record(change):
-        logger.DEBUG("Processing change: %s" % change)
+        logger.debug("Processing change: %s" % change)
         if 'patchSets' not in change:
             return
         patchsets = [(int(ps['number']), ps['ref']) for ps in change['patchSets']]
