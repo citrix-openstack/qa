@@ -22,6 +22,10 @@ exit 1
 THIS_DIR="$(cd $(dirname $(readlink -f $0)) && pwd)"
 CONFLICT_PATCHES_DIR="${1:-}"
 
+if [ -n "$CONFLICT_PATCHES_DIR" ]; then
+CONFLICT_PATCHES_DIR="$(cd $CONFLICT_PATCHES_DIR && pwd)"
+fi
+
 echo "Working directory   : [$THIS_DIR]"
 echo "Conflict patches dir: [$CONFLICT_PATCHES_DIR]"
 
