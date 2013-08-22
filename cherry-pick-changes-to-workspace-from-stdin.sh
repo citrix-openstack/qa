@@ -55,8 +55,13 @@ while read change; do
                     echo "There are no conflict-resolvers."
                     exit 1
                 fi
-                echo "[CHERRY-PICK-FAIL] Printing diff"
-                git diff
+                echo "[CHERRY-PICK-FAIL] Removing commit ids from conflicting files"
+                git diff --name-only --diff-filter=U | while read conflicting_filename; do
+                    sed -ie 's/^\(>\+\) \([^ ]\+\) \(.*\)$/\1 \3/g' \
+                      "$conflicting_filename"
+                done
+                echo "[CHERRY-PICK-FAIL] Printing diff to standard output"
+                git --no-pager diff
                 resolution_script="$CONFLICT_PATCHES_DIR/$change_number"
                 echo "[CHERRY-PICK-FAIL] looking for resolution script as $resolution_script"
                 if [ -x  "$resolution_script" ]; then
