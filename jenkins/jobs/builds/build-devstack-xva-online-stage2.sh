@@ -60,6 +60,38 @@ EOF
 #Shutdown the VM
 xe -s $XENSERVERHOST -u root -pw $XENSERVERPASSWORD vm-shutdown vm=$VMUUID
 
+# Repackage the vhd inorder to minimize its size
+SLAVEUUID=$(xe -s $XENSERVERHOST -u root -pw $XENSERVERPASSWORD vm-list name-label=slave --minimal)
+RVBDUUID=$(xe -s $XENSERVERHOST -u root -pw $XENSERVERPASSWORD vbd-list vm-uuid=$VMUUID --minimal)
+RVDIUUID=$(xe -s $XENSERVERHOST -u root -pw $XENSERVERPASSWORD vbd-param-get uuid=$RVBDUUID param-name=vdi-uuid)
+xe -s $XENSERVERHOST -u root -pw $XENSERVERPASSWORD vbd-destroy uuid=$RVBDUUID || true
+SLAVERVBDUUID=$(xe -s $XENSERVERHOST -u root -pw $XENSERVERPASSWORD vbd-create vm-uuid=$SLAVEUUID vdi-uuid=$RVDIUUID device=4)
+xe -s $XENSERVERHOST -u root -pw $XENSERVERPASSWORD vbd-plug uuid=$SLAVERVBDUUID
+WVDIUUID=$(xe -s $XENSERVERHOST -u root -pw $XENSERVERPASSWORD vdi-create sr-uuid=$(xe -s $XENSERVERHOST -u root -pw $XENSERVERPASSWORD vdi-list uuid=$RVDIUUID params=sr-uuid --minimal) name-label=DevStackOSDomUDisk type=system virtual-size=$(xe -s $XENSERVERHOST -u root -pw $XENSERVERPASSWORD vdi-list uuid=$RVDIUUID params=virtual-size --minimal))
+SLAVEVWBDUUID=$(xe -s $XENSERVERHOST -u root -pw $XENSERVERPASSWORD vbd-create vm-uuid=$SLAVEUUID vdi-uuid=$WVDIUUID device=5)
+xe -s $XENSERVERHOST -u root -pw $XENSERVERPASSWORD vbd-plug uuid=$SLAVEVWBDUUID
+sudo sfdisk -d /dev/xvde | sudo sfdisk /dev/xvdf
+sudo dd if=/dev/xvde of=/dev/xvdf bs=446 count=1
+mkdir xvde1
+sudo mount /dev/xvde1 xvde1
+sudo mkfs.ext4 /dev/xvdf1
+mkdir xvdf1
+sudo mount /dev/xvdf1 xvdf1
+sudo cp -ax xvde1/* xvdf1/
+sudo umount xvde1
+sudo umount xvdf1
+rmdir xvde1
+rmdir xvdf1
+ROOTUUID=$(sudo blkid /dev/xvde1 | awk '{ print $2 }' | sed 's/UUID="//g' | sed 's/"//g')
+SWAPUUID=$(sudo blkid /dev/xvde5 | awk '{ print $2 }' | sed 's/UUID="//g' | sed 's/"//g')
+sudo tune2fs /dev/xvdf1 -U $ROOTUUID
+sudo mkswap -U $SWAPUUID /dev/xvdf5
+xe -s $XENSERVERHOST -u root -pw $XENSERVERPASSWORD vbd-unplug uuid=$SLAVERVBDUUID
+xe -s $XENSERVERHOST -u root -pw $XENSERVERPASSWORD vbd-destroy uuid=$SLAVERVBDUUID
+xe -s $XENSERVERHOST -u root -pw $XENSERVERPASSWORD vbd-unplug uuid=$SLAVEVWBDUUID
+xe -s $XENSERVERHOST -u root -pw $XENSERVERPASSWORD vbd-destroy uuid=$SLAVEVWBDUUID
+xe -s $XENSERVERHOST -u root -pw $XENSERVERPASSWORD vbd-create vm-uuid=$VMUUID vdi-uuid=$WVDIUUID device=0 bootable=true
+
 # Export the XVA 
 xe -s $XENSERVERHOST -u root -pw $XENSERVERPASSWORD vm-export filename=devstack.xva compress=true vm="DevStackOSDomU" include-snapshots=false
 
