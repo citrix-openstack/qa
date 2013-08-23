@@ -55,22 +55,36 @@ while read change; do
                     echo "There are no conflict-resolvers."
                     exit 1
                 fi
-                echo "[CHERRY-PICK-FAIL] Removing commit ids from conflicting files"
+                echo "[CHERRY-PICK-CONFLICT] Removing commit ids from conflicting files"
                 git diff --name-only --diff-filter=U | while read conflicting_filename; do
                     sed -ie 's/^\(>\+\) \([^ ]\+\) \(.*\)$/\1 \3/g' \
                       "$conflicting_filename"
                 done
-                echo "[CHERRY-PICK-FAIL] Printing diff to standard output"
+                echo "[CHERRY-PICK-CONFLICT] Printing diff to standard output"
                 git --no-pager diff
                 resolution_script="$CONFLICT_PATCHES_DIR/$change_number"
-                echo "[CHERRY-PICK-FAIL] looking for resolution script as $resolution_script"
+                diff_script="$CONFLICT_PATCHES_DIR/$change_number.diff"
+                echo "[CHERRY-PICK-CONFLICT] looking for resolution script as $resolution_script"
                 if [ -x  "$resolution_script" ]; then
-                    echo "[CHERRY-PICK-FAIL] Applying script $resolution_script"
+                    echo "[CHERRY-PICK-CONFLICT] Applying script $resolution_script"
                     $resolution_script
-                    echo "[CHERRY-PICK-FAIL] script done"
+                    echo "[CHERRY-PICK-CONFLICT] script done"
                 else
-                    echo "[CHERRY-PICK-FAIL] No resolution found"
-                    exit 1
+                    echo "[CHERRY-PICK-CONFLICT] looking for diff as $diff_script"
+                    if [ -e "$diff_script" ]; then
+                        echo "[CHERRY-PICK-CONFLICT] applying diff $diff_script"
+                        git apply "$diff_script"
+
+                        git diff --name-only --diff-filter=U | while read conflicting_filename; do
+                            git add "$conflicting_filename"
+                        done
+
+                        git commit --no-edit --allow-empty
+                        echo "[CHERRY-PICK-CONFLICT] applied diff $diff_script"
+                    else
+                        echo "[CHERRY-PICK-FAIL] No resolution found"
+                        exit 1
+                    fi
                 fi
             fi
         cd ..
