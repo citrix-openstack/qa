@@ -18,7 +18,7 @@ OtherDevstack=$1
 # Get the localrc
 scp stack@$OtherDevstack:devstack/localrc remote_localrc
 
-numMatch=`ssh -o LogLevel=quiet stack@$OtherDevstack "nova-manage service list 2>/dev/null | grep -c nova-compute"`
+numMatch=`ssh -o LogLevel=quiet stack@$OtherDevstack "nova-manage service list 2>/dev/null | grep nova-compute | wc -l"`
 
 # Change our options
 ~/devstack/unstack.sh
