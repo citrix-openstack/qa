@@ -18,20 +18,13 @@ OtherDevstack=$1
 # Get the localrc
 scp stack@$OtherDevstack:devstack/localrc remote_localrc
 
-# If Devstack1 already knows about the name of our Devstack2 host, we need to change Devstack2's hostname
-master_hosts_known=`ssh -o LogLevel=quiet stack@$OtherDevstack "nova-manage service list 2>/dev/null | grep nova-compute"`
+numMatch=`ssh -o LogLevel=quiet stack@$OtherDevstack "nova-manage service list 2>/dev/null | grep -c nova-compute"`
 
 # Change our options
 ~/devstack/unstack.sh
 cp ~/devstack/localrc ~/devstack/localrc.bck.`date +"%m_%d_%Y"`
 
 slaveHost=`hostname`
-existingComputeCount=`echo $master_hosts_known | grep -c "nova-compute"`
-
-# Grep returns an error code if it doesn't find any!
-set +e
-numMatch=`echo "$master_hosts_known" | grep nova-compute | grep -c $slaveHost`
-set -e
 
 # Change hostname on slave to add the count
 newHost=Compute$numMatch
