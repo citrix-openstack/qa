@@ -22,4 +22,6 @@ TARGET_REF="${1-$(print_usage_and_die)}"
 echo "updating $TARGET_REF to point to HEAD"
 ./with-all-repos-in-workspace.sh git update-ref "$TARGET_REF" HEAD
 echo "Pushing HEAD as a reference $TARGET_REF to build remote"
-./with-all-repos-in-workspace.sh git push --tags --quiet build HEAD:"$TARGET_REF"
+./with-all-repos-in-workspace.sh git push --quiet build HEAD:"$TARGET_REF"
+echo "Pushing tags"
+./with-all-repos-in-workspace.sh git push --tags build
