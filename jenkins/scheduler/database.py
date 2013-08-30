@@ -1,6 +1,5 @@
 from selectors import first
 
-
 def set_database(filename, contents):
     """
     >>> import os
@@ -9,9 +8,18 @@ def set_database(filename, contents):
     >>> os.path.exists('test_db')
     True
     >>> if os.path.exists('test_db'): os.unlink('test_db')
-    >>> set_database('test_db', '[1, 2, 3]')
+    >>> set_database('test_db', '[dict(HOST=\"a\"), dict(HOST=\"b\"), dict(HOST=\"c\")]')
     >>> os.path.exists('test_db')
     True
+    >>> lock_items('test_db', 'lock1')
+    [{'HOST': 'a'}]
+    >>> set_database('test_db', '[dict(HOST=\"c\"), dict(HOST=\"b\"), dict(HOST=\"a\")]')
+    >>> os.path.exists('test_db')
+    True
+    >>> get_database('test_db')
+    [{'HOST': 'c'}, {'HOST': 'b'}, {'HOST': 'a'}]
+    >>> get_locks('test_db')
+    [u'lock1']
     """
 
     import sqlite3
@@ -19,13 +27,20 @@ def set_database(filename, contents):
 
     c = conn.cursor()
 
+    cur_locks = {}
+    for table_name, in c.execute('SELECT name FROM sqlite_master WHERE type=\'table\' AND name=\'stuff\''):
+        if table_name == "stuff":
+            for lock, data in c.execute('SELECT lock, data FROM stuff'):
+                cur_locks[eval(data)['HOST']] = lock
+
     c.execute('DROP TABLE IF EXISTS stuff')
     c.execute('CREATE TABLE stuff (id INTEGER PRIMARY KEY, data TEXT, lock TEXT)')
 
     id = 0
     for record in eval(contents):
+        new_lock = cur_locks.get(record['HOST'], "")
         c.execute('INSERT INTO stuff (id, data, lock) VALUES(:id, :data, :lock)',
-            dict(id=id, data=repr(record), lock=""))
+            dict(id=id, data=repr(record), lock=new_lock))
         id += 1
 
     conn.commit()
@@ -34,9 +49,11 @@ def set_database(filename, contents):
 
 def get_database(filename):
     """
-    >>> set_database('test_db', '["a", "b", "c"]')
+    >>> import os
+    >>> if os.path.exists('test_db'): os.unlink('test_db')
+    >>> set_database('test_db', '[dict(HOST=\"1\"), dict(HOST=\"2\"), dict(HOST=\"3\")]')
     >>> get_database('test_db')
-    ['a', 'b', 'c']
+    [{'HOST': '1'}, {'HOST': '2'}, {'HOST': '3'}]
     >>> set_database('test_db', '[]')
     >>> get_database('test_db')
     []
@@ -57,11 +74,13 @@ def get_database(filename):
 
 def lock_items(filename, lock, term_generator=None):
     """
-    >>> set_database('test_db', '[1, 2, 3]')
+    >>> import os
+    >>> if os.path.exists('test_db'): os.unlink('test_db')
+    >>> set_database('test_db', '[dict(HOST=\"1\"), dict(HOST=\"2\"), dict(HOST=\"3\")]')
     >>> lock_items('test_db', 'a')
-    [1]
+    [{'HOST': '1'}]
     >>> lock_items('test_db', 'b')
-    [2]
+    [{'HOST': '2'}]
     >>> lock_items('test_db', '')
     Traceback (most recent call last):
     ...
@@ -69,12 +88,12 @@ def lock_items(filename, lock, term_generator=None):
     >>> set_database('test_db', '[]')
     >>> lock_items('test_db', 'c')
     []
-    >>> set_database('test_db', '[1, 2, 3]')
+    >>> set_database('test_db', '[dict(HOST=\"1\"), dict(HOST=\"2\"), dict(HOST=\"3\")]')
     >>> seen_items = []
     >>> lock_items('test_db', 'a', lambda x: lambda: seen_items.append(x))
     []
     >>> seen_items
-    [1, 2, 3]
+    [{'HOST': '1'}, {'HOST': '2'}, {'HOST': '3'}]
     """
 
     if lock == "":
@@ -107,11 +126,13 @@ def lock_items(filename, lock, term_generator=None):
 
 def get_locks(filename):
     """
-    >>> set_database('test_db', '[1, 2, 3]')
+    >>> import os
+    >>> if os.path.exists('test_db'): os.unlink('test_db')
+    >>> set_database('test_db', '[dict(HOST=\"1\"), dict(HOST=\"2\"), dict(HOST=\"3\")]')
     >>> get_locks('test_db')
     []
     >>> lock_items('test_db', 'lock1')
-    [1]
+    [{'HOST': '1'}]
     >>> get_locks('test_db')
     [u'lock1']
     """
@@ -132,10 +153,12 @@ def get_locks(filename):
 
 def release_lock(filename, lock):
     """
-    >>> set_database('test_db', '[1, 2, 3]')
+    >>> import os
+    >>> if os.path.exists('test_db'): os.unlink('test_db')
+    >>> set_database('test_db', '[dict(HOST=\"1\"), dict(HOST=\"2\"), dict(HOST=\"3\")]')
     >>> release_lock('test_db', 'somelock')
     >>> lock_items('test_db', 'lock1')
-    [1]
+    [{'HOST': '1'}]
     >>> get_locks('test_db')
     [u'lock1']
     >>> release_lock('test_db', 'lock1')
