@@ -101,7 +101,7 @@ SCREEN_LOGDIR=/tmp/devstack/log/
 XENAPI_CONNECTION_URL="http://$XENSERVER_IP"
 VNCSERVER_PROXYCLIENT_ADDRESS="$XENSERVER_IP"
 
-MULTI_HOST=False
+MULTI_HOST=1
 
 # Skip boot from volume exercise
 SKIP_EXERCISES="boot_from_volume"
