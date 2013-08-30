@@ -3,7 +3,7 @@
 from getters import wait_for_first
 import sys
 
-if len(sys.argv) > 0:
+if len(sys.argv) > 1:
     pool = sys.argv[1]
 else:
     pool = ""
