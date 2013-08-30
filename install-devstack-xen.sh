@@ -30,8 +30,8 @@ SWIFT_HASH="66a3d6b56c1f479c8b4e70ab5c2000f5"
 
 # Use a combination of openstack master and citrix-openstack citrix-fixes
 # May not be instantly up to date with openstack master
-NOVA_REPO=https://github.com/citrix-openstack/nova.git
-NOVA_BRANCH=build
+#NOVA_REPO=https://github.com/citrix-openstack/nova.git
+#NOVA_BRANCH=build
 
 # TEMPEST SETTINGS
 #
