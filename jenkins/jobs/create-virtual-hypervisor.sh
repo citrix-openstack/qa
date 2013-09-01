@@ -48,6 +48,11 @@ function add_key_to_xenserver() {
 "$REMOTELIB/bash.sh" "root@$XENSERVER" << END_OF_XENSERVER_SETUP
 set -eux
 
+while ! ping -c 1 gold.eng.hq.xensource.com; do
+    echo "Ping failed, sleeping"
+    sleep 1
+done
+
 grep "$pubkey" ~/.ssh/authorized_keys || echo "$pubkey" >> ~/.ssh/authorized_keys
 END_OF_XENSERVER_SETUP
 }
