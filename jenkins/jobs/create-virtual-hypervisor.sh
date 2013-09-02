@@ -18,6 +18,7 @@ Positional arguments:
   VMNAME    - Name of the VM
   NETNAME   - Network to use
   DEVBOX_IP - IP of devbox
+  VH_IP     - IP of the virtual hypervisor
 USAGE
 exit 1
 }
@@ -27,6 +28,7 @@ XENSERVER=${2-$(print_usage_and_quit)}
 VMNAME=${3-$(print_usage_and_quit)}
 NETNAME=${4-$(print_usage_and_quit)}
 DEVBOX_IP=${5-$(print_usage_and_quit)}
+VH_IP=${6-$(print_usage_and_quit)}
 
 function generate_devbox_key() {
 "$REMOTELIB/bash.sh" "ubuntu@$DEVBOX_IP" << END_OF_GENERATE_KEY
@@ -46,6 +48,11 @@ function add_key_to_xenserver() {
 "$REMOTELIB/bash.sh" "root@$XENSERVER" << END_OF_XENSERVER_SETUP
 set -eux
 
+while ! ping -c 1 gold.eng.hq.xensource.com; do
+    echo "Ping failed, sleeping"
+    sleep 1
+done
+
 grep "$pubkey" ~/.ssh/authorized_keys || echo "$pubkey" >> ~/.ssh/authorized_keys
 END_OF_XENSERVER_SETUP
 }
@@ -64,4 +71,5 @@ cat "$BUILDDIR/create-virtual-hypervisor.sh" | "$REMOTELIB/bash.sh" "ubuntu@$DEV
     "$XENSERVER" \
     "$VMNAME" \
     "$NETNAME" \
-    "~/.ssh/id_rsa_devbox"
+    "~/.ssh/id_rsa_devbox" \
+    "$VH_IP"

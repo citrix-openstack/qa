@@ -16,6 +16,7 @@ Positional arguments:
   VMNAME    - Name of the VM
   NETNAME   - Network to use
   SSHKEY    - SSH key to use
+  VH_IP     - IP of the virtual hypervisor
 USAGE
 exit 1
 }
@@ -25,6 +26,7 @@ XENSERVER=${2-$(print_usage_and_quit)}
 VMNAME=${3-$(print_usage_and_quit)}
 NETNAME=${4-$(print_usage_and_quit)}
 SSHKEY=${5-$(print_usage_and_quit)}
+VH_IP=${6-$(print_usage_and_quit)}
 
 set -x
 
@@ -68,28 +70,27 @@ $VHROOT/scripts/xs_start_create_vm_with_cdrom.sh \
 
 vm=$(echo "xe vm-list name-label='$VMNAME' --minimal" | on_xenserver)
 mac=$(echo "xe vif-list vm-uuid=$vm params=MAC --minimal" | on_xenserver)
-vhip="192.168.32.10"
 
 # Wipe existing config
-sudo sed -i /etc/dnsmasq.conf -e "s/.*$vhip.*//g"
+sudo sed -i /etc/dnsmasq.conf -e "s/.*$VH_IP.*//g"
 
 # Reserve the IP
 sudo tee -a /etc/dnsmasq.conf << EOF
-dhcp-host=$mac,$vhip
+dhcp-host=$mac,$VH_IP
 EOF
 
 # Restart dnsmasq (due to config file changes)
 sudo service dnsmasq restart
 
 # Make a record of that IP
-echo "$vhip" > ~/.vhip
+echo "$VH_IP" >> ~/.vhip
 
 on_xenserver << EOF
 xe vm-start vm="$VMNAME"
 EOF
 
 # wait till ssh is up on VH
-while ! echo "kk" | nc "$vhip" 22; do
+while ! echo "kk" | nc "$VH_IP" 22; do
     sleep 1
 done
 
@@ -97,9 +98,9 @@ done
 sudo apt-get install -qy sshpass
 
 # Store host key
-ssh-keyscan "$vhip" >> ~/.ssh/known_hosts
+ssh-keyscan "$VH_IP" >> ~/.ssh/known_hosts
 
 # Setup passwordless ssh
-sshpass -p 'somepass' ssh-copy-id -i ~/.ssh/id_rsa_devbox.pub "root@$vhip"
+sshpass -p 'somepass' ssh-copy-id -i ~/.ssh/id_rsa_devbox.pub "root@$VH_IP"
 
 rm -rf "$TEMPDIR"
