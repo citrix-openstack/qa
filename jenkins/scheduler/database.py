@@ -34,7 +34,7 @@ def set_database(filename, contents):
                 cur_locks[eval(data)['HOST']] = lock
 
     c.execute('DROP TABLE IF EXISTS stuff')
-    c.execute('CREATE TABLE stuff (id INTEGER PRIMARY KEY, data TEXT, lock TEXT)')
+    c.execute('CREATE TABLE stuff (id INTEGER PRIMARY KEY, data TEXT, lock TEXT, lock_reason TEXT)')
 
     id = 0
     for record in eval(contents):
@@ -72,7 +72,7 @@ def get_database(filename):
     return result
 
 
-def lock_items(filename, lock, term_generator=None):
+def lock_items(filename, lock, term_generator=None, lock_reason=None):
     """
     >>> import os
     >>> if os.path.exists('test_db'): os.unlink('test_db')
@@ -117,6 +117,10 @@ def lock_items(filename, lock, term_generator=None):
             c.execute('UPDATE stuff SET lock = :lock WHERE id = :id', dict(lock=lock, id=id))
             assert c.rowcount == 1
             results.append(item)
+            
+            if lock_reason:
+                c.execute('UPDATE stuff SET lock_reason = :lock_reason WHERE id = :id', dict(lock_reason=lock_reason, id=id))
+                assert c.rowcount == 1
 
     conn.commit()
     conn.close()
@@ -145,6 +149,39 @@ def get_locks(filename):
     locks = []
     for lock, in c.execute('SELECT DISTINCT(lock) FROM stuff WHERE lock <> :empty_lock ORDER by lock', dict(empty_lock="")).fetchall():
         locks.append(lock)
+
+    conn.close()
+
+    return locks
+
+def get_lock_details(filename, hostname=None):
+    """
+    >>> import os
+    >>> if os.path.exists('test_db'): os.unlink('test_db')
+    >>> set_database('test_db', '[dict(HOST=\"1\"), dict(HOST=\"2\"), dict(HOST=\"3\")]')
+    >>> get_lock_details('test_db')
+    {}
+    >>> lock_items('test_db', 'lock1', lock_reason='reason')
+    [{'HOST': '1'}]
+    >>> get_lock_details('test_db')
+    {'1': {'lock': u'lock1', 'reason': u'reason'}}
+    >>> get_lock_details('test_db', '2')
+    {}
+    >>> get_lock_details('test_db', '1')
+    {'1': {'lock': u'lock1', 'reason': u'reason'}}
+    """
+
+    import sqlite3
+    conn = sqlite3.connect(filename)
+
+    c = conn.cursor()
+
+    locks = {}
+    for lock, data, reason, in c.execute('SELECT lock, data, lock_reason FROM stuff WHERE lock <> :empty_lock ORDER by id',
+                                 dict(empty_lock="")).fetchall():
+        item = eval(data)
+        if hostname is None or item['HOST'] == hostname:
+            locks[item['HOST']] = {'lock':lock, 'reason':reason}
 
     conn.close()
 
