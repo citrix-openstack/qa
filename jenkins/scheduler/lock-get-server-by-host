@@ -1,19 +1,25 @@
 #!/usr/bin/env python
 
 from getters import wait_for_first
-import sys
+import sys, argparse
 
+parser = argparse.ArgumentParser(description='Lock a single server')
+parser.add_argument('host', help='The host to lock')
+parser.add_argument('--reason', dest='reason', 
+                   help='Reason for the lock (optional)')
 
-host, = sys.argv[1:]
+args = parser.parse_args()
+
+host = args.host
 
 def is_required_server(item):
     try:
+        print item, args
         return host == item.get("HOST")
     except:
         return False
 
-
-server_data, lock = wait_for_first(is_required_server)
+server_data, lock = wait_for_first(is_required_server, args.reason)
 
 for item in server_data.items():
     print '%s=%s' % item

@@ -2,9 +2,15 @@
 
 from getters import wait_for
 from selectors import first_pair_where_vlans_match
+import sys, argparse
 
+parser = argparse.ArgumentParser(description='Lock a server pair')
+parser.add_argument('--reason', dest='reason', 
+                   help='Reason for the lock (optional)')
 
-items, lock = wait_for(first_pair_where_vlans_match)
+args = parser.parse_args()
+
+items, lock = wait_for(first_pair_where_vlans_match, args.reason)
 
 for idx, server in enumerate(items):
     for key, value in server.items():

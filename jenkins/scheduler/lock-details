@@ -1,0 +1,11 @@
+#!/usr/bin/env python
+
+import database, sys
+
+DATABASE='server.database'
+
+host = None
+if len(sys.argv) > 1:
+    host = sys.argv[1]
+for lock, details in database.get_lock_details(DATABASE, host).iteritems():
+    print lock, ': ',  str(details)

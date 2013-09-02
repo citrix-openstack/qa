@@ -2,12 +2,16 @@
 
 from getters import wait_for_first
 import sys
+import argparse
 
-if len(sys.argv) > 1:
-    pool = sys.argv[1]
-else:
-    pool = ""
+parser = argparse.ArgumentParser(description='Lock a single server')
+parser.add_argument('pool', nargs='?', help='The pool to lock from', default="")
+parser.add_argument('--reason', dest='reason', 
+                   help='Reason for the lock (optional)')
 
+args = parser.parse_args()
+
+pool = args.pool
 def is_server_in_pool(item):
     try:
         return bool(item.get("POOL", "") == pool)
@@ -15,7 +19,7 @@ def is_server_in_pool(item):
         return False
 
 
-server_data, lock = wait_for_first(is_server_in_pool)
+server_data, lock = wait_for_first(is_server_in_pool, args.reason)
 
 for item in server_data.items():
     print '%s=%s' % item
