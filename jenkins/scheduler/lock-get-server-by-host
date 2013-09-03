@@ -14,7 +14,6 @@ host = args.host
 
 def is_required_server(item):
     try:
-        print item, args
         return host == item.get("HOST")
     except:
         return False
