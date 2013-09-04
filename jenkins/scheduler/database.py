@@ -30,17 +30,21 @@ def set_database(filename, contents):
     cur_locks = {}
     for table_name, in c.execute('SELECT name FROM sqlite_master WHERE type=\'table\' AND name=\'stuff\''):
         if table_name == "stuff":
-            for lock, data in c.execute('SELECT lock, data FROM stuff'):
-                cur_locks[eval(data)['HOST']] = lock
+            for lock, lock_date, data in c.execute('SELECT lock, lock_date, data FROM stuff'):
+                cur_locks[eval(data)['HOST']] = (lock, lock_date)
 
     c.execute('DROP TABLE IF EXISTS stuff')
     c.execute('CREATE TABLE stuff (id INTEGER PRIMARY KEY, data TEXT, lock TEXT, lock_reason TEXT, lock_date DATETIME)')
 
     id = 0
     for record in eval(contents):
-        new_lock = cur_locks.get(record['HOST'], "")
-        c.execute('INSERT INTO stuff (id, data, lock, lock_date) VALUES(:id, :data, :lock, datetime(\'now\'))',
-            dict(id=id, data=repr(record), lock=new_lock))
+        new_lock = cur_locks.get(record['HOST'], None)
+        if new_lock:
+            c.execute('INSERT INTO stuff (id, data, lock, lock_date) VALUES(:id, :data, :lock, :lock_date)',
+                      dict(id=id, data=repr(record), lock=new_lock[0], lock_date=new_lock[1]))
+        else:
+            c.execute('INSERT INTO stuff (id, data, lock) VALUES(:id, :data, :lock)',
+                      dict(id=id, data=repr(record), lock=""))
         id += 1
 
     conn.commit()
@@ -114,7 +118,7 @@ def lock_items(filename, lock, term_generator=None, lock_reason=None):
     results = []
     for term, id, item in terms_ids_items:
         if term():
-            c.execute('UPDATE stuff SET lock = :lock WHERE id = :id', dict(lock=lock, id=id))
+            c.execute('UPDATE stuff SET lock = :lock, lock_date = datetime(\'now\') WHERE id = :id', dict(lock=lock, id=id))
             assert c.rowcount == 1
             results.append(item)
             
