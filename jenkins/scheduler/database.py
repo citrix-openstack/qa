@@ -34,12 +34,12 @@ def set_database(filename, contents):
                 cur_locks[eval(data)['HOST']] = lock
 
     c.execute('DROP TABLE IF EXISTS stuff')
-    c.execute('CREATE TABLE stuff (id INTEGER PRIMARY KEY, data TEXT, lock TEXT, lock_reason TEXT, lock_date DATE)')
+    c.execute('CREATE TABLE stuff (id INTEGER PRIMARY KEY, data TEXT, lock TEXT, lock_reason TEXT, lock_date DATETIME)')
 
     id = 0
     for record in eval(contents):
         new_lock = cur_locks.get(record['HOST'], "")
-        c.execute('INSERT INTO stuff (id, data, lock, lock_date) VALUES(:id, :data, :lock, date(\'now\'))',
+        c.execute('INSERT INTO stuff (id, data, lock, lock_date) VALUES(:id, :data, :lock, datetime(\'now\'))',
             dict(id=id, data=repr(record), lock=new_lock))
         id += 1
 
