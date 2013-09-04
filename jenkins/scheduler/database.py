@@ -30,17 +30,21 @@ def set_database(filename, contents):
     cur_locks = {}
     for table_name, in c.execute('SELECT name FROM sqlite_master WHERE type=\'table\' AND name=\'stuff\''):
         if table_name == "stuff":
-            for lock, data in c.execute('SELECT lock, data FROM stuff'):
-                cur_locks[eval(data)['HOST']] = lock
+            for lock, lock_date, data in c.execute('SELECT lock, lock_date, data FROM stuff'):
+                cur_locks[eval(data)['HOST']] = (lock, lock_date)
 
     c.execute('DROP TABLE IF EXISTS stuff')
-    c.execute('CREATE TABLE stuff (id INTEGER PRIMARY KEY, data TEXT, lock TEXT, lock_reason TEXT)')
+    c.execute('CREATE TABLE stuff (id INTEGER PRIMARY KEY, data TEXT, lock TEXT, lock_reason TEXT, lock_date DATETIME)')
 
     id = 0
     for record in eval(contents):
-        new_lock = cur_locks.get(record['HOST'], "")
-        c.execute('INSERT INTO stuff (id, data, lock) VALUES(:id, :data, :lock)',
-            dict(id=id, data=repr(record), lock=new_lock))
+        new_lock = cur_locks.get(record['HOST'], None)
+        if new_lock:
+            c.execute('INSERT INTO stuff (id, data, lock, lock_date) VALUES(:id, :data, :lock, :lock_date)',
+                      dict(id=id, data=repr(record), lock=new_lock[0], lock_date=new_lock[1]))
+        else:
+            c.execute('INSERT INTO stuff (id, data, lock) VALUES(:id, :data, :lock)',
+                      dict(id=id, data=repr(record), lock=""))
         id += 1
 
     conn.commit()
@@ -114,7 +118,7 @@ def lock_items(filename, lock, term_generator=None, lock_reason=None):
     results = []
     for term, id, item in terms_ids_items:
         if term():
-            c.execute('UPDATE stuff SET lock = :lock WHERE id = :id', dict(lock=lock, id=id))
+            c.execute('UPDATE stuff SET lock = :lock, lock_date = datetime(\'now\') WHERE id = :id', dict(lock=lock, id=id))
             assert c.rowcount == 1
             results.append(item)
             
@@ -163,12 +167,12 @@ def get_lock_details(filename, hostname=None):
     {}
     >>> lock_items('test_db', 'lock1', lock_reason='reason')
     [{'HOST': '1'}]
-    >>> get_lock_details('test_db')
-    {'1': {'lock': u'lock1', 'reason': u'reason'}}
+    >>> get_lock_details('test_db') # doctest: +ELLIPSIS
+    {'1': {'date': ..., 'lock': u'lock1', 'reason': u'reason'}}
     >>> get_lock_details('test_db', '2')
     {}
-    >>> get_lock_details('test_db', '1')
-    {'1': {'lock': u'lock1', 'reason': u'reason'}}
+    >>> get_lock_details('test_db', '1') # doctest: +ELLIPSIS
+    {'1': {'date': ..., 'lock': u'lock1', 'reason': u'reason'}}
     """
 
     import sqlite3
@@ -177,11 +181,12 @@ def get_lock_details(filename, hostname=None):
     c = conn.cursor()
 
     locks = {}
-    for lock, data, reason, in c.execute('SELECT lock, data, lock_reason FROM stuff WHERE lock <> :empty_lock ORDER by id',
+    for lock, data, reason, lock_date, in c.execute(
+        'SELECT lock, data, lock_reason, lock_date FROM stuff WHERE lock <> :empty_lock ORDER by id',
                                  dict(empty_lock="")).fetchall():
         item = eval(data)
         if hostname is None or item['HOST'] == hostname:
-            locks[item['HOST']] = {'lock':lock, 'reason':reason}
+            locks[item['HOST']] = {'lock':lock, 'reason':reason, 'date':lock_date}
 
     conn.close()
 
