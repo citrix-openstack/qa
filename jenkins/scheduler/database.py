@@ -34,12 +34,12 @@ def set_database(filename, contents):
                 cur_locks[eval(data)['HOST']] = lock
 
     c.execute('DROP TABLE IF EXISTS stuff')
-    c.execute('CREATE TABLE stuff (id INTEGER PRIMARY KEY, data TEXT, lock TEXT, lock_reason TEXT)')
+    c.execute('CREATE TABLE stuff (id INTEGER PRIMARY KEY, data TEXT, lock TEXT, lock_reason TEXT, lock_date DATE)')
 
     id = 0
     for record in eval(contents):
         new_lock = cur_locks.get(record['HOST'], "")
-        c.execute('INSERT INTO stuff (id, data, lock) VALUES(:id, :data, :lock)',
+        c.execute('INSERT INTO stuff (id, data, lock, lock_date) VALUES(:id, :data, :lock, date(\'now\'))',
             dict(id=id, data=repr(record), lock=new_lock))
         id += 1
 
@@ -163,12 +163,12 @@ def get_lock_details(filename, hostname=None):
     {}
     >>> lock_items('test_db', 'lock1', lock_reason='reason')
     [{'HOST': '1'}]
-    >>> get_lock_details('test_db')
-    {'1': {'lock': u'lock1', 'reason': u'reason'}}
+    >>> get_lock_details('test_db') # doctest: +ELLIPSIS
+    {'1': {'date': ..., 'lock': u'lock1', 'reason': u'reason'}}
     >>> get_lock_details('test_db', '2')
     {}
-    >>> get_lock_details('test_db', '1')
-    {'1': {'lock': u'lock1', 'reason': u'reason'}}
+    >>> get_lock_details('test_db', '1') # doctest: +ELLIPSIS
+    {'1': {'date': ..., 'lock': u'lock1', 'reason': u'reason'}}
     """
 
     import sqlite3
@@ -177,11 +177,12 @@ def get_lock_details(filename, hostname=None):
     c = conn.cursor()
 
     locks = {}
-    for lock, data, reason, in c.execute('SELECT lock, data, lock_reason FROM stuff WHERE lock <> :empty_lock ORDER by id',
+    for lock, data, reason, lock_date, in c.execute(
+        'SELECT lock, data, lock_reason, lock_date FROM stuff WHERE lock <> :empty_lock ORDER by id',
                                  dict(empty_lock="")).fetchall():
         item = eval(data)
         if hostname is None or item['HOST'] == hostname:
-            locks[item['HOST']] = {'lock':lock, 'reason':reason}
+            locks[item['HOST']] = {'lock':lock, 'reason':reason, 'date':lock_date}
 
     conn.close()
 
