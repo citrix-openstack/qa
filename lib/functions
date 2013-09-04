@@ -48,6 +48,7 @@ GLANCE_REPO openstack glance.git github
 HEATCLIENT_REPO openstack python-heatclient.git github
 HEAT_REPO openstack heat.git github
 HORIZON_REPO openstack horizon.git github
+IRONIC_REPO openstack ironic.git github
 KEYSTONECLIENT_REPO openstack python-keystoneclient.git github
 KEYSTONE_REPO openstack keystone.git github
 NEUTRONCLIENT_REPO openstack python-neutronclient.git github
