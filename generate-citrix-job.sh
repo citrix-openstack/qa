@@ -52,6 +52,11 @@ if [ "$SETUP_TYPE" == "neutron" ]; then
     cat "$THIS_DIR/modifications/use-neutron" >> $EXTENSIONS
 fi
 
+# Configure VLAN Manager if needed
+if [ "$SETUP_TYPE" == "nova-vlan" ]; then
+    cat "$THIS_DIR/modifications/use-vlan" >> $EXTENSIONS
+fi
+
 # Extend template
 sed \
     -e "/$EXTENSION_POINT/r  $EXTENSIONS" \
