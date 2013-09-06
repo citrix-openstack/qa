@@ -10,3 +10,6 @@ ENABLE_TENANT_VLANS="True"
 OVS_VLAN_RANGES="physnet1:1000:1024"
 
 Q_USE_DEBUG_COMMAND=True
+
+# Disable multi host
+MULTI_HOST=0
