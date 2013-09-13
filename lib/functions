@@ -67,6 +67,8 @@ SWIFT3_REPO fujita swift3.git github
 SWIFTCLIENT_REPO openstack python-swiftclient.git github
 SWIFT_REPO openstack swift.git github
 TEMPEST_REPO openstack tempest.git github
+TROVECLIENT_REPO openstack python-troveclient.git github
+TROVE_REPO openstack trove.git github
 EOF
 }
 
