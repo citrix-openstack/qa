@@ -248,6 +248,7 @@ EOF
         echo "   success" | log_info
     else
         echo "   fail" | log_error
+        exit 1
     fi
 }
 
