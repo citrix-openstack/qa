@@ -64,6 +64,17 @@ rm -f nova_suppack.iso
 EOF
 }
 
+function show_devstack_network_config() {
+    local xenserver
+
+    xenserver="$1"
+    shift
+
+    $REMOTELIB/bash.sh root@$xenserver << EOF
+xe vif-list vm-name-label=DevStackOSDomU params=device,network-name-label
+EOF
+}
+
 
 function print_usage_and_die() {
     log_error << EOF
@@ -115,6 +126,9 @@ EOF
 
     echo " - Installing suppack..."
     install_suppack $xenserver $suppack_location
+    echo "   Done" | log_info
+    echo " - Displaying network configuration"
+    show_devstack_network_config $xenserver
     echo "   Done" | log_info
 }
 
