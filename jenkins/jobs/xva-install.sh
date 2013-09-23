@@ -15,7 +15,7 @@ function log_info() {
 
 function log_error() {
     echo -ne "\e[0;31m"
-    cat | sed 's/^/ERROR: /'
+    cat
     echo -ne "\e[0m"
 }
 
@@ -33,6 +33,17 @@ rm -f devstack.xva
 wget -qO devstack.xva $xva_location
 xe vm-import filename=devstack.xva > /dev/null
 rm -f devstack.xva
+EOF
+}
+
+function no_devstack_vm() {
+    local xenserver
+
+    xenserver="$1"
+    shift
+
+    $REMOTELIB/bash.sh root@$xenserver << EOF
+[ -z "\$(xe vm-list name-label=DevStackOSDomU --minimal)" ]
 EOF
 }
 
@@ -56,8 +67,11 @@ EOF
 
 function print_usage_and_die() {
     log_error << EOF
+usage: $0 xenserver xva_location suppack_location
+
+Install a devstack xva together with the nova plugins.
+
 $1
-Usage: $0 xenserver xva_location suppack_location
 EOF
     exit 1
 }
@@ -77,7 +91,7 @@ function main() {
     shift || print_usage_and_die "suppack_location not specified"
     set -u
 
-    log_info << EOF
+    cat << EOF
 Listing parameters
 ------------------
 xenserver:        $xenserver
@@ -85,10 +99,23 @@ xva_location:     $xva_location
 suppack_location: $suppack_location
 
 EOF
-    echo " - Importing xva..." | log_info
+    echo " - Checking for existing devstack machine..."
+    if no_devstack_vm $xenserver; then
+        echo "   No vm found" | log_info
+    else
+        log_error << EOF
+   A VM with the name DevStackOSDomU was found. This function is not yet
+   implemented. Please remove the VM manually, and re-run this script.
+EOF
+        exit 1
+    fi
+    echo " - Importing xva..."
     import_xva_from_url $xenserver $xva_location
-    echo " - Installing suppack..." | log_info
+    echo "   Done" | log_info
+
+    echo " - Installing suppack..."
     install_suppack $xenserver $suppack_location
+    echo "   Done" | log_info
 }
 
 main $@
