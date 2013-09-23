@@ -72,6 +72,7 @@ function show_devstack_network_config() {
 
     $REMOTELIB/bash.sh root@$xenserver << EOF
 xe vif-list vm-name-label=DevStackOSDomU params=device,network-name-label
+xe network-list params=bridge,name-label
 EOF
 }
 
