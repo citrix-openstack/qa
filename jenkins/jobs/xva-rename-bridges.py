@@ -5,7 +5,7 @@ import StringIO
 
 def get_args():
     parser = argparse.ArgumentParser(description='Rename network bridges in an'
-        ' xva file: xapi1 -> xapi101 and xapi2 -> xapi102')
+        ' xva file: xapi1 -> openstack1 and xapi2 -> openstack2')
     parser.add_argument('source_xva_file', help='source xva file')
     parser.add_argument('target_xva_file', help='target xva file')
     return parser.parse_args()
@@ -18,7 +18,7 @@ def hack_xva(src, tgt):
                 with tarfile.open(mode='w|gz', fileobj=tgt_stream) as tgt_tar:
                     original_info = src_tar.next()
                     xml_file = src_tar.extractfile(original_info).read()
-                    modded_xml = xml_file.replace('xapi1', 'xapi101').replace('xapi2', 'xapi102')
+                    modded_xml = xml_file.replace('xapi1', 'openstack1').replace('xapi2', 'openstack2')
 
                     modified_xml_file = StringIO.StringIO(modded_xml)
 
