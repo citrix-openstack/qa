@@ -40,10 +40,20 @@ generate_repos > "$tmpfile"
 # Cherry pick required changes
 while read change; do
     set -e
+
+    if [ -z "$change" ]; then
+        echo "Skipping empty line"
+        continue
+    fi
     user=$(echo "$change" | cut -d"/" -f 1)
     repo=$(echo "$change" | cut -d" " -f 1 | cut -d"/" -f 2)
     change_number=$(echo "$change" | cut -d" " -f 2 | cut -d"/" -f 4)
     changeref=$(echo "$change" | cut -d" " -f 2)
+
+    if [ -z "$user" ] || [ -z "$repo" ] || [ -z "$change_number" ] || [ -z "$changeref" ]; then
+        echo "Failed to get all parameters"
+        exit 1
+    fi
     if grep -q "$user $repo" "$tmpfile"; then
         echo "[CHERRY-PICK-START] $change"
         repo_record=$(grep "$user $repo" "$tmpfile")
