@@ -45,7 +45,7 @@ DEFAULT_INSTANCE_TYPE="m1.tiny"
 #
 # Compute settings
 #
-MULTI_HOST=true
+MULTI_HOST=1
 # our image doesn't have the agent
 EXTRA_OPTS=("xenapi_disable_agent=True")
 OSDOMU_MEM_MB=4096
