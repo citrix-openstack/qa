@@ -73,13 +73,13 @@ VOLUME_BACKING_FILE_SIZE=10000M
 # DISABLE Boot from Volume
 SKIP_EXERCISES="boot_from_volume"
 
-# Use a XenServer Image:
-# IMAGE_URLS="https://github.com/downloads/citrix-openstack/warehouse/cirros-0.3.0-x86_64-disk.vhd.tgz"
-# DEFAULT_IMAGE_NAME="cirros-0.3.0-x86_64-disk"
+# Use a XenServer Image and the standard one
+# The XenServer image is faster, however tempest requires the uec files
+IMAGE_URLS="\
+https://github.com/downloads/citrix-openstack/warehouse/cirros-0.3.0-x86_64-disk.vhd.tgz,\
+http://download.cirros-cloud.net/0.3.1/cirros-0.3.1-x86_64-uec.tar.gz"
 
-# Use a raw Image:
-# IMAGE_URLS="http://copper.eng.hq.xensource.com/builds/raw-cirros-0.3.0-x86_64-disk.img"
-# DEFAULT_IMAGE_NAME="raw-cirros"
+DEFAULT_IMAGE_NAME="cirros-0.3.0-x86_64-disk"
 
 ACTIVE_TIMEOUT=500
 TERMINATE_TIMEOUT=500
