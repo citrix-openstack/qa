@@ -13,9 +13,7 @@ function syntax {
 
 function create_template {
     cat > $1 <<EOF
-#
-# Set passwords to avoid prompts
-#
+# Passwords
 MYSQL_PASSWORD=citrix
 SERVICE_TOKEN=citrix
 ADMIN_PASSWORD=citrix
