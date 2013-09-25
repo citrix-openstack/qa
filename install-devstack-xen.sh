@@ -66,9 +66,8 @@ BOOT_TIMEOUT=500
 #NOVA_BRANCH=build
 
 MULTI_HOST=1
-XEN_FIREWALL_DRIVER=nova.virt.xenapi.firewall.Dom0IptablesFirewallDriver
-# turn off rate limit to help tempest
-
+# XEN_FIREWALL_DRIVER=nova.virt.xenapi.firewall.Dom0IptablesFirewallDriver
+XEN_FIREWALL_DRIVER=nova.virt.firewall.NoopFirewallDriver
 
 #
 # Volume settings
