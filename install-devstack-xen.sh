@@ -62,32 +62,6 @@ VIRT_DRIVER=xenserver
 VOLUME_BACKING_FILE_SIZE=10000M
 
 
-#
-# Networking settings
-#
-
-# MGMT network params
-MGT_IP="dhcp"
-MGT_NETMASK=255.255.255.0
-
-
-# Public network
-PUB_IP=172.24.4.10
-PUB_NETMASK=255.255.255.0
-
-
-# VM network params
-VM_IP=10.255.255.255
-VM_NETMASK=255.255.255.0
-
-
-# Expose OpenStack Services on the management network
-HOST_IP_IFACE="eth2"
-
-# OpenStack VM Settings
-UBUNTU_INST_RELEASE="precise"
-UBUNTU_INST_IFACE="eth2"
-
 # Use a custom repository, and a proxy
 #UBUNTU_INST_HTTP_HOSTNAME="mirror.anl.gov"
 #UBUNTU_INST_HTTP_DIRECTORY="/pub/ubuntu"
