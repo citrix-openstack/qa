@@ -34,9 +34,7 @@ SWIFT_HASH="66a3d6b56c1f479c8b4e70ab5c2000f5"
 #NOVA_BRANCH=build
 
 # TEMPEST SETTINGS
-#
-# Need to be set, otherwise image resize fails (TODO: bug)
-DEFAULT_INSTANCE_TYPE="m1.small"
+DEFAULT_INSTANCE_TYPE="m1.tiny"
 
 
 #
