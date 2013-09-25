@@ -49,6 +49,10 @@ https://github.com/downloads/citrix-openstack/warehouse/cirros-0.3.0-x86_64-disk
 http://download.cirros-cloud.net/0.3.1/cirros-0.3.1-x86_64-uec.tar.gz"
 
 DEFAULT_IMAGE_NAME="cirros-0.3.0-x86_64-disk"
+
+# OpenStack VM settings
+OSDOMU_VDI_GB=40
+
 # Use a combination of openstack master and citrix-openstack citrix-fixes
 # May not be instantly up to date with openstack master
 #NOVA_REPO=https://github.com/citrix-openstack/nova.git
@@ -81,20 +85,13 @@ SKIP_EXERCISES="boot_from_volume"
 ACTIVE_TIMEOUT=500
 TERMINATE_TIMEOUT=500
 
-
-#
-# DevStack settings
-#
+# Devstack Settings
+## Logging
 LOGFILE=/tmp/devstack/log/stack.log
 SCREEN_LOGDIR=/tmp/devstack/log/
-ENABLED_SERVICES+=,tempest,
-
-#
-# XenServer settings
-#
-OSDOMU_VDI_GB=40
-
 VERBOSE=False
+## Enabled services
+ENABLED_SERVICES+=,tempest,
 EOF
 }
 
