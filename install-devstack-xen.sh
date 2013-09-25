@@ -37,22 +37,19 @@ CINDER_SECURE_DELETE=False
 # Tempest
 DEFAULT_INSTANCE_TYPE="m1.tiny"
 
+# Compute settings
+EXTRA_OPTS=("xenapi_disable_agent=True")
+API_RATE_LIMIT=False
+VIRT_DRIVER=xenserver
+
 # Use a combination of openstack master and citrix-openstack citrix-fixes
 # May not be instantly up to date with openstack master
 #NOVA_REPO=https://github.com/citrix-openstack/nova.git
 #NOVA_BRANCH=build
 
-#
-# Compute settings
-#
 MULTI_HOST=1
-# our image doesn't have the agent
-EXTRA_OPTS=("xenapi_disable_agent=True")
-OSDOMU_MEM_MB=4096
 XEN_FIREWALL_DRIVER=nova.virt.xenapi.firewall.Dom0IptablesFirewallDriver
 # turn off rate limit to help tempest
-API_RATE_LIMIT=False
-VIRT_DRIVER=xenserver
 
 
 #
