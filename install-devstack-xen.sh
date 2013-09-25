@@ -42,6 +42,13 @@ EXTRA_OPTS=("xenapi_disable_agent=True")
 API_RATE_LIMIT=False
 VIRT_DRIVER=xenserver
 
+# Use a XenServer Image and the standard one
+# The XenServer image is faster, however tempest requires the uec files
+IMAGE_URLS="\
+https://github.com/downloads/citrix-openstack/warehouse/cirros-0.3.0-x86_64-disk.vhd.tgz,\
+http://download.cirros-cloud.net/0.3.1/cirros-0.3.1-x86_64-uec.tar.gz"
+
+DEFAULT_IMAGE_NAME="cirros-0.3.0-x86_64-disk"
 # Use a combination of openstack master and citrix-openstack citrix-fixes
 # May not be instantly up to date with openstack master
 #NOVA_REPO=https://github.com/citrix-openstack/nova.git
@@ -70,13 +77,6 @@ VOLUME_BACKING_FILE_SIZE=10000M
 # DISABLE Boot from Volume
 SKIP_EXERCISES="boot_from_volume"
 
-# Use a XenServer Image and the standard one
-# The XenServer image is faster, however tempest requires the uec files
-IMAGE_URLS="\
-https://github.com/downloads/citrix-openstack/warehouse/cirros-0.3.0-x86_64-disk.vhd.tgz,\
-http://download.cirros-cloud.net/0.3.1/cirros-0.3.1-x86_64-uec.tar.gz"
-
-DEFAULT_IMAGE_NAME="cirros-0.3.0-x86_64-disk"
 
 ACTIVE_TIMEOUT=500
 TERMINATE_TIMEOUT=500
