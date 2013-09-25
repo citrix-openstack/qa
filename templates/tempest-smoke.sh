@@ -90,7 +90,6 @@ http://download.cirros-cloud.net/0.3.1/cirros-0.3.1-x86_64-uec.tar.gz"
 DEFAULT_IMAGE_NAME="cirros-0.3.0-x86_64-disk"
 
 # OpenStack VM settings
-# OSDOMU_MEM_MB=4096
 OSDOMU_VDI_GB=40
 
 # Exercise settings
