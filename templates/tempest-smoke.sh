@@ -95,7 +95,9 @@ BOOT_TIMEOUT=500
 # DevStack settings
 LOGFILE=/tmp/devstack/log/stack.log
 SCREEN_LOGDIR=/tmp/devstack/log/
-#VERBOSE=True
+
+# Turn off verbose, so console is nice and clean
+VERBOSE=False
 
 # XenAPI specific
 XENAPI_CONNECTION_URL="http://$XENSERVER_IP"
