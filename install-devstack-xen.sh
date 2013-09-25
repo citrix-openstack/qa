@@ -31,6 +31,9 @@ VM_BRIDGE_OR_NET_NAME="osvmnet"
 PUB_BRIDGE_OR_NET_NAME="ospubnet"
 XEN_INT_BRIDGE_OR_NET_NAME="osintnet"
 
+# Do not use secure delete
+CINDER_SECURE_DELETE=False
+
 # Use a combination of openstack master and citrix-openstack citrix-fixes
 # May not be instantly up to date with openstack master
 #NOVA_REPO=https://github.com/citrix-openstack/nova.git
