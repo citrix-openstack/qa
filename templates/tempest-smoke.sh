@@ -62,6 +62,14 @@ SWIFT_HASH="66a3d6b56c1f479c8b4e70ab5c2000f5"
 XEN_XVDB_SIZE_GB=10
 VOLUME_BACKING_DEVICE=/dev/xvdb
 
+# Nice short names, so we could export an XVA
+VM_BRIDGE_OR_NET_NAME="osvmnet"
+PUB_BRIDGE_OR_NET_NAME="ospubnet"
+XEN_INT_BRIDGE_OR_NET_NAME="osintnet"
+
+# As we have nice names, specify FLAT_NETWORK_BRIDGE
+FLAT_NETWORK_BRIDGE="osvmnet"
+
 # Do not use secure delete
 CINDER_SECURE_DELETE=False
 
