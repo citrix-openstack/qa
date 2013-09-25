@@ -53,6 +53,13 @@ DEFAULT_IMAGE_NAME="cirros-0.3.0-x86_64-disk"
 # OpenStack VM settings
 OSDOMU_VDI_GB=40
 
+# Exercise settings
+ACTIVE_TIMEOUT=500
+TERMINATE_TIMEOUT=500
+
+# Increase boot timeout for neutron tests:
+BOOT_TIMEOUT=500
+
 # Use a combination of openstack master and citrix-openstack citrix-fixes
 # May not be instantly up to date with openstack master
 #NOVA_REPO=https://github.com/citrix-openstack/nova.git
@@ -82,8 +89,6 @@ VOLUME_BACKING_FILE_SIZE=10000M
 SKIP_EXERCISES="boot_from_volume"
 
 
-ACTIVE_TIMEOUT=500
-TERMINATE_TIMEOUT=500
 
 # Devstack Settings
 ## Logging
