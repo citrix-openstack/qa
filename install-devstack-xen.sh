@@ -26,7 +26,7 @@ XENAPI_PASSWORD=%XenServerPassword%
 # As swift is enabled by default, we need a hash for it:
 SWIFT_HASH="66a3d6b56c1f479c8b4e70ab5c2000f5"
 
-# Nice short names, so we could export an XVA
+# Nice short names, so we could use them as bridge names as well
 VM_BRIDGE_OR_NET_NAME="osvmnet"
 PUB_BRIDGE_OR_NET_NAME="ospubnet"
 XEN_INT_BRIDGE_OR_NET_NAME="osintnet"
@@ -34,14 +34,13 @@ XEN_INT_BRIDGE_OR_NET_NAME="osintnet"
 # Do not use secure delete
 CINDER_SECURE_DELETE=False
 
+# Tempest
+DEFAULT_INSTANCE_TYPE="m1.tiny"
+
 # Use a combination of openstack master and citrix-openstack citrix-fixes
 # May not be instantly up to date with openstack master
 #NOVA_REPO=https://github.com/citrix-openstack/nova.git
 #NOVA_BRANCH=build
-
-# TEMPEST SETTINGS
-DEFAULT_INSTANCE_TYPE="m1.tiny"
-
 
 #
 # Compute settings
