@@ -15,12 +15,16 @@ EOF
     exit 1
 }
 
-set +u
-HOST="$1"
-shift || print_usage_and_die "No xenserver specified"
-XenServerPassword="$1"
-shift || print_usage_and_die "No xenserver_password specified"
-set -u
+function parse_parameters() {
+    set +u
+    HOST="$1"
+    shift || print_usage_and_die "No xenserver specified"
+    XenServerPassword="$1"
+    shift || print_usage_and_die "No xenserver_password specified"
+    set -u
+}
+
+parse_parameters $@
 
 
 SLAVE_IP=$(run_bash_script_on "root@$HOST" "$THISDIR/xslib/start-slave.sh")
