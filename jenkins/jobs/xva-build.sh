@@ -1,10 +1,23 @@
 #!/bin/bash
 set -eu
 
+function print_usage_and_die() {
+    log_error << EOF
+usage: $0 xenserver xenserver_password
+
+Build a DevStack XVA
+
+$1
+EOF
+    exit 1
+}
+
+set +u
 HOST="$1"
-shift
+shift || print_usage_and_die "No xenserver specified"
 XenServerPassword="$1"
-shift
+shift || print_usage_and_die "No xenserver_password specified"
+set -u
 
 THISDIR=$(cd $(dirname $(readlink -f "$0")) && pwd)
 . "$THISDIR/functions.sh"
