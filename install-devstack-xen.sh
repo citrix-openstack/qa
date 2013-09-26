@@ -13,8 +13,8 @@ function syntax {
     exit 1
 }
 
-function create_template {
-    cat > $1 <<EOF
+function print_template {
+    cat <<EOF
 # Passwords
 MYSQL_PASSWORD=citrix
 SERVICE_TOKEN=citrix
@@ -99,7 +99,7 @@ if [ ! -e $TEMPLATE_LOCALRC ]; then
     echo
     echo "Template localrc $TEMPLATE_LOCALRC not found: generating new template"
     echo
-    create_template $TEMPLATE_LOCALRC
+    print_template > $TEMPLATE_LOCALRC
 fi
 
 # Temporary directory
