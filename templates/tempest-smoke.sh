@@ -1,33 +1,83 @@
 #!/bin/bash
-
 set -eu
 
 function print_usage_and_die
 {
 cat >&2 << EOF
-usage: $0 XENSERVER_IP XENSERVER_PASS
+usage: $0 XENSERVER_IP XENSERVER_PASS [-t TEST_TYPE] [-d DEVSTACK_URL]
 
-A simple script to use devstack to setup an OpenStack, and run tests on it.
+A simple script to use devstack to setup an OpenStack, and optionally
+run tests on it.
 
 positional arguments:
  XENSERVER_IP     The IP address of the XenServer
  XENSERVER_PASS   The root password for the XenServer
+
+optional arguments:
  TEST_TYPE        Type of the tests to run. One of [none, smoke, full]
                   defaults to none
+ DEVSTACK_TGZ     An URL pointing to a tar.gz snapshot of devstack. This
+                  defaults to the official devstack repository.
 
-An example run on github's trunk:
+An example run:
 
 $0 10.219.10.25 mypassword
+
+$@
 EOF
 exit 1
 }
 
-XENSERVER_IP="${1-$(print_usage_and_die)}"
-XENSERVER_PASS="${2-$(print_usage_and_die)}"
+# Defaults for optional arguments
 DEVSTACK_TGZ="https://github.com/openstack-dev/devstack/archive/master.tar.gz"
-TEST_TYPE="${3-none}"
+TEST_TYPE="none"
 
-set -eux
+# Get Positional arguments
+set +u
+XENSERVER_IP="$1"
+shift || print_usage_and_die "ERROR: XENSERVER_IP not specified!"
+XENSERVER_PASS="$1"
+shift || print_usage_and_die "ERROR: XENSERVER_PASS not specified!"
+set +u
+
+# Number of options passed to this script
+REMAINING_OPTIONS="$#"
+
+# Get optional parameters
+set +e
+while getopts ":t:d:" flag; do
+    REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
+    case "$flag" in
+        t)
+            TEST_TYPE="$OPTARG"
+            REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
+            if ! [ "$TEST_TYPE" = "none" -o "$TEST_TYPE" = "smoke" -o "$TEST_TYPE" = "full" ]; then
+                print_usage_and_die "$TEST_TYPE - Invalid value for TEST_TYPE"
+            fi
+            ;;
+        d)
+            DEVSTACK_TGZ="$OPTARG"
+            REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
+            ;;
+        \?)
+            print_usage_and_die "Invalid option -$OPTARG"
+            ;;
+    esac
+done
+set -e
+
+# Make sure that all options processed
+if [ "0" != "$REMAINING_OPTIONS" ]; then
+    print_usage_and_die "ERROR: some arguments were not recognised!"
+fi
+
+# Print out summary
+cat << EOF
+XENSERVER_IP:   $XENSERVER_IP
+XENSERVER_PASS: $XENSERVER_PASS
+TEST_TYPE:      $TEST_TYPE
+DEVSTACK_TGZ:   $DEVSTACK_TGZ
+EOF
 
 function remote_bash() {
     ssh -q \
