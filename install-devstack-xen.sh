@@ -4,8 +4,7 @@
 # the specified XenServer.
 set -e
 
-thisdir=$(dirname $(readlink -f "$0"))
-TEMPLATE_LOCALRC="${thisdir}/localrc.template"
+TEMPLATE_LOCALRC="localrc.template"
 
 function syntax {
     echo "Syntax: $0 <private key> <host> <root password>"
