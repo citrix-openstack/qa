@@ -7,23 +7,6 @@ XSLIB=$(cd $(dirname $(readlink -f "$0")) && cd xslib && pwd)
 
 . "$THISDIR/functions.sh"
 
-function import_xva_from_url() {
-    local xenserver
-    local xva_location
-
-    xenserver="$1"
-    shift
-    xva_location="$1"
-    shift
-
-    remote_bash root@$xenserver << EOF
-rm -f devstack.xva
-wget -qO devstack.xva $xva_location
-xe vm-import filename=devstack.xva > /dev/null
-rm -f devstack.xva
-EOF
-}
-
 function devstack_vm_stopped() {
     local xenserver
 
