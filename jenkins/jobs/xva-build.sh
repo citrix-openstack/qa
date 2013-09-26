@@ -1,6 +1,11 @@
 #!/bin/bash
 set -eu
 
+HOST="$1"
+shift
+XenServerPassword="$1"
+shift
+
 THISDIR=$(cd $(dirname $(readlink -f "$0")) && pwd)
 . "$THISDIR/functions.sh"
 
