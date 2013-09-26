@@ -2,21 +2,11 @@
 
 set -eu
 
+THISDIR=$(cd $(dirname $(readlink -f "$0")) && pwd)
 XSLIB=$(cd $(dirname $(readlink -f "$0")) && cd xslib && pwd)
 REMOTELIB=$(cd $(dirname $(readlink -f "$0")) && cd remote && pwd)
 
-function log_info() {
-    echo -ne "\e[0;32m"
-    cat
-    echo -ne "\e[0m"
-}
-
-
-function log_error() {
-    echo -ne "\e[0;31m"
-    cat
-    echo -ne "\e[0m"
-}
+. "$THISDIR/functions.sh"
 
 function import_xva_from_url() {
     local xenserver
