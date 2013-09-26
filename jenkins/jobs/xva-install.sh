@@ -3,7 +3,6 @@
 set -eu
 
 THISDIR=$(cd $(dirname $(readlink -f "$0")) && pwd)
-XSLIB=$(cd $(dirname $(readlink -f "$0")) && cd xslib && pwd)
 
 . "$THISDIR/functions.sh"
 
