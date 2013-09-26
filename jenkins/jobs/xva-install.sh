@@ -4,7 +4,6 @@ set -eu
 
 THISDIR=$(cd $(dirname $(readlink -f "$0")) && pwd)
 XSLIB=$(cd $(dirname $(readlink -f "$0")) && cd xslib && pwd)
-REMOTELIB=$(cd $(dirname $(readlink -f "$0")) && cd remote && pwd)
 
 . "$THISDIR/functions.sh"
 
@@ -17,7 +16,7 @@ function import_xva_from_url() {
     xva_location="$1"
     shift
 
-    $REMOTELIB/bash.sh root@$xenserver << EOF
+    remote_bash root@$xenserver << EOF
 rm -f devstack.xva
 wget -qO devstack.xva $xva_location
 xe vm-import filename=devstack.xva > /dev/null
@@ -31,7 +30,7 @@ function no_devstack_vm() {
     xenserver="$1"
     shift
 
-    $REMOTELIB/bash.sh root@$xenserver << EOF
+    remote_bash root@$xenserver << EOF
 [ -z "\$(xe vm-list name-label=DevStackOSDomU --minimal)" ]
 EOF
 }
@@ -45,7 +44,7 @@ function install_suppack() {
     suppack_location="$1"
     shift
 
-    $REMOTELIB/bash.sh root@$xenserver << EOF
+    remote_bash root@$xenserver << EOF
 rm -f nova_suppack.iso
 wget -qO nova_suppack.iso $suppack_location
 echo "Y" | xe-install-supplemental-pack nova_suppack.iso > /dev/null
@@ -59,7 +58,7 @@ function show_devstack_network_config() {
     xenserver="$1"
     shift
 
-    $REMOTELIB/bash.sh root@$xenserver << EOF
+    remote_bash root@$xenserver << EOF
 xe vif-list vm-name-label=DevStackOSDomU params=device,network-name-label
 xe network-list params=bridge,name-label
 EOF

@@ -13,3 +13,17 @@ function log_error() {
     cat
     echo -ne "\e[0m"
 }
+
+
+function remote_bash() {
+    local server
+    server="$1"
+
+    shift
+
+    ssh -q \
+        -o Batchmode=yes \
+        -o StrictHostKeyChecking=no \
+        -o UserKnownHostsFile=/dev/null \
+        "$server" bash -s -- "$@"
+}

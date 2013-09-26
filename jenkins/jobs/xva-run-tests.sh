@@ -4,7 +4,6 @@ set -eu
 
 THISDIR=$(cd $(dirname $(readlink -f "$0")) && pwd)
 XSLIB=$(cd $(dirname $(readlink -f "$0")) && cd xslib && pwd)
-REMOTELIB=$(cd $(dirname $(readlink -f "$0")) && cd remote && pwd)
 
 . "$THISDIR/functions.sh"
 
@@ -17,7 +16,7 @@ function import_xva_from_url() {
     xva_location="$1"
     shift
 
-    $REMOTELIB/bash.sh root@$xenserver << EOF
+    remote_bash root@$xenserver << EOF
 rm -f devstack.xva
 wget -qO devstack.xva $xva_location
 xe vm-import filename=devstack.xva > /dev/null
@@ -31,7 +30,7 @@ function devstack_vm_stopped() {
     xenserver="$1"
     shift
 
-    $REMOTELIB/bash.sh root@$xenserver << EOF
+    remote_bash root@$xenserver << EOF
 [ "halted" = "\$(xe vm-list name-label=DevStackOSDomU params=power-state --minimal)" ]
 EOF
 }
@@ -42,7 +41,7 @@ function stop_devstack_vm() {
     xenserver="$1"
     shift
 
-    $REMOTELIB/bash.sh root@$xenserver << EOF
+    remote_bash root@$xenserver << EOF
 xe vm-shutdown name-label=DevStackOSDomU
 while [ "halted" != "\$(xe vm-list name-label=DevStackOSDomU params=power-state --minimal)" ]; do
     sleep 1
@@ -58,7 +57,7 @@ function start_devstack_vm() {
     xenserver="$1"
     shift
 
-    $REMOTELIB/bash.sh root@$xenserver << EOF
+    remote_bash root@$xenserver << EOF
 xe vm-start name-label=DevStackOSDomU
 while [ "running" != "\$(xe vm-list name-label=DevStackOSDomU params=power-state --minimal)" ]; do
     sleep 1
@@ -73,7 +72,7 @@ function wait_for_devstack_network() {
     xenserver="$1"
     shift
 
-    $REMOTELIB/bash.sh root@$xenserver << EOF
+    remote_bash root@$xenserver << EOF
 while true; do
     IP=\$(xe vm-list name-label=DevStackOSDomU params=networks --minimal | sed -ne "s,^.*0/ip: \\([0-9.]*\\).*\\$,\1,p")
     if [ -z "\$IP" ]; then
@@ -93,7 +92,7 @@ function get_devstack_ip() {
     xenserver="$1"
     shift
 
-    $REMOTELIB/bash.sh root@$xenserver << EOF
+    remote_bash root@$xenserver << EOF
 xe vm-list name-label=DevStackOSDomU params=networks --minimal | sed -ne "s,^.*0/ip: \\([0-9.]*\\).*\\$,\1,p"
 EOF
 }
