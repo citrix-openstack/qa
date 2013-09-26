@@ -27,3 +27,15 @@ function remote_bash() {
         -o UserKnownHostsFile=/dev/null \
         "$server" bash -s -- "$@"
 }
+
+
+function run_bash_script_on() {
+    local server
+    local script
+
+    server="$1"
+    script="$2"
+    shift 2
+
+    cat "$script" | remote_bash "$server" $@
+}
