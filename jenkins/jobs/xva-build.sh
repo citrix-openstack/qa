@@ -14,7 +14,7 @@ function run_on
     ssh -o StrictHostKeyChecking=no ubuntu@$THE_IP "chmod 755 $TEMPSCRIPT && ($TEMPSCRIPT $@) && rm $TEMPSCRIPT"
 }
 
-SLAVE_IP=$("jenkins/devstack-xen/run-on-xenserver.sh" "$HOST" "jenkins/jobs/xslib/start-slave.sh")
+SLAVE_IP=$("jenkins/devstack-xen/run-on-xenserver.sh" "$HOST" "$THISDIR/xslib/start-slave.sh")
 
 echo "Building Devstack XVA"
 run_on "$SLAVE_IP" "$THISDIR/builds/build-devstack-xva-online-stage1.sh" "$HOST" "$XenServerPassword"
