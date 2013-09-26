@@ -60,11 +60,6 @@ TERMINATE_TIMEOUT=500
 # Increase boot timeout for neutron tests:
 BOOT_TIMEOUT=500
 
-# Use a combination of openstack master and citrix-openstack citrix-fixes
-# May not be instantly up to date with openstack master
-#NOVA_REPO=https://github.com/citrix-openstack/nova.git
-#NOVA_BRANCH=build
-
 MULTI_HOST=1
 # XEN_FIREWALL_DRIVER=nova.virt.xenapi.firewall.Dom0IptablesFirewallDriver
 XEN_FIREWALL_DRIVER=nova.virt.firewall.NoopFirewallDriver
@@ -74,7 +69,6 @@ XEN_FIREWALL_DRIVER=nova.virt.firewall.NoopFirewallDriver
 #
 # make tempest pass by having bigger volume file
 VOLUME_BACKING_FILE_SIZE=10000M
-
 
 # Use a custom repository, and a proxy
 #UBUNTU_INST_HTTP_HOSTNAME="mirror.anl.gov"
@@ -167,10 +161,7 @@ set -x
 # $DevStackURL (optional) - URL of the devstack zip file
 # $CleanTemplates (default:false) - If true, clean the templates
 
-# The citrix-openstack/devstack/build repository is slightly behind (up to a day) trunk
-# but incorporates some fixes that may not have been committed to trunk yet from 
-# citrix-openstack/devstack/citrix-fixes.
-DevStackURL=${DevStackURL-"https://github.com/citrix-openstack/devstack/zipball/build"}
+DevStackURL=${DevStackURL-"https://github.com/openstack-dev/devstack/zipball/master"}
 CleanTemplates="${CleanTemplates-true}"
 DhcpTimeout=120
 
