@@ -1,6 +1,9 @@
 #!/bin/bash
 set -eu
 
+THISDIR=$(cd $(dirname $(readlink -f "$0")) && pwd)
+. "$THISDIR/functions.sh"
+
 function print_usage_and_die() {
     log_error << EOF
 usage: $0 xenserver xenserver_password
@@ -19,8 +22,6 @@ XenServerPassword="$1"
 shift || print_usage_and_die "No xenserver_password specified"
 set -u
 
-THISDIR=$(cd $(dirname $(readlink -f "$0")) && pwd)
-. "$THISDIR/functions.sh"
 
 SLAVE_IP=$(run_bash_script_on "root@$HOST" "$THISDIR/xslib/start-slave.sh")
 
