@@ -4,6 +4,9 @@
 # the specified XenServer.
 set -e
 
+thisdir=$(dirname $(readlink -f "$0"))
+TEMPLATE_LOCALRC="${thisdir}/localrc.template"
+
 function syntax {
     echo "Syntax: $0 <private key> <host> <root password>"
     echo "Environment variables \$PrivID, \$Server and"\
@@ -93,8 +96,6 @@ ENABLED_SERVICES+=,tempest,
 EOF
 }
 
-thisdir=$(dirname $(readlink -f "$0"))
-TEMPLATE_LOCALRC="${thisdir}/localrc.template"
 if [ ! -e $TEMPLATE_LOCALRC ]; then
     echo
     echo "Template localrc $TEMPLATE_LOCALRC not found: generating new template"
