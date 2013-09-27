@@ -147,6 +147,10 @@ function on_xenserver() {
     ssh $_SSH_OPTIONS "root@$XENSERVER" bash -s --
 }
 
+echo -n "Generate id_rsa.pub..."
+echo "ssh-keygen -y -f .ssh/id_rsa > .ssh/id_rsa.pub" | on_xenserver
+echo "OK"
+
 echo -n "Verify that XenServer can log in to itself..."
 if echo "ssh -o StrictHostKeyChecking=no $XENSERVER true" | on_xenserver; then
     echo "OK"
