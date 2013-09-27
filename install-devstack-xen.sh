@@ -4,13 +4,13 @@ set -eu
 function print_usage_and_die
 {
 cat >&2 << EOF
-usage: $0 XENSERVER_IP XENSERVER_PASS PRIVKEY [-t TEST_TYPE] [-d DEVSTACK_URL] [-f]
+usage: $0 XENSERVER XENSERVER_PASS PRIVKEY [-t TEST_TYPE] [-d DEVSTACK_URL] [-f]
 
 A simple script to use devstack to setup an OpenStack, and optionally
 run tests on it.
 
 positional arguments:
- XENSERVER_IP     The IP address of the XenServer
+ XENSERVER        The address of the XenServer
  XENSERVER_PASS   The root password for the XenServer
  PRIVKEY          A passwordless private key to be used for installation.
                   This key will be copied over to the xenserver host, and will
@@ -48,8 +48,8 @@ FORCE_SR_REPLACEMENT="false"
 
 # Get Positional arguments
 set +u
-XENSERVER_IP="$1"
-shift || print_usage_and_die "ERROR: XENSERVER_IP not specified!"
+XENSERVER="$1"
+shift || print_usage_and_die "ERROR: XENSERVER not specified!"
 XENSERVER_PASS="$1"
 shift || print_usage_and_die "ERROR: XENSERVER_PASS not specified!"
 PRIVKEY="$1"
@@ -100,7 +100,7 @@ _SSH_OPTIONS="\
 
 # Print out summary
 cat << EOF
-XENSERVER_IP:   $XENSERVER_IP
+XENSERVER:      $XENSERVER
 XENSERVER_PASS: $XENSERVER_PASS
 PRIVKEY:        $PRIVKEY
 TEST_TYPE:      $TEST_TYPE
@@ -115,23 +115,23 @@ ssh-keygen -y -f $PRIVKEY > "$tmp_dir/devstack.pub"
 sshpass -p "$XENSERVER_PASS" \
     ssh-copy-id \
         -i "$tmp_dir/devstack.pub" \
-        root@$XENSERVER_IP > /dev/null 2>&1
+        root@$XENSERVER > /dev/null 2>&1
 rm -rf "$tmp_dir"
 unset tmp_dir
 echo "OK"
 
 echo -n "Set up the key as the xenserver's private key..."
-scp $_SSH_OPTIONS $PRIVKEY "root@$XENSERVER_IP:.ssh/id_rsa"
+scp $_SSH_OPTIONS $PRIVKEY "root@$XENSERVER:.ssh/id_rsa"
 echo "OK"
 
 # Helper function
 function on_xenserver() {
-    ssh $_SSH_OPTIONS "root@$XENSERVER_IP" bash -s --
+    ssh $_SSH_OPTIONS "root@$XENSERVER" bash -s --
 }
 
 echo -n "Verify that XenServer can log in to itself..."
 on_xenserver << END_OF_CHECK_KEY_SETUP
-ssh -o StrictHostKeyChecking=no $XENSERVER_IP true
+ssh -o StrictHostKeyChecking=no $XENSERVER true
 END_OF_CHECK_KEY_SETUP
 echo "OK"
 
@@ -174,6 +174,17 @@ if [ "\$(xe sr-param-get uuid=\$defaultSR param-name=type)" != "ext" ]; then
     exit 1
 fi
 END_OF_SR_OPERATIONS
+echo "OK"
+
+echo -n "Get the IP address of XenServer..."
+XENSERVER_IP=$(on_xenserver << GET_XENSERVER_IP
+ifconfig xenbr0 | grep "inet addr" | cut -d ":" -f2 | sed "s/ .*//"
+GET_XENSERVER_IP
+)
+if [ -z "$XENSERVER_IP" ]; then
+    echo "Failed to detect the IP address of XenServer"
+    exit 1
+fi
 echo "OK"
 
 TMPDIR=$(echo "mktemp -d" | on_xenserver)
