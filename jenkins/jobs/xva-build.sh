@@ -21,6 +21,7 @@ function parse_parameters() {
     shift || print_usage_and_die "No xenserver specified"
     XenServerPassword="$1"
     shift || print_usage_and_die "No xenserver_password specified"
+    SETUPSCRIPT_URL="${1:-"https://raw.github.com/citrix-openstack/qa/master/install-devstack-xen.sh"}"
     set -u
 }
 
@@ -33,7 +34,7 @@ echo "Worker: $WORKER"
 
 echo "Building Devstack XVA" | log_info
 run_bash_script_on "$WORKER" \
-    "$THISDIR/builds/build-devstack-xva-online-stage1.sh" "$HOST" "$XenServerPassword"
+    "$THISDIR/builds/build-devstack-xva-online-stage1.sh" "$HOST" "$XenServerPassword" "$SETUPSCRIPT_URL"
 run_bash_script_on "$WORKER" \
     "$THISDIR/builds/build-devstack-xva-online-stage2.sh" "$HOST" "$XenServerPassword"
 
