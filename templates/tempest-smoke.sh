@@ -4,7 +4,7 @@ set -eu
 function print_usage_and_die
 {
 cat >&2 << EOF
-usage: $0 XENSERVER_IP XENSERVER_PASS PRIVKEY [-t TEST_TYPE] [-d DEVSTACK_URL]
+usage: $0 XENSERVER_IP XENSERVER_PASS PRIVKEY [-t TEST_TYPE] [-d DEVSTACK_URL] [-f]
 
 A simple script to use devstack to setup an OpenStack, and optionally
 run tests on it.
@@ -23,6 +23,11 @@ optional arguments:
  DEVSTACK_TGZ     An URL pointing to a tar.gz snapshot of devstack. This
                   defaults to the official devstack repository.
 
+flags:
+ -f               Force SR replacement. If your XenServer has an LVM type SR,
+                  it will be destroyed and replaced with an ext SR.
+                  WARNING: This will destroy your actual default SR !
+
 An example run:
 
   # Create a passwordless ssh key
@@ -39,6 +44,7 @@ exit 1
 # Defaults for optional arguments
 DEVSTACK_TGZ="https://github.com/openstack-dev/devstack/archive/master.tar.gz"
 TEST_TYPE="none"
+FORCE_SR_REPLACEMENT="false"
 
 # Get Positional arguments
 set +u
@@ -55,7 +61,7 @@ REMAINING_OPTIONS="$#"
 
 # Get optional parameters
 set +e
-while getopts ":t:d:" flag; do
+while getopts ":t:d:f" flag; do
     REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
     case "$flag" in
         t)
@@ -68,6 +74,9 @@ while getopts ":t:d:" flag; do
         d)
             DEVSTACK_TGZ="$OPTARG"
             REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
+            ;;
+        f)
+            FORCE_SR_REPLACEMENT="true"
             ;;
         \?)
             print_usage_and_die "Invalid option -$OPTARG"
@@ -96,6 +105,8 @@ XENSERVER_PASS: $XENSERVER_PASS
 PRIVKEY:        $PRIVKEY
 TEST_TYPE:      $TEST_TYPE
 DEVSTACK_TGZ:   $DEVSTACK_TGZ
+
+FORCE_SR_REPLACEMENT: $FORCE_SR_REPLACEMENT
 EOF
 
 echo -n "Authenticate the key with XenServer..."
@@ -122,6 +133,47 @@ echo -n "Verify that XenServer can log in to itself..."
 on_xenserver << END_OF_CHECK_KEY_SETUP
 ssh -o StrictHostKeyChecking=no $XENSERVER_IP true
 END_OF_CHECK_KEY_SETUP
+echo "OK"
+
+echo -n "Verify XenServer has an ext type default SR..."
+on_xenserver << END_OF_SR_OPERATIONS
+set -eu
+
+# Verify the host is suitable for devstack
+defaultSR=\$(xe pool-list params=default-SR minimal=true)
+if [ "\$(xe sr-param-get uuid=\$defaultSR param-name=type)" != "ext" ]; then
+    if [ "true" == "$FORCE_SR_REPLACEMENT" ]; then
+        echo ""
+        echo ""
+        echo "Trying to replace the default SR with an EXT SR"
+
+        pbd_uuid=\`xe pbd-list sr-uuid=\$defaultSR minimal=true\`
+        host_uuid=\`xe pbd-param-get uuid=\$pbd_uuid param-name=host-uuid\`
+        use_device=\`xe pbd-param-get uuid=\$pbd_uuid param-name=device-config param-key=device\`
+
+        # Destroy the existing SR
+        xe pbd-unplug uuid=\$pbd_uuid
+        xe sr-destroy uuid=\$defaultSR
+
+        sr_uuid=\`xe sr-create content-type=user host-uuid=\$host_uuid type=ext device-config:device=\$use_device shared=false name-label="Local storage"\`
+        pool_uuid=\`xe pool-list minimal=true\`
+        xe pool-param-set default-SR=\$sr_uuid uuid=\$pool_uuid
+        xe pool-param-set suspend-image-SR=\$sr_uuid uuid=\$pool_uuid
+        xe sr-param-add uuid=\$sr_uuid param-name=other-config i18n-key=local-storage
+        exit 0
+    fi
+    echo ""
+    echo ""
+    echo "ERROR: The xenserver host must have an EXT3 SR as the default SR"
+    echo "Use the -f flag to destroy the current default SR and create a new"
+    echo "ext type default SR."
+    echo ""
+    echo "WARNING: This will destroy your actual default SR !"
+    echo ""
+
+    exit 1
+fi
+END_OF_SR_OPERATIONS
 echo "OK"
 
 TMPDIR=$(echo "mktemp -d" | on_xenserver)
