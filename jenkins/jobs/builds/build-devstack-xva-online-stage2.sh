@@ -97,6 +97,23 @@ xecommand vbd-unplug uuid=$SLAVEVWBDUUID
 xecommand vbd-destroy uuid=$SLAVEVWBDUUID
 xecommand vbd-create vm-uuid=$VMUUID vdi-uuid=$WVDIUUID device=0 bootable=true
 
+# Re-create XVDB
+CINDER_VBD=$(xecommand vbd-list vm-name-label=DevStackOSDomU device=xvdb --minimal)
+
+if [ -n "$CINDER_VBD" ]; then
+    vdi=$(xecommand vbd-param-get param-name=vdi-uuid uuid=$CINDER_VBD)
+    virtual_size=$(xecommand vdi-param-get param-name=virtual-size uuid=$vdi --minimal)
+    localsr=$(xecommand vdi-param-get param-name=sr-uuid uuid=$vdi --minimal)
+    xecommand vbd-destroy uuid=$CINDER_VBD
+    xecommand vdi-destroy uuid=$vdi
+    vdi=$(xecommand vdi-create \
+        name-label="Cinder volumes" \
+        virtual_size=$virtual_size \
+        sr-uuid=$localsr \
+        type=user)
+    xecommand vbd-create vm-uuid=$VMUUID vdi-uuid=$vdi device=1
+fi
+
 # Export the XVA 
 xecommand vm-export filename=devstack_original.xva compress=true vm="DevStackOSDomU" include-snapshots=false
 
