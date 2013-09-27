@@ -67,7 +67,7 @@ xecommand vm-shutdown vm=$VMUUID
 
 # Repackage the vhd inorder to minimize its size
 SLAVEUUID=$(xecommand vm-list name-label=slave --minimal)
-RVBDUUID=$(xecommand vbd-list vm-uuid=$VMUUID --minimal)
+RVBDUUID=$(xecommand vbd-list vm-uuid=$VMUUID device=xvda --minimal)
 RVDIUUID=$(xecommand vbd-param-get uuid=$RVBDUUID param-name=vdi-uuid)
 xecommand vbd-destroy uuid=$RVBDUUID || true
 SLAVERVBDUUID=$(xecommand vbd-create vm-uuid=$SLAVEUUID vdi-uuid=$RVDIUUID device=4)
