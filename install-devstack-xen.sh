@@ -27,6 +27,8 @@ flags:
  -f               Force SR replacement. If your XenServer has an LVM type SR,
                   it will be destroyed and replaced with an ext SR.
                   WARNING: This will destroy your actual default SR !
+ -w               Wipe the /root/.ssh directory of your XenServer.
+                  WARNING: This will remove all your keys from XenServer.
 
 An example run:
 
@@ -45,6 +47,7 @@ exit 1
 DEVSTACK_TGZ="https://github.com/openstack-dev/devstack/archive/master.tar.gz"
 TEST_TYPE="none"
 FORCE_SR_REPLACEMENT="false"
+WIPE_SSH_CONFIG="false"
 
 # Get Positional arguments
 set +u
@@ -61,7 +64,7 @@ REMAINING_OPTIONS="$#"
 
 # Get optional parameters
 set +e
-while getopts ":t:d:f" flag; do
+while getopts ":t:d:fw" flag; do
     REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
     case "$flag" in
         t)
@@ -77,6 +80,9 @@ while getopts ":t:d:f" flag; do
             ;;
         f)
             FORCE_SR_REPLACEMENT="true"
+            ;;
+        w)
+            WIPE_SSH_CONFIG="true"
             ;;
         \?)
             print_usage_and_die "Invalid option -$OPTARG"
@@ -107,7 +113,19 @@ TEST_TYPE:      $TEST_TYPE
 DEVSTACK_TGZ:   $DEVSTACK_TGZ
 
 FORCE_SR_REPLACEMENT: $FORCE_SR_REPLACEMENT
+WIPE_SSH_CONFIG:      $WIPE_SSH_CONFIG
 EOF
+
+if [ "true" = "$WIPE_SSH_CONFIG" ]; then
+    echo -n "Wiping root user's .ssh directory on XenServer..."
+    sshpass -p "$XENSERVER_PASS" \
+        ssh \
+            -q \
+            -o StrictHostKeyChecking=no \
+            -o UserKnownHostsFile=/dev/null \
+            root@$XENSERVER "rm -rf .ssh"
+    echo "OK"
+fi
 
 echo -n "Authenticate the key with XenServer..."
 tmp_dir="$(mktemp -d)"
@@ -130,10 +148,17 @@ function on_xenserver() {
 }
 
 echo -n "Verify that XenServer can log in to itself..."
-on_xenserver << END_OF_CHECK_KEY_SETUP
-ssh -o StrictHostKeyChecking=no $XENSERVER true
-END_OF_CHECK_KEY_SETUP
-echo "OK"
+if echo "ssh -o StrictHostKeyChecking=no $XENSERVER true" | on_xenserver; then
+    echo "OK"
+else
+    echo ""
+    echo ""
+    echo "ERROR: XenServer couldn't authenticate to itself. This might"
+    echo "be caused by having a key originally installed on XenServer"
+    echo "consider using the -w parameter to wipe all your ssh settings"
+    echo "on XenServer."
+    exit 1
+fi
 
 echo -n "Verify XenServer has an ext type default SR..."
 on_xenserver << END_OF_SR_OPERATIONS
