@@ -4,7 +4,7 @@ set -eu
 function print_usage_and_die
 {
 cat >&2 << EOF
-usage: $0 XENSERVER_IP XENSERVER_PASS [-t TEST_TYPE] [-d DEVSTACK_URL]
+usage: $0 XENSERVER_IP XENSERVER_PASS PRIVKEY [-t TEST_TYPE] [-d DEVSTACK_URL]
 
 A simple script to use devstack to setup an OpenStack, and optionally
 run tests on it.
@@ -12,6 +12,10 @@ run tests on it.
 positional arguments:
  XENSERVER_IP     The IP address of the XenServer
  XENSERVER_PASS   The root password for the XenServer
+ PRIVKEY          A passwordless private key to be used for installation.
+                  This key will be copied over to the xenserver host, and will
+                  be used for migration/resize tasks if multiple XenServers
+                  used.
 
 optional arguments:
  TEST_TYPE        Type of the tests to run. One of [none, smoke, full]
@@ -21,7 +25,11 @@ optional arguments:
 
 An example run:
 
-$0 10.219.10.25 mypassword
+  # Create a passwordless ssh key
+  ssh-keygen -t rsa -N "" -f devstack_key.priv
+
+  # Install devstack on XenServer 10.219.10.25
+  $0 10.219.10.25 mypassword devstack_key.priv
 
 $@
 EOF
@@ -38,7 +46,9 @@ XENSERVER_IP="$1"
 shift || print_usage_and_die "ERROR: XENSERVER_IP not specified!"
 XENSERVER_PASS="$1"
 shift || print_usage_and_die "ERROR: XENSERVER_PASS not specified!"
-set +u
+PRIVKEY="$1"
+shift || print_usage_and_die "ERROR: PRIVKEY not specified!"
+set -u
 
 # Number of options passed to this script
 REMAINING_OPTIONS="$#"
@@ -71,25 +81,52 @@ if [ "0" != "$REMAINING_OPTIONS" ]; then
     print_usage_and_die "ERROR: some arguments were not recognised!"
 fi
 
+# Set up internal variables
+_SSH_OPTIONS="\
+    -q \
+    -o BatchMode=yes \
+    -o StrictHostKeyChecking=no \
+    -o UserKnownHostsFile=/dev/null \
+    -i $PRIVKEY"
+
 # Print out summary
 cat << EOF
 XENSERVER_IP:   $XENSERVER_IP
 XENSERVER_PASS: $XENSERVER_PASS
+PRIVKEY:        $PRIVKEY
 TEST_TYPE:      $TEST_TYPE
 DEVSTACK_TGZ:   $DEVSTACK_TGZ
 EOF
 
-function remote_bash() {
-    ssh -q \
-        -o Batchmode=yes \
-        -o StrictHostKeyChecking=no \
-        -o UserKnownHostsFile=/dev/null \
-        "root@$XENSERVER_IP" bash -s --
+echo -n "Authenticate the key with XenServer..."
+tmp_dir="$(mktemp -d)"
+ssh-keygen -y -f $PRIVKEY > "$tmp_dir/devstack.pub"
+sshpass -p "$XENSERVER_PASS" \
+    ssh-copy-id \
+        -i "$tmp_dir/devstack.pub" \
+        root@$XENSERVER_IP > /dev/null 2>&1
+rm -rf "$tmp_dir"
+unset tmp_dir
+echo "OK"
+
+echo -n "Set up the key as the xenserver's private key..."
+scp $_SSH_OPTIONS $PRIVKEY "root@$XENSERVER_IP:.ssh/id_rsa"
+echo "OK"
+
+# Helper function
+function on_xenserver() {
+    ssh $_SSH_OPTIONS "root@$XENSERVER_IP" bash -s --
 }
 
-TMPDIR=$(echo "mktemp -d" | remote_bash)
+echo -n "Verify that XenServer can log in to itself..."
+on_xenserver << END_OF_CHECK_KEY_SETUP
+ssh -o StrictHostKeyChecking=no $XENSERVER_IP true
+END_OF_CHECK_KEY_SETUP
+echo "OK"
 
-remote_bash << END_OF_XENSERVER_COMMANDS
+TMPDIR=$(echo "mktemp -d" | on_xenserver)
+
+on_xenserver << END_OF_XENSERVER_COMMANDS
 set -exu
 cd $TMPDIR
 
@@ -186,7 +223,7 @@ if [ "$TEST_TYPE" == "none" ]; then
 fi
 
 # Run tests
-remote_bash << END_OF_XENSERVER_COMMANDS
+on_xenserver << END_OF_XENSERVER_COMMANDS
 set -exu
 cd $TMPDIR
 cd devstack*
