@@ -16,4 +16,4 @@ wget -qO install-devstack-xen.sh "$SETUPSCRIPT_URL"
 chmod 755 install-devstack-xen.sh
 rm -f $TEMPKEYFILE
 ssh-keygen -t rsa -N "" -f $TEMPKEYFILE
-./install-devstack-xen.sh $TEMPKEYFILE $XENSERVERHOST $XENSERVERPASSWORD
+./install-devstack-xen.sh $XENSERVERHOST $XENSERVERPASSWORD $TEMPKEYFILE
