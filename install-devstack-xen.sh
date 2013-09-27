@@ -218,7 +218,8 @@ PUB_BRIDGE_OR_NET_NAME="ospubnet"
 XEN_INT_BRIDGE_OR_NET_NAME="osintnet"
 
 # As we have nice names, specify FLAT_NETWORK_BRIDGE
-FLAT_NETWORK_BRIDGE="osvmnet"
+# This requires https://review.openstack.org/48296 to land
+# FLAT_NETWORK_BRIDGE="osvmnet"
 
 # Do not use secure delete
 CINDER_SECURE_DELETE=False

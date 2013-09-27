@@ -47,6 +47,9 @@ NEUTRON_ZIPBALL_URL="http://gold.eng.hq.xensource.com/git/internal/builds/neutro
 EOF
 } >> "$EXTENSIONS"
 
+# Set FLAT_NETWORK_BRIDGE
+echo "FLAT_NETWORK_BRIDGE=osvmnet" >> $EXTENSIONS
+
 # Configure neutron if needed
 if [ "$SETUP_TYPE" == "neutron" ]; then
     cat "$THIS_DIR/modifications/use-neutron" >> $EXTENSIONS
