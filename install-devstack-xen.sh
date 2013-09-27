@@ -1,37 +1,213 @@
 #!/bin/bash
-#
-# This script installs a DevStack DomU VM on
-# the specified XenServer.
-set -e
+set -eu
 
-TEMPLATE_LOCALRC="localrc.template"
+function print_usage_and_die
+{
+cat >&2 << EOF
+usage: $0 XENSERVER_IP XENSERVER_PASS PRIVKEY [-t TEST_TYPE] [-d DEVSTACK_URL] [-f]
 
-function syntax {
-    echo "Syntax: $0 <private key> <host> <root password>"
-    echo "Environment variables \$PrivID, \$Server and"\
-	" \$XenServerPassword can be used as an alternative"
-    exit 1
+A simple script to use devstack to setup an OpenStack, and optionally
+run tests on it.
+
+positional arguments:
+ XENSERVER_IP     The IP address of the XenServer
+ XENSERVER_PASS   The root password for the XenServer
+ PRIVKEY          A passwordless private key to be used for installation.
+                  This key will be copied over to the xenserver host, and will
+                  be used for migration/resize tasks if multiple XenServers
+                  used.
+
+optional arguments:
+ TEST_TYPE        Type of the tests to run. One of [none, smoke, full]
+                  defaults to none
+ DEVSTACK_TGZ     An URL pointing to a tar.gz snapshot of devstack. This
+                  defaults to the official devstack repository.
+
+flags:
+ -f               Force SR replacement. If your XenServer has an LVM type SR,
+                  it will be destroyed and replaced with an ext SR.
+                  WARNING: This will destroy your actual default SR !
+
+An example run:
+
+  # Create a passwordless ssh key
+  ssh-keygen -t rsa -N "" -f devstack_key.priv
+
+  # Install devstack on XenServer 10.219.10.25
+  $0 10.219.10.25 mypassword devstack_key.priv
+
+$@
+EOF
+exit 1
 }
 
-function print_template {
-    cat <<EOF
+# Defaults for optional arguments
+DEVSTACK_TGZ="https://github.com/openstack-dev/devstack/archive/master.tar.gz"
+TEST_TYPE="none"
+FORCE_SR_REPLACEMENT="false"
+
+# Get Positional arguments
+set +u
+XENSERVER_IP="$1"
+shift || print_usage_and_die "ERROR: XENSERVER_IP not specified!"
+XENSERVER_PASS="$1"
+shift || print_usage_and_die "ERROR: XENSERVER_PASS not specified!"
+PRIVKEY="$1"
+shift || print_usage_and_die "ERROR: PRIVKEY not specified!"
+set -u
+
+# Number of options passed to this script
+REMAINING_OPTIONS="$#"
+
+# Get optional parameters
+set +e
+while getopts ":t:d:f" flag; do
+    REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
+    case "$flag" in
+        t)
+            TEST_TYPE="$OPTARG"
+            REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
+            if ! [ "$TEST_TYPE" = "none" -o "$TEST_TYPE" = "smoke" -o "$TEST_TYPE" = "full" ]; then
+                print_usage_and_die "$TEST_TYPE - Invalid value for TEST_TYPE"
+            fi
+            ;;
+        d)
+            DEVSTACK_TGZ="$OPTARG"
+            REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
+            ;;
+        f)
+            FORCE_SR_REPLACEMENT="true"
+            ;;
+        \?)
+            print_usage_and_die "Invalid option -$OPTARG"
+            ;;
+    esac
+done
+set -e
+
+# Make sure that all options processed
+if [ "0" != "$REMAINING_OPTIONS" ]; then
+    print_usage_and_die "ERROR: some arguments were not recognised!"
+fi
+
+# Set up internal variables
+_SSH_OPTIONS="\
+    -q \
+    -o BatchMode=yes \
+    -o StrictHostKeyChecking=no \
+    -o UserKnownHostsFile=/dev/null \
+    -i $PRIVKEY"
+
+# Print out summary
+cat << EOF
+XENSERVER_IP:   $XENSERVER_IP
+XENSERVER_PASS: $XENSERVER_PASS
+PRIVKEY:        $PRIVKEY
+TEST_TYPE:      $TEST_TYPE
+DEVSTACK_TGZ:   $DEVSTACK_TGZ
+
+FORCE_SR_REPLACEMENT: $FORCE_SR_REPLACEMENT
+EOF
+
+echo -n "Authenticate the key with XenServer..."
+tmp_dir="$(mktemp -d)"
+ssh-keygen -y -f $PRIVKEY > "$tmp_dir/devstack.pub"
+sshpass -p "$XENSERVER_PASS" \
+    ssh-copy-id \
+        -i "$tmp_dir/devstack.pub" \
+        root@$XENSERVER_IP > /dev/null 2>&1
+rm -rf "$tmp_dir"
+unset tmp_dir
+echo "OK"
+
+echo -n "Set up the key as the xenserver's private key..."
+scp $_SSH_OPTIONS $PRIVKEY "root@$XENSERVER_IP:.ssh/id_rsa"
+echo "OK"
+
+# Helper function
+function on_xenserver() {
+    ssh $_SSH_OPTIONS "root@$XENSERVER_IP" bash -s --
+}
+
+echo -n "Verify that XenServer can log in to itself..."
+on_xenserver << END_OF_CHECK_KEY_SETUP
+ssh -o StrictHostKeyChecking=no $XENSERVER_IP true
+END_OF_CHECK_KEY_SETUP
+echo "OK"
+
+echo -n "Verify XenServer has an ext type default SR..."
+on_xenserver << END_OF_SR_OPERATIONS
+set -eu
+
+# Verify the host is suitable for devstack
+defaultSR=\$(xe pool-list params=default-SR minimal=true)
+if [ "\$(xe sr-param-get uuid=\$defaultSR param-name=type)" != "ext" ]; then
+    if [ "true" == "$FORCE_SR_REPLACEMENT" ]; then
+        echo ""
+        echo ""
+        echo "Trying to replace the default SR with an EXT SR"
+
+        pbd_uuid=\`xe pbd-list sr-uuid=\$defaultSR minimal=true\`
+        host_uuid=\`xe pbd-param-get uuid=\$pbd_uuid param-name=host-uuid\`
+        use_device=\`xe pbd-param-get uuid=\$pbd_uuid param-name=device-config param-key=device\`
+
+        # Destroy the existing SR
+        xe pbd-unplug uuid=\$pbd_uuid
+        xe sr-destroy uuid=\$defaultSR
+
+        sr_uuid=\`xe sr-create content-type=user host-uuid=\$host_uuid type=ext device-config:device=\$use_device shared=false name-label="Local storage"\`
+        pool_uuid=\`xe pool-list minimal=true\`
+        xe pool-param-set default-SR=\$sr_uuid uuid=\$pool_uuid
+        xe pool-param-set suspend-image-SR=\$sr_uuid uuid=\$pool_uuid
+        xe sr-param-add uuid=\$sr_uuid param-name=other-config i18n-key=local-storage
+        exit 0
+    fi
+    echo ""
+    echo ""
+    echo "ERROR: The xenserver host must have an EXT3 SR as the default SR"
+    echo "Use the -f flag to destroy the current default SR and create a new"
+    echo "ext type default SR."
+    echo ""
+    echo "WARNING: This will destroy your actual default SR !"
+    echo ""
+
+    exit 1
+fi
+END_OF_SR_OPERATIONS
+echo "OK"
+
+TMPDIR=$(echo "mktemp -d" | on_xenserver)
+
+on_xenserver << END_OF_XENSERVER_COMMANDS
+set -exu
+cd $TMPDIR
+
+wget -qO - "$DEVSTACK_TGZ" |
+    tar -xzf -
+cd devstack*
+
+cat << LOCALRC_CONTENT_ENDS_HERE > localrc
 # Passwords
 MYSQL_PASSWORD=citrix
 SERVICE_TOKEN=citrix
 ADMIN_PASSWORD=citrix
 SERVICE_PASSWORD=citrix
 RABBIT_PASSWORD=citrix
-# This is the password for your DomU (for both stack and root users)
 GUEST_PASSWORD=citrix
-# IMPORTANT: The following must be set to your dom0 root password!
-XENAPI_PASSWORD=%XenServerPassword%
-# As swift is enabled by default, we need a hash for it:
+XENAPI_PASSWORD="$XENSERVER_PASS"
 SWIFT_HASH="66a3d6b56c1f479c8b4e70ab5c2000f5"
 
-# Nice short names, so we could use them as bridge names as well
+# Use xvdb for backing cinder volumes
+XEN_XVDB_SIZE_GB=10
+VOLUME_BACKING_DEVICE=/dev/xvdb
+
+# Nice short names, so we could export an XVA
 VM_BRIDGE_OR_NET_NAME="osvmnet"
 PUB_BRIDGE_OR_NET_NAME="ospubnet"
 XEN_INT_BRIDGE_OR_NET_NAME="osintnet"
+
+# As we have nice names, specify FLAT_NETWORK_BRIDGE
+FLAT_NETWORK_BRIDGE="osvmnet"
 
 # Do not use secure delete
 CINDER_SECURE_DELETE=False
@@ -62,198 +238,66 @@ TERMINATE_TIMEOUT=500
 # Increase boot timeout for neutron tests:
 BOOT_TIMEOUT=500
 
+# DevStack settings
+LOGFILE=/tmp/devstack/log/stack.log
+SCREEN_LOGDIR=/tmp/devstack/log/
+
+# Turn off verbose, so console is nice and clean
+VERBOSE=False
+
+# XenAPI specific
+XENAPI_CONNECTION_URL="http://$XENSERVER_IP"
+VNCSERVER_PROXYCLIENT_ADDRESS="$XENSERVER_IP"
+
 MULTI_HOST=1
+
+# Skip boot from volume exercise
+SKIP_EXERCISES="boot_from_volume"
+
+ENABLED_SERVICES=g-api,g-reg,key,n-api,n-crt,n-obj,n-cpu,n-sch,horizon,mysql,rabbit,sysstat,tempest,s-proxy,s-account,s-container,s-object,cinder,c-api,c-vol,c-sch,n-cond,heat,h-api,h-api-cfn,h-api-cw,h-eng,n-net
+
 # XEN_FIREWALL_DRIVER=nova.virt.xenapi.firewall.Dom0IptablesFirewallDriver
 XEN_FIREWALL_DRIVER=nova.virt.firewall.NoopFirewallDriver
 
-#
-# Volume settings
-#
-# make tempest pass by having bigger volume file
-VOLUME_BACKING_FILE_SIZE=10000M
+# 9 Gigabyte for object store
+SWIFT_LOOPBACK_DISK_SIZE=9000000
 
-# Use a custom repository, and a proxy
-#UBUNTU_INST_HTTP_HOSTNAME="mirror.anl.gov"
-#UBUNTU_INST_HTTP_DIRECTORY="/pub/ubuntu"
-#UBUNTU_INST_HTTP_PROXY="http://gold.eng.hq.xensource.com:8000"
+# Additional Localrc parameters here
 
-#
-# exercise.sh settings
-#
-# DISABLE Boot from Volume
-SKIP_EXERCISES="boot_from_volume"
+LOCALRC_CONTENT_ENDS_HERE
 
-
-
-# Devstack Settings
-## Logging
-LOGFILE=/tmp/devstack/log/stack.log
-SCREEN_LOGDIR=/tmp/devstack/log/
-VERBOSE=False
-## Enabled services
-ENABLED_SERVICES+=,tempest,
-EOF
-}
-
-if [ ! -e $TEMPLATE_LOCALRC ]; then
-    echo
-    echo "Template localrc $TEMPLATE_LOCALRC not found: generating new template"
-    echo
-    print_template > $TEMPLATE_LOCALRC
-fi
-
-# Temporary directory
-tmpdir=`mktemp -d`
-trap "rm -rf $tmpdir" EXIT
-
-PrivID=${1:-$PrivID}
-Server=${2:-$Server}
-XenServerPassword=${3:-$XenServerPassword}
-XenServerVmVlan=${XenServerVmVlan:-24}
-
-[ -z $Server ] && syntax
-[ -z $XenServerPassword ] && syntax
-[ -z $XenServerVmVlan ]&& syntax
-
-if [ ! -e $PrivID ]; then
-    echo "ID file $PrivID does not exist; Please specify valid private key"
-    exit 1
-fi
-ssh-keygen -y -f $PrivID > $tmpdir/key.pub
-
-ssh_options="-o BatchMode=yes -o StrictHostKeyChecking=no "
-ssh_options+="-o UserKnownHostsFile=/dev/null -i $PrivID"
-
-# Now we have our variables set up, ensure we don't mis-type them
-set -u
-
-# Tolerate this ssh failing - we might need to copy the key across
-set +e
-ssh -o LogLevel=quiet $ssh_options root@$Server /bin/true >/dev/null 2>&1
-if [ $? != 0 ] ; then
-    set -e
-    echo "Please supply password for ssh-copy-id.  " \
-        "This should be the last time the password is needed:"
-    ssh-copy-id -i $tmpdir/key.pub root@$Server
-fi
-set -e
-
-
-GENERATED_LOCALRC=$tmpdir\localrc
-
-# Generate localrc
-cat $TEMPLATE_LOCALRC |
-sed -e "s,%XenServerVmVlan%,$XenServerVmVlan,g;
-        s,%XenServerPassword%,$XenServerPassword,g;
-" > $GENERATED_LOCALRC
-
-LocalrcAppend=${LocalrcAppend-"localrc.append"}
-[ -e "${LocalrcAppend}" ] && ( cat "$LocalrcAppend" >> $GENERATED_LOCALRC ) || \
-    echo "$LocalrcAppend was not found, not appending to localrc"
-
-set -x
-
-# The parmaters expected are:
-# $Server - XenServer host for compute DomU
-# $XenServerVmVlan - Vlan ID
-# $XenServerPassword - Password for your XenServer
-
-# $DevStackURL (optional) - URL of the devstack zip file
-# $CleanTemplates (default:false) - If true, clean the templates
-
-DevStackURL=${DevStackURL-"https://github.com/openstack-dev/devstack/zipball/master"}
-CleanTemplates="${CleanTemplates-true}"
-DhcpTimeout=120
-
-#
-# Add the clean templates setting
-# and correct the IP address for dom0
-#
-XenApiIP=`ssh $ssh_options root@$Server "ifconfig xenbr0 | grep \"inet addr\" | cut -d \":\" -f2 | sed \"s/ .*//\""`
-cat <<EOF >> $GENERATED_LOCALRC
-CLEAN_TEMPLATES=$CleanTemplates
-XENAPI_CONNECTION_URL="http://$XenApiIP"
-VNCSERVER_PROXYCLIENT_ADDRESS=$XenApiIP
-EOF
-
-#
-# Show the content on the localrc file
-#
-
-set +x
-echo "Content of localrc file:"
-cat $GENERATED_LOCALRC
-echo "** end of localrc file **"
-
-#
-# Run the next steps on the XenServer host
-#
-
-#
-# Clean directory, create directory and
-# copy what we need to the XenServer
-#
-SCRIPT_TMP_DIR=/tmp/jenkins_test
-
-cat > $tmpdir/install_devstack.sh <<EOF
-#!/bin/bash
-set -eux
-
-# Verify the host is suitable for devstack
-defaultSR=\`xe pool-list params=default-SR minimal=true\`
-if [ "\`xe sr-param-get uuid=\$defaultSR param-name=type\`" != "ext" ]; then
-    echo ""
-    echo "ERROR: The xenserver host must have an EXT3 SR as the default SR"
-    echo ""
-    echo "Trying to replace the LVM SR with an EXT SR"
-
-    pbd_uuid=\`xe pbd-list sr-uuid=\$defaultSR minimal=true\`
-    host_uuid=\`xe pbd-param-get uuid=\$pbd_uuid param-name=host-uuid\`
-    use_device=\`xe pbd-param-get uuid=\$pbd_uuid param-name=device-config param-key=device\`
-
-    # Destroy the existing SR
-    xe pbd-unplug uuid=\$pbd_uuid
-    xe sr-destroy uuid=\$defaultSR
-
-    sr_uuid=\`xe sr-create content-type=user host-uuid=\$host_uuid type=ext device-config:device=\$use_device shared=false name-label="Local storage"\`
-    pool_uuid=\`xe pool-list minimal=true\`
-    xe pool-param-set default-SR=\$sr_uuid uuid=\$pool_uuid
-    xe pool-param-set suspend-image-SR=\$sr_uuid uuid=\$pool_uuid
-    xe sr-param-add uuid=\$sr_uuid param-name=other-config i18n-key=local-storage
-fi
-
-rm -rf $SCRIPT_TMP_DIR
-mkdir -p $SCRIPT_TMP_DIR
-
-wget -nv --no-check-certificate $DevStackURL -O $SCRIPT_TMP_DIR/devstack.zip
-# Remove the top-level directory (<user>-<repo>-<commit>)
-# so the output is in a "devstack" directory
-unzip -oq $SCRIPT_TMP_DIR/devstack.zip -d $SCRIPT_TMP_DIR/tmpunzip
-mv $SCRIPT_TMP_DIR/tmpunzip/* $SCRIPT_TMP_DIR/devstack
-rm -rf $SCRIPT_TMP_DIR/tmpunzip
-
-preseedcfg=$SCRIPT_TMP_DIR/devstack/tools/xen/devstackubuntupreseed.cfg
-# Additional DHCP timeout
-sed -ie "s,#\(d-i netcfg/dhcp_timeout string\).*,\1 ${DhcpTimeout},g" \$preseedcfg
-
-cp /tmp/localrc $SCRIPT_TMP_DIR/devstack/localrc
-
-pushd $SCRIPT_TMP_DIR/devstack/tools/xen/
+cd tools/xen
 ./install_os_domU.sh
-popd
-EOF
+END_OF_XENSERVER_COMMANDS
 
-chmod +x $tmpdir/install_devstack.sh
-echo
-echo "*** Content of install_devstack.sh ***"
-cat $tmpdir/install_devstack.sh
-echo "*** End of install_devstack.sh ***"
+if [ "$TEST_TYPE" == "none" ]; then
+    exit 0
+fi
 
-set -x
+# Run tests
+on_xenserver << END_OF_XENSERVER_COMMANDS
+set -exu
+cd $TMPDIR
+cd devstack*
 
-scp $ssh_options $PrivID "root@$Server:~/.ssh/id_rsa"
-scp $ssh_options $tmpdir/key.pub "root@$Server:~/.ssh/id_rsa.pub"
-scp $ssh_options "$GENERATED_LOCALRC" "root@$Server:/tmp/localrc"
-scp $ssh_options "$tmpdir/install_devstack.sh" "root@$Server:/tmp/install_devstack.sh"
-ssh $ssh_options root@$Server "chmod +x /tmp/install_devstack.sh && /tmp/install_devstack.sh" \
-    " | tee $SCRIPT_TMP_DIR/install_devstack.log"
+GUEST_IP=\$(. "tools/xen/functions" && find_ip_by_name DevStackOSDomU 0)
+ssh -q \
+    -o Batchmode=yes \
+    -o StrictHostKeyChecking=no \
+    -o UserKnownHostsFile=/dev/null \
+    "stack@\$GUEST_IP" bash -s -- << END_OF_DEVSTACK_COMMANDS
+set -exu
+
+cd /opt/stack/devstack/
+./exercise.sh
+
+cd /opt/stack/tempest 
+if [ "$TEST_TYPE" == "smoke" ]; then
+    nosetests -sv --nologcapture --attr=type=smoke tempest
+elif [ "$TEST_TYPE" == "full" ]; then
+    nosetests -sv tempest/api tempest/scenario tempest/thirdparty tempest/cli
+fi
+
+END_OF_DEVSTACK_COMMANDS
+
+END_OF_XENSERVER_COMMANDS

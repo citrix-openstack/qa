@@ -25,7 +25,7 @@ THIS_DIR=$(cd $(dirname "$0") && pwd)
 
 . $THIS_DIR/lib/functions
 
-TEMPLATE_NAME="$THIS_DIR/templates/tempest-smoke.sh"
+TEMPLATE_NAME="$THIS_DIR/install-devstack-xen.sh"
 BRANCH_REF_NAME="${1-$(print_usage_and_die)}"
 SETUP_TYPE="${2-"nova-network"}"
 
