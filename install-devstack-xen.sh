@@ -27,8 +27,6 @@ flags:
  -f               Force SR replacement. If your XenServer has an LVM type SR,
                   it will be destroyed and replaced with an ext SR.
                   WARNING: This will destroy your actual default SR !
- -w               Wipe the /root/.ssh directory of your XenServer.
-                  WARNING: This will remove all your keys from XenServer.
 
 An example run:
 
@@ -47,7 +45,6 @@ exit 1
 DEVSTACK_TGZ="https://github.com/openstack-dev/devstack/archive/master.tar.gz"
 TEST_TYPE="none"
 FORCE_SR_REPLACEMENT="false"
-WIPE_SSH_CONFIG="false"
 
 # Get Positional arguments
 set +u
@@ -64,7 +61,7 @@ REMAINING_OPTIONS="$#"
 
 # Get optional parameters
 set +e
-while getopts ":t:d:fw" flag; do
+while getopts ":t:d:f" flag; do
     REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
     case "$flag" in
         t)
@@ -80,9 +77,6 @@ while getopts ":t:d:fw" flag; do
             ;;
         f)
             FORCE_SR_REPLACEMENT="true"
-            ;;
-        w)
-            WIPE_SSH_CONFIG="true"
             ;;
         \?)
             print_usage_and_die "Invalid option -$OPTARG"
@@ -113,33 +107,19 @@ TEST_TYPE:      $TEST_TYPE
 DEVSTACK_TGZ:   $DEVSTACK_TGZ
 
 FORCE_SR_REPLACEMENT: $FORCE_SR_REPLACEMENT
-WIPE_SSH_CONFIG:      $WIPE_SSH_CONFIG
 EOF
 
-if [ "true" = "$WIPE_SSH_CONFIG" ]; then
-    echo -n "Wiping root user's .ssh directory on XenServer..."
-    sshpass -p "$XENSERVER_PASS" \
-        ssh \
-            -q \
-            -o StrictHostKeyChecking=no \
-            -o UserKnownHostsFile=/dev/null \
-            root@$XENSERVER "rm -rf .ssh"
-    echo "OK"
-fi
-
-echo -n "Authenticate the key with XenServer..."
+echo -n "Setup ssh keys on XenServer..."
 tmp_dir="$(mktemp -d)"
 ssh-keygen -y -f $PRIVKEY > "$tmp_dir/devstack.pub"
 sshpass -p "$XENSERVER_PASS" \
     ssh-copy-id \
         -i "$tmp_dir/devstack.pub" \
         root@$XENSERVER > /dev/null 2>&1
+scp $_SSH_OPTIONS $PRIVKEY "root@$XENSERVER:.ssh/id_rsa"
+scp $_SSH_OPTIONS $tmp_dir/devstack.pub "root@$XENSERVER:.ssh/id_rsa.pub"
 rm -rf "$tmp_dir"
 unset tmp_dir
-echo "OK"
-
-echo -n "Set up the key as the xenserver's private key..."
-scp $_SSH_OPTIONS $PRIVKEY "root@$XENSERVER:.ssh/id_rsa"
 echo "OK"
 
 # Helper function
