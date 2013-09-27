@@ -122,5 +122,8 @@ wget -q "https://raw.github.com/citrix-openstack/qa/master/jenkins/jobs/xva-rena
 python xva-rename-bridges.py devstack_original.xva devstack.xva
 rm -f devstack_original.xva
 
+echo "Devstack XVA ready"
+ls -lah devstack.xva
+
 # Destroy the VM
 xecommand vm-destroy uuid=$VMUUID
