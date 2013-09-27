@@ -6,7 +6,7 @@ THISDIR=$(cd $(dirname $(readlink -f "$0")) && pwd)
 
 function print_usage_and_die() {
     log_error << EOF
-usage: $0 xenserver xenserver_password
+usage: $0 xenserver xenserver_password setupscript_url devstack_tgz_url
 
 Build a DevStack XVA
 
@@ -21,7 +21,10 @@ function parse_parameters() {
     shift || print_usage_and_die "No xenserver specified"
     XenServerPassword="$1"
     shift || print_usage_and_die "No xenserver_password specified"
-    SETUPSCRIPT_URL="${1:-"https://raw.github.com/citrix-openstack/qa/master/install-devstack-xen.sh"}"
+    SETUPSCRIPT_URL="$1"
+    shift || print_usage_and_die "No setupscript url specified"
+    DEVSTACK_TGZ_URL="$1"
+    shift || print_usage_and_die "No devstack tgz url specified"
     set -u
 }
 
@@ -34,7 +37,7 @@ echo "Worker: $WORKER"
 
 echo "Building Devstack XVA" | log_info
 run_bash_script_on "$WORKER" \
-    "$THISDIR/builds/build-devstack-xva-online-stage1.sh" "$HOST" "$XenServerPassword" "$SETUPSCRIPT_URL"
+    "$THISDIR/builds/build-devstack-xva-online-stage1.sh" "$HOST" "$XenServerPassword" "$SETUPSCRIPT_URL" "$DEVSTACK_TGZ_URL"
 run_bash_script_on "$WORKER" \
     "$THISDIR/builds/build-devstack-xva-online-stage2.sh" "$HOST" "$XenServerPassword"
 
