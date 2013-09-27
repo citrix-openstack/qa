@@ -25,7 +25,7 @@ THIS_DIR=$(cd $(dirname "$0") && pwd)
 
 . $THIS_DIR/lib/functions
 
-TEMPLATE_NAME="$THIS_DIR/templates/tempest-smoke.sh"
+TEMPLATE_NAME="$THIS_DIR/install-devstack-xen.sh"
 BRANCH_REF_NAME="${1-$(print_usage_and_die)}"
 SETUP_TYPE="${2-"nova-network"}"
 
@@ -46,6 +46,9 @@ NOVA_ZIPBALL_URL="http://gold.eng.hq.xensource.com/git/internal/builds/nova/arch
 NEUTRON_ZIPBALL_URL="http://gold.eng.hq.xensource.com/git/internal/builds/neutron/archive/$BRANCH_REF_NAME.zip"
 EOF
 } >> "$EXTENSIONS"
+
+# Set FLAT_NETWORK_BRIDGE
+echo "FLAT_NETWORK_BRIDGE=osvmnet" >> $EXTENSIONS
 
 # Configure neutron if needed
 if [ "$SETUP_TYPE" == "neutron" ]; then

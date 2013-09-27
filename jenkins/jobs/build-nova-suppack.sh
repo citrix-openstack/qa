@@ -2,9 +2,11 @@
 
 set -eu
 
-SCRIPTDIR=$(cd $(dirname $(readlink -f "$0")) && cd .. && cd devstack-xen && pwd)
 XSLIB=$(cd $(dirname $(readlink -f "$0")) && cd xslib && pwd)
 BUILDLIB=$(cd $(dirname $(readlink -f "$0")) && cd builds && pwd)
+THISDIR=$(cd $(dirname $(readlink -f "$0")) && pwd)
+
+. "$THISDIR/functions.sh"
 
 function print_usage_and_die
 {
@@ -27,21 +29,7 @@ GITREPO="${2-$(print_usage_and_die)}"
 DDK_ROOT_URL="${3-$(print_usage_and_die)}"
 GITBRANCH="${4-$(print_usage_and_die)}"
 
-function start_slave
-{
-    "$SCRIPTDIR/run-on-xenserver.sh" "$SERVERNAME" "$XSLIB/start-slave.sh"
-}
-
-function run_on
-{
-    THE_IP="$1"
-    SCRIPT="$2"
-    shift 2
-
-    cat "$SCRIPT" | ssh -q -o Batchmode=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "ubuntu@$THE_IP" bash -s -- "$@"
-}
-
 echo "Spinning up virtual machine"
-SLAVE_IP=$(start_slave)
+WORKER=$(cat $XSLIB/get_worker.sh | remote_bash "root@$XENSERVERNAME")
 echo "Starting job on $SLAVE_IP"
-run_on $SLAVE_IP "$BUILDLIB/build-nova-suppack.sh" "$GITREPO" "$DDK_ROOT_URL" "$GITBRANCH"
+run_bash_script_on $SLAVE_IP "$BUILDLIB/build-nova-suppack.sh" "$GITREPO" "$DDK_ROOT_URL" "$GITBRANCH"
