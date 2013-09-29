@@ -150,7 +150,8 @@ set -eu
 
 # Verify the host is suitable for devstack
 defaultSR=\$(xe pool-list params=default-SR minimal=true)
-if [ "\$(xe sr-param-get uuid=\$defaultSR param-name=type)" != "ext" ]; then
+curentSrType=\$(xe sr-param-get uuid=\$defaultSR param-name=type)
+if [ "\$currentSrType" != "ext" -a "\$currentSrType" != "nfs" -a "\$currentSrType" != "ffs" ]; then
     if [ "true" == "$FORCE_SR_REPLACEMENT" ]; then
         echo ""
         echo ""
@@ -173,7 +174,7 @@ if [ "\$(xe sr-param-get uuid=\$defaultSR param-name=type)" != "ext" ]; then
     fi
     echo ""
     echo ""
-    echo "ERROR: The xenserver host must have an EXT3 SR as the default SR"
+    echo "ERROR: The xenserver host must have an EXT3/NFS/FFS SR as the default SR"
     echo "Use the -f flag to destroy the current default SR and create a new"
     echo "ext type default SR."
     echo ""
