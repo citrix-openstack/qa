@@ -188,7 +188,7 @@ echo "OK"
 
 echo -n "Get the IP address of XenServer..."
 XENSERVER_IP=$(on_xenserver << GET_XENSERVER_IP
-ifconfig xenbr0 | grep "inet addr" | cut -d ":" -f2 | sed "s/ .*//"
+xe host-list params=address minimal=true
 GET_XENSERVER_IP
 )
 if [ -z "$XENSERVER_IP" ]; then
@@ -317,7 +317,7 @@ cd /opt/stack/tempest
 if [ "$TEST_TYPE" == "smoke" ]; then
     nosetests -sv --nologcapture --attr=type=smoke tempest
 elif [ "$TEST_TYPE" == "full" ]; then
-    nosetests -sv tempest/api tempest/scenario tempest/thirdparty tempest/cli
+    nosetests -sv tempest/api tempest/scenario tempest/thirdparty tempest/cli -e tempest.scenario.test_volume_boot_pattern.TestVolumeBootPattern
 fi
 
 END_OF_DEVSTACK_COMMANDS
