@@ -11,7 +11,8 @@ def set_database(filename, contents):
     >>> set_database('test_db', '[dict(HOST=\"a\"), dict(HOST=\"b\"), dict(HOST=\"c\")]')
     >>> os.path.exists('test_db')
     True
-    >>> lock_items('test_db', 'lock1')
+    >>> from selectors import first
+    >>> lock_items('test_db', 'lock1', first(lambda x: x['HOST'] == 'a'))
     [{'HOST': 'a'}]
     >>> set_database('test_db', '[dict(HOST=\"c\"), dict(HOST=\"b\"), dict(HOST=\"a\")]')
     >>> os.path.exists('test_db')
@@ -81,11 +82,12 @@ def lock_items(filename, lock, term_generator=None, lock_reason=None):
     >>> import os
     >>> if os.path.exists('test_db'): os.unlink('test_db')
     >>> set_database('test_db', '[dict(HOST=\"1\"), dict(HOST=\"2\"), dict(HOST=\"3\")]')
-    >>> lock_items('test_db', 'a')
+    >>> from selectors import first
+    >>> lock_items('test_db', 'a', first(lambda x: x['HOST'] == '1'))
     [{'HOST': '1'}]
-    >>> lock_items('test_db', 'b')
+    >>> lock_items('test_db', 'b', first(lambda x: x['HOST'] == '2'))
     [{'HOST': '2'}]
-    >>> lock_items('test_db', '')
+    >>> lock_items('test_db', '', first(lambda x: x['HOST'] == '3'))
     Traceback (most recent call last):
     ...
     ValueError: Invalid lock value: ''
@@ -96,6 +98,7 @@ def lock_items(filename, lock, term_generator=None, lock_reason=None):
     >>> seen_items = []
     >>> lock_items('test_db', 'a', lambda x: lambda: seen_items.append(x))
     []
+    >>> seen_items.sort()
     >>> seen_items
     [{'HOST': '1'}, {'HOST': '2'}, {'HOST': '3'}]
     """
@@ -111,7 +114,7 @@ def lock_items(filename, lock, term_generator=None, lock_reason=None):
     term_generator = term_generator or first()
 
     terms_ids_items = []
-    for id, data in c.execute('SELECT id, data FROM stuff WHERE lock = :empty_lock ORDER by id', dict(empty_lock="")).fetchall():
+    for id, data in c.execute('SELECT id, data FROM stuff WHERE lock = :empty_lock ORDER by random()', dict(empty_lock="")).fetchall():
         item = eval(data)
         terms_ids_items.append((term_generator(item), id, item))
 
@@ -136,7 +139,7 @@ def get_locks(filename):
     """
     >>> import os
     >>> if os.path.exists('test_db'): os.unlink('test_db')
-    >>> set_database('test_db', '[dict(HOST=\"1\"), dict(HOST=\"2\"), dict(HOST=\"3\")]')
+    >>> set_database('test_db', '[dict(HOST=\"1\")]')
     >>> get_locks('test_db')
     []
     >>> lock_items('test_db', 'lock1')
@@ -162,7 +165,7 @@ def get_lock_details(filename, hostname=None):
     """
     >>> import os
     >>> if os.path.exists('test_db'): os.unlink('test_db')
-    >>> set_database('test_db', '[dict(HOST=\"1\"), dict(HOST=\"2\"), dict(HOST=\"3\")]')
+    >>> set_database('test_db', '[dict(HOST=\"1\")]')
     >>> get_lock_details('test_db')
     {}
     >>> lock_items('test_db', 'lock1', lock_reason='reason')
@@ -197,7 +200,7 @@ def release_lock(filename, lock):
     """
     >>> import os
     >>> if os.path.exists('test_db'): os.unlink('test_db')
-    >>> set_database('test_db', '[dict(HOST=\"1\"), dict(HOST=\"2\"), dict(HOST=\"3\")]')
+    >>> set_database('test_db', '[dict(HOST=\"1\")]')
     >>> release_lock('test_db', 'somelock')
     >>> lock_items('test_db', 'lock1')
     [{'HOST': '1'}]
