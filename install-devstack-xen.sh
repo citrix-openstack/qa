@@ -150,7 +150,7 @@ set -eu
 
 # Verify the host is suitable for devstack
 defaultSR=\$(xe pool-list params=default-SR minimal=true)
-curentSrType=\$(xe sr-param-get uuid=\$defaultSR param-name=type)
+currentSrType=\$(xe sr-param-get uuid=\$defaultSR param-name=type)
 if [ "\$currentSrType" != "ext" -a "\$currentSrType" != "nfs" -a "\$currentSrType" != "ffs" ]; then
     if [ "true" == "$FORCE_SR_REPLACEMENT" ]; then
         echo ""
