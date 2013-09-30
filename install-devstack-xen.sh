@@ -127,6 +127,36 @@ function on_xenserver() {
     ssh $_SSH_OPTIONS "root@$XENSERVER" bash -s --
 }
 
+function copy_logs_on_failure()
+{
+    set +e
+    $@
+    EXIT_CODE=$?
+    set -e
+    if [ $EXIT_CODE -ne 0 ]; then
+	on_xenserver << END_OF_XENSERVER_COMMANDS
+set -exu
+ssh -q \
+    -o Batchmode=yes \
+    -o StrictHostKeyChecking=no \
+    -o UserKnownHostsFile=/dev/null \
+    "stack@\$GUEST_IP" bash -s -- << END_OF_DEVSTACK_COMMANDS
+tar zcfp /tmp/devstack_logs.tgz /tmp/devstack
+END_OF_DEVSTACK_COMMANDS
+mkdir /root/artifacts
+scp -q \
+    -o Batchmode=yes \
+    -o StrictHostKeyChecking=no \
+    -o UserKnownHostsFile=/dev/null \
+    stack@\$GUEST_IP:/tmp/devstack/devstack_logs.tgz \
+    /root/artifacts/
+END_OF_XENSERVER_COMMANDS
+        mkdir ${BUILD_NUMBER}_output
+        scp -q -o BatchMode=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ${BUILD_NUMBER}.privkey $HOST:artifacts/* ${BUILD_NUMBER}_output
+        exit $EXIT_CODE
+    fi
+}
+
 echo -n "Generate id_rsa.pub..."
 echo "ssh-keygen -y -f .ssh/id_rsa > .ssh/id_rsa.pub" | on_xenserver
 echo "OK"
@@ -145,7 +175,7 @@ else
 fi
 
 echo -n "Verify XenServer has an ext type default SR..."
-on_xenserver << END_OF_SR_OPERATIONS
+copy_logs_on_failure on_xenserver << END_OF_SR_OPERATIONS
 set -eu
 
 # Verify the host is suitable for devstack
@@ -199,10 +229,8 @@ echo "OK"
 
 TMPDIR=$(echo "mktemp -d" | on_xenserver)
 
-on_xenserver << END_OF_XENSERVER_COMMANDS
+copy_logs_on_failure on_xenserver << END_OF_XENSERVER_COMMANDS
 set -exu
-
-rm -rf /root/artifacts || true
 
 cd $TMPDIR
 
@@ -300,13 +328,12 @@ if [ "$TEST_TYPE" == "none" ]; then
 fi
 
 # Run tests
-on_xenserver << END_OF_XENSERVER_COMMANDS
+copy_logs_on_failure on_xenserver << END_OF_XENSERVER_COMMANDS
 set -exu
 cd $TMPDIR
 cd devstack*
 
 GUEST_IP=\$(. "tools/xen/functions" && find_ip_by_name DevStackOSDomU 0)
-set +e
 ssh -q \
     -o Batchmode=yes \
     -o StrictHostKeyChecking=no \
@@ -318,31 +345,12 @@ cd /opt/stack/devstack/
 ./exercise.sh
 
 cd /opt/stack/tempest 
-set +e
 if [ "$TEST_TYPE" == "smoke" ]; then
     nosetests -sv --nologcapture --attr=type=smoke tempest
-    EXIT_CODE=$?
 elif [ "$TEST_TYPE" == "full" ]; then
-    nosetests -sv tempest/api tempest/scenario tempest/thirdparty tempest/cli -e tempest.scenario.test_volume_boot_pattern.TestVolumeBootPattern
-    EXIT_CODE=$?
+    nosetests -sv tempest/api tempest/scenario tempest/thirdparty tempest/cli
 fi
-set -e
 
-tar zcfvp /tmp/devstack/devstack.tgz /tmp/devstack/*
-
-exit $EXIT_CODE
 END_OF_DEVSTACK_COMMANDS
-EXIT_CODE=$?
-set +e
-
-mkdir /root/artifacts
-scp -q \
-    -o Batchmode=yes \
-    -o StrictHostKeyChecking=no \
-    -o UserKnownHostsFile=/dev/null \
-    stack@\$GUEST_IP:/tmp/devstack/devstack.tgz \
-    /root/artifacts/
-
-exit $EXIT_CODE
 
 END_OF_XENSERVER_COMMANDS
