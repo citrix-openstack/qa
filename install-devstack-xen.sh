@@ -136,6 +136,7 @@ function copy_logs_on_failure()
     if [ $EXIT_CODE -ne 0 ]; then
 	on_xenserver << END_OF_XENSERVER_COMMANDS
 set -exu
+GUEST_IP=\$(. "tools/xen/functions" && find_ip_by_name DevStackOSDomU 0)
 ssh -q \
     -o Batchmode=yes \
     -o StrictHostKeyChecking=no \
