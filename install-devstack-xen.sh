@@ -154,7 +154,7 @@ scp -q \
     -o Batchmode=yes \
     -o StrictHostKeyChecking=no \
     -o UserKnownHostsFile=/dev/null \
-    stack@\$GUEST_IP:/tmp/devstack/devstack_logs.tgz \
+    stack@\$GUEST_IP:/tmp/devstack_logs.tgz \
     /root/artifacts/
 END_OF_XENSERVER_COMMANDS
         mkdir ${BUILD_NUMBER}_output
