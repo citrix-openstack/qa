@@ -108,7 +108,7 @@ if [ -n "$CINDER_VBD" ]; then
     xecommand vdi-destroy uuid=$vdi
     vdi=$(xecommand vdi-create \
         name-label=CinderVolumes \
-        virtual_size=$virtual_size \
+        virtual-size=$virtual_size \
         sr-uuid=$localsr \
         type=user)
     xecommand vbd-create vm-uuid=$VMUUID vdi-uuid=$vdi device=1
