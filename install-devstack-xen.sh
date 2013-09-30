@@ -306,6 +306,7 @@ cd $TMPDIR
 cd devstack*
 
 GUEST_IP=\$(. "tools/xen/functions" && find_ip_by_name DevStackOSDomU 0)
+set +e
 ssh -q \
     -o Batchmode=yes \
     -o StrictHostKeyChecking=no \
@@ -317,15 +318,22 @@ cd /opt/stack/devstack/
 ./exercise.sh
 
 cd /opt/stack/tempest 
+set +e
 if [ "$TEST_TYPE" == "smoke" ]; then
     nosetests -sv --nologcapture --attr=type=smoke tempest
+    EXIT_CODE=$?
 elif [ "$TEST_TYPE" == "full" ]; then
     nosetests -sv tempest/api tempest/scenario tempest/thirdparty tempest/cli -e tempest.scenario.test_volume_boot_pattern.TestVolumeBootPattern
+    EXIT_CODE=$?
 fi
+set -e
 
 tar zcfvp /tmp/devstack/devstack.tgz /tmp/devstack/*
 
+exit $EXIT_CODE
 END_OF_DEVSTACK_COMMANDS
+EXIT_CODE=$?
+set +e
 
 mkdir /root/artifacts
 scp -q \
@@ -334,5 +342,7 @@ scp -q \
     -o UserKnownHostsFile=/dev/null \
     stack@\$GUEST_IP:/tmp/devstack/devstack.tgz \
     /root/artifacts/
+
+exit $EXIT_CODE
 
 END_OF_XENSERVER_COMMANDS
