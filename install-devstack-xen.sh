@@ -150,7 +150,8 @@ set -eu
 
 # Verify the host is suitable for devstack
 defaultSR=\$(xe pool-list params=default-SR minimal=true)
-if [ "\$(xe sr-param-get uuid=\$defaultSR param-name=type)" != "ext" ]; then
+currentSrType=\$(xe sr-param-get uuid=\$defaultSR param-name=type)
+if [ "\$currentSrType" != "ext" -a "\$currentSrType" != "nfs" -a "\$currentSrType" != "ffs" ]; then
     if [ "true" == "$FORCE_SR_REPLACEMENT" ]; then
         echo ""
         echo ""
@@ -173,7 +174,7 @@ if [ "\$(xe sr-param-get uuid=\$defaultSR param-name=type)" != "ext" ]; then
     fi
     echo ""
     echo ""
-    echo "ERROR: The xenserver host must have an EXT3 SR as the default SR"
+    echo "ERROR: The xenserver host must have an EXT3/NFS/FFS SR as the default SR"
     echo "Use the -f flag to destroy the current default SR and create a new"
     echo "ext type default SR."
     echo ""
@@ -187,7 +188,7 @@ echo "OK"
 
 echo -n "Get the IP address of XenServer..."
 XENSERVER_IP=$(on_xenserver << GET_XENSERVER_IP
-ifconfig xenbr0 | grep "inet addr" | cut -d ":" -f2 | sed "s/ .*//"
+xe host-list params=address minimal=true
 GET_XENSERVER_IP
 )
 if [ -z "$XENSERVER_IP" ]; then
@@ -200,6 +201,9 @@ TMPDIR=$(echo "mktemp -d" | on_xenserver)
 
 on_xenserver << END_OF_XENSERVER_COMMANDS
 set -exu
+
+rm -rf /root/artifacts || true
+
 cd $TMPDIR
 
 wget -qO - "$DEVSTACK_TGZ" |
@@ -316,9 +320,19 @@ cd /opt/stack/tempest
 if [ "$TEST_TYPE" == "smoke" ]; then
     nosetests -sv --nologcapture --attr=type=smoke tempest
 elif [ "$TEST_TYPE" == "full" ]; then
-    nosetests -sv tempest/api tempest/scenario tempest/thirdparty tempest/cli
+    nosetests -sv tempest/api tempest/scenario tempest/thirdparty tempest/cli -e tempest.scenario.test_volume_boot_pattern.TestVolumeBootPattern
 fi
 
+tar zcfvp /tmp/devstack/devstack.tgz /tmp/devstack/*
+
 END_OF_DEVSTACK_COMMANDS
+
+mkdir /root/artifacts
+scp -q \
+    -o Batchmode=yes \
+    -o StrictHostKeyChecking=no \
+    -o UserKnownHostsFile=/dev/null \
+    stack@\$GUEST_IP:/tmp/devstack/devstack.tgz \
+    /root/artifacts/
 
 END_OF_XENSERVER_COMMANDS
