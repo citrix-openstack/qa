@@ -28,9 +28,14 @@ SLAVE_IP=$(cat $XSLIB/start-slave.sh | "$REMOTELIB/bash.sh" "root@$XENSERVERNAME
 "$REMOTELIB/bash.sh" "ubuntu@$SLAVE_IP" << END_OF_XSCORE_BUILD_SCRIPT
 set -eux
 
-sudo apt-get -qy update
-sudo apt-get -qy dist-upgrade
-sudo apt-get install -qy git
+sudo tee /etc/apt/apt.conf.d/90-assume-yes << APT_ASSUME_YES
+APT::Get::Assume-Yes "true";
+APT::Get::force-yes "true";
+APT_ASSUME_YES
+
+sudo apt-get update
+sudo apt-get dist-upgrade
+sudo apt-get install git
 
 git clone https://github.com/xapi-project/xenserver-core.git xenserver-core
 
