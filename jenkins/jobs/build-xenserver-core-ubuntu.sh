@@ -37,9 +37,17 @@ sudo apt-get update
 sudo apt-get dist-upgrade
 sudo apt-get install git
 
-git clone https://github.com/xapi-project/xenserver-core.git xenserver-core
+#git clone https://github.com/xapi-project/xenserver-core.git -b deb-build-fixes xenserver-core
+git clone https://github.com/matelakat/xenserver-core.git -b deb-build-fixes xenserver-core
 
 cd xenserver-core
+
+cat >> pbuilderrc.in << EOF
+MIRRORSITE="http://mirror.anl.gov/pub/ubuntu/"
+OTHERMIRROR="deb file:@PWD@/RPMS/ ./|deb-src file:@PWD@/SRPMS/ ./|deb http://ppa.launchpad.net/louis-gesbert/ocp/ubuntu raring main|deb http://mirror.anl.gov/pub/ubuntu/ raring universe"
+export http_proxy=http://gold.eng.hq.xensource.com:8000
+EOF
+
 sudo ./configure.sh
 ./makemake.py > Makefile
 sudo make
