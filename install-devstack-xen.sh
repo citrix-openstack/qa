@@ -201,6 +201,9 @@ TMPDIR=$(echo "mktemp -d" | on_xenserver)
 
 on_xenserver << END_OF_XENSERVER_COMMANDS
 set -exu
+
+rm -rf /root/artifacts || true
+
 cd $TMPDIR
 
 wget -qO - "$DEVSTACK_TGZ" |
@@ -320,6 +323,16 @@ elif [ "$TEST_TYPE" == "full" ]; then
     nosetests -sv tempest/api tempest/scenario tempest/thirdparty tempest/cli -e tempest.scenario.test_volume_boot_pattern.TestVolumeBootPattern
 fi
 
+tar zcfvp /tmp/devstack/devstack.tgz /tmp/devstack/*
+
 END_OF_DEVSTACK_COMMANDS
+
+mkdir /root/artifacts
+scp -q \
+    -o Batchmode=yes \
+    -o StrictHostKeyChecking=no \
+    -o UserKnownHostsFile=/dev/null \
+    stack@\$GUEST_IP:/tmp/devstack/devstack.tgz \
+    /root/artifacts/
 
 END_OF_XENSERVER_COMMANDS
