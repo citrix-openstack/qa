@@ -135,8 +135,12 @@ function copy_logs_on_failure()
     set -e
     if [ $EXIT_CODE -ne 0 ]; then
 	on_xenserver << END_OF_XENSERVER_COMMANDS
-set -exu
+set -xu
+cd $TMPDIR
+cd devstack*
+
 GUEST_IP=\$(. "tools/xen/functions" && find_ip_by_name DevStackOSDomU 0)
+if [ -n \$GUEST_IP ]; then
 ssh -q \
     -o Batchmode=yes \
     -o StrictHostKeyChecking=no \
@@ -144,6 +148,7 @@ ssh -q \
     "stack@\$GUEST_IP" bash -s -- << END_OF_DEVSTACK_COMMANDS
 tar zcfp /tmp/devstack_logs.tgz /tmp/devstack
 END_OF_DEVSTACK_COMMANDS
+fi
 mkdir /root/artifacts
 scp -q \
     -o Batchmode=yes \
