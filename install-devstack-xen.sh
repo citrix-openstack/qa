@@ -158,7 +158,7 @@ scp -q \
     /root/artifacts/
 END_OF_XENSERVER_COMMANDS
         mkdir ${BUILD_NUMBER}_output
-        scp -q -o BatchMode=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ${BUILD_NUMBER}.privkey $HOST:artifacts/* ${BUILD_NUMBER}_output
+        scp -q -o BatchMode=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ${BUILD_NUMBER}.privkey $XENSERVER:artifacts/* ${BUILD_NUMBER}_output
         exit $EXIT_CODE
     fi
 }
