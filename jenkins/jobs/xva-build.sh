@@ -6,7 +6,7 @@ THISDIR=$(cd $(dirname $(readlink -f "$0")) && pwd)
 
 function print_usage_and_die() {
     log_error << EOF
-usage: $0 xenserver xenserver_password setupscript_url devstack_tgz_url
+usage: $0 xenserver xenserver_password setupscript_url devstack_tgz_url nova_repo nova_branch
 
 Build a DevStack XVA
 
@@ -25,6 +25,10 @@ function parse_parameters() {
     shift || print_usage_and_die "No setupscript url specified"
     DEVSTACK_TGZ_URL="$1"
     shift || print_usage_and_die "No devstack tgz url specified"
+    NOVA_REPO="$1"
+    shift || print_usage_and_die "No nova repo specified"
+    NOVA_BRANCH="$1"
+    shift || print_usage_and_die "No nova branch specified"
     set -u
 }
 
@@ -43,7 +47,7 @@ run_bash_script_on "$WORKER" \
 
 echo "Building Nova suppack" | log_info
 run_bash_script_on "$WORKER" \
-    "$THISDIR/builds/build-nova-suppack.sh" "https://github.com/openstack/nova.git" "http://copper.eng.hq.xensource.com/builds/ddk-xs6_2.tgz" "master"
+    "$THISDIR/builds/build-nova-suppack.sh" "$NOVA_REPO" "http://copper.eng.hq.xensource.com/builds/ddk-xs6_2.tgz" "$NOVA_BRANCH"
 
 echo "Qualifying Devstack XVA with Nova suppack" | log_info
 run_bash_script_on "$WORKER" \

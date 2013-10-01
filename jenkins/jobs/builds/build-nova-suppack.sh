@@ -13,7 +13,14 @@ sudo apt-get -qy upgrade
 sudo apt-get install -qy git rpm
 
 # Create rpm file
-git clone -b "$GITBRANCH" "$GITREPO"
+
+## Check out Nova
+git clone "$GITREPO" nova
+cd nova
+git fetch origin "$GITBRANCH"
+git checkout FETCH_HEAD
+cd ..
+
 cd nova/plugins/xenserver/xenapi/contrib
 ./build-rpm.sh
 cd

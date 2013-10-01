@@ -47,8 +47,14 @@ NEUTRON_ZIPBALL_URL="http://gold.eng.hq.xensource.com/git/internal/builds/neutro
 EOF
 } >> "$EXTENSIONS"
 
-# Set FLAT_NETWORK_BRIDGE
-echo "FLAT_NETWORK_BRIDGE=osvmnet" >> $EXTENSIONS
+function testing_trunk() {
+    echo "$BRANCH_REF_NAME" | grep -q "os-trunk-test"
+}
+
+# Set FLAT_NETWORK_BRIDGE, but only if we are not testing trunk
+if ! testing_trunk; then
+    echo "FLAT_NETWORK_BRIDGE=osvmnet" >> $EXTENSIONS
+fi
 
 # Configure neutron if needed
 if [ "$SETUP_TYPE" == "neutron" ]; then
@@ -63,6 +69,7 @@ fi
 # Extend template
 sed \
     -e "/$EXTENSION_POINT/r  $EXTENSIONS" \
+    -e "s,^\(DEVSTACK_TGZ=\).*,\1http://gold.eng.hq.xensource.com/git/internal/builds/devstack/archive/$BRANCH_REF_NAME.tar.gz,g" \
     "$TEMPLATE_NAME"
 
 rm -f "$EXTENSIONS"
