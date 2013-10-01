@@ -28,5 +28,10 @@ for branch in trunk ctx; do
     done
 done
 
+cli get-job "os-ctx-test" |
+    sed \
+        -e "s,ADD_CITRIX_CHANGES=true,ADD_CITRIX_CHANGES=false,g" \
+        -e "s,os-ctx-,os-trunk-,g" |
+            cli update-job "os-trunk-test"
 
  rm -f $TEMPLATEJOB jenkins-cli.jar
