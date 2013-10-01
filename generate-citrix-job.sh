@@ -69,6 +69,7 @@ fi
 # Extend template
 sed \
     -e "/$EXTENSION_POINT/r  $EXTENSIONS" \
+    -e "s,^\(DEVSTACK_TGZ=\).*,\1http://gold.eng.hq.xensource.com/git/internal/builds/devstack/archive/$BRANCH_REF_NAME.tar.gz,g" \
     "$TEMPLATE_NAME"
 
 rm -f "$EXTENSIONS"
