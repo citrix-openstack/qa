@@ -4,7 +4,7 @@ set -eu
 function print_usage_and_die
 {
 cat >&2 << EOF
-usage: $0 XENSERVER XENSERVER_PASS PRIVKEY [-t TEST_TYPE] [-d DEVSTACK_URL] [-f] [-l LOG_FILE_DIRECTORY]
+usage: $0 XENSERVER XENSERVER_PASS PRIVKEY [-t TEST_TYPE] [-d DEVSTACK_URL] [-f] [-l LOG_FILE_DIRECTORY] [-j JEOS_URL]
 
 A simple script to use devstack to setup an OpenStack, and optionally
 run tests on it.
@@ -23,6 +23,9 @@ optional arguments:
  DEVSTACK_TGZ       An URL pointing to a tar.gz snapshot of devstack. This
                     defaults to the official devstack repository.
  LOG_FILE_DIRECTORY The directory in which to store the devstack logs on failure.
+ JEOS_URL           An URL for an xva containing an exported minimal OS template
+                    with the name jeos_template_for_devstack, to be used
+                    as a starting point.
 
 flags:
  -f                 Force SR replacement. If your XenServer has an LVM type SR,
@@ -47,6 +50,7 @@ DEVSTACK_TGZ="https://github.com/openstack-dev/devstack/archive/master.tar.gz"
 TEST_TYPE="none"
 FORCE_SR_REPLACEMENT="false"
 LOG_FILE_DIRECTORY=""
+JEOS_URL=""
 
 # Get Positional arguments
 set +u
@@ -63,7 +67,7 @@ REMAINING_OPTIONS="$#"
 
 # Get optional parameters
 set +e
-while getopts ":t:d:fl:" flag; do
+while getopts ":t:d:fl:j:" flag; do
     REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
     case "$flag" in
         t)
@@ -82,6 +86,10 @@ while getopts ":t:d:fl:" flag; do
             ;;
 	l)
 	    LOG_FILE_DIRECTORY="$OPTARG"
+            REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
+            ;;
+	j)
+	    JEOS_URL="$OPTARG"
             REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
             ;;
         \?)
@@ -113,6 +121,7 @@ TEST_TYPE:      $TEST_TYPE
 DEVSTACK_TGZ:   $DEVSTACK_TGZ
 
 FORCE_SR_REPLACEMENT: $FORCE_SR_REPLACEMENT
+JEOS_URL:             ${JEOS_URL:-template will not be imported}
 EOF
 
 echo -n "Setup ssh keys on XenServer..."
@@ -242,6 +251,34 @@ fi
 echo "OK"
 
 TMPDIR=$(echo "mktemp -d" | on_xenserver)
+
+if [ -n "$JEOS_URL" ]; then
+    echo "(re-)importing JeOS template"
+    on_xenserver << END_OF_JEOS_IMPORT
+set -eu
+JEOS_TEMPLATE="\$(xe template-list name-label="jeos_template_for_devstack" --minimal)"
+
+if [ -n "\$JEOS_TEMPLATE" ]; then
+    echo "  jeos_template_for_devstack already exist, uninstalling"
+    xe template-uninstall template-uuid="\$JEOS_TEMPLATE" force=true > /dev/null
+fi
+
+rm -f /root/jeos-for-devstack.xva
+echo "  downloading $JEOS_URL to /root/jeos-for-devstack.xva"
+wget -qO /root/jeos-for-devstack.xva "$JEOS_URL"
+echo "  importing /root/jeos-for-devstack.xva"
+xe vm-import filename=/root/jeos-for-devstack.xva
+rm -f /root/jeos-for-devstack.xva
+echo "  verify template imported"
+JEOS_TEMPLATE="\$(xe template-list name-label="jeos_template_for_devstack" --minimal)"
+if [ -z "\$JEOS_TEMPLATE" ]; then
+    echo "FATAL: template jeos_template_for_devstack does not exist after import."
+    exit 1
+fi
+
+END_OF_JEOS_IMPORT
+    echo "OK"
+fi
 
 copy_logs_on_failure on_xenserver << END_OF_XENSERVER_COMMANDS
 set -exu
