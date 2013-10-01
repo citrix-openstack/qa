@@ -6,6 +6,8 @@ XENSERVERHOST=$1
 XENSERVERPASSWORD=$2
 SETUPSCRIPT_URL="$3"
 
+shift 3
+
 TEMPKEYFILE=$(mktemp)
 
 # Prepare slave requirements
@@ -17,4 +19,4 @@ chmod 755 install-devstack-xen.sh
 rm -f $TEMPKEYFILE
 ssh-keygen -t rsa -N "" -f $TEMPKEYFILE
 ssh-keyscan $XENSERVERHOST >> ~/.ssh/known_hosts
-./install-devstack-xen.sh $XENSERVERHOST $XENSERVERPASSWORD $TEMPKEYFILE
+./install-devstack-xen.sh $XENSERVERHOST $XENSERVERPASSWORD $TEMPKEYFILE $@

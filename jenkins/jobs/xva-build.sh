@@ -6,7 +6,7 @@ THISDIR=$(cd $(dirname $(readlink -f "$0")) && pwd)
 
 function print_usage_and_die() {
     log_error << EOF
-usage: $0 xenserver xenserver_password setupscript_url nova_repo nova_branch
+usage: $0 xenserver xenserver_password setupscript_url nova_repo nova_branch jeos_url
 
 Build a DevStack XVA
 
@@ -27,6 +27,8 @@ function parse_parameters() {
     shift || print_usage_and_die "No nova repo specified"
     NOVA_BRANCH="$1"
     shift || print_usage_and_die "No nova branch specified"
+    JEOS_URL="$1"
+    shift || print_usage_and_die "No jeos url specified"
     set -u
 }
 
@@ -39,7 +41,7 @@ echo "Worker: $WORKER"
 
 echo "Building Devstack XVA" | log_info
 run_bash_script_on "$WORKER" \
-    "$THISDIR/builds/build-devstack-xva-online-stage1.sh" "$HOST" "$XenServerPassword" "$SETUPSCRIPT_URL"
+    "$THISDIR/builds/build-devstack-xva-online-stage1.sh" "$HOST" "$XenServerPassword" "$SETUPSCRIPT_URL" -j "$JEOS_URL"
 run_bash_script_on "$WORKER" \
     "$THISDIR/builds/build-devstack-xva-online-stage2.sh" "$HOST" "$XenServerPassword"
 
