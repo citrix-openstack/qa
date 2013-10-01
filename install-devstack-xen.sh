@@ -83,6 +83,7 @@ while getopts ":t:d:fl:" flag; do
 	l)
 	    LOG_FILE_DIRECTORY="$OPTARG"
             REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
+            ;;
         \?)
             print_usage_and_die "Invalid option -$OPTARG"
             ;;
