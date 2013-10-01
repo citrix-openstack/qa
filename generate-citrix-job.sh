@@ -52,7 +52,7 @@ function testing_trunk() {
 }
 
 # Set FLAT_NETWORK_BRIDGE, but only if we are not testing trunk
-if ! testing_trunk;
+if ! testing_trunk; then
     echo "FLAT_NETWORK_BRIDGE=osvmnet" >> $EXTENSIONS
 fi
 
