@@ -15,15 +15,15 @@ TEMPLATEJOB=`tempfile`
 cli get-job "os-TEMPLATE_JOB" > "$TEMPLATEJOB"
 
 function generate_job() {
-    sed -e "s/TEST_TYPE_DEFAULT/$1/g" -e "s/SETUP_TYPE_DEFAULT/$2/g" "$TEMPLATEJOB"
+    sed -e "s/TEST_TYPE_DEFAULT/$1/g" -e "s/SETUP_TYPE_DEFAULT/$2/g" -e "s/BRANCH_TYPE/$3/g" "$TEMPLATEJOB"
 }
 
 for branch in trunk ctx; do
     for test_type in smoke full; do
       for setup_type in nova-network neutron; do
         jobname="os-$branch-$setup_type-$test_type"
-        generate_job $test_type $setup_type | cli update-job "$jobname"\
-          || generate_job $test_type $setup_type | cli create-job "$jobname"
+        generate_job $test_type $setup_type $branch | cli update-job "$jobname"\
+          || generate_job $test_type $setup_type $branch | cli create-job "$jobname"
       done
     done
 done
