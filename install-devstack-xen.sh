@@ -4,29 +4,30 @@ set -eu
 function print_usage_and_die
 {
 cat >&2 << EOF
-usage: $0 XENSERVER XENSERVER_PASS PRIVKEY [-t TEST_TYPE] [-d DEVSTACK_URL] [-f]
+usage: $0 XENSERVER XENSERVER_PASS PRIVKEY [-t TEST_TYPE] [-d DEVSTACK_URL] [-f] [-l LOG_FILE_DIRECTORY]
 
 A simple script to use devstack to setup an OpenStack, and optionally
 run tests on it.
 
 positional arguments:
- XENSERVER        The address of the XenServer
- XENSERVER_PASS   The root password for the XenServer
- PRIVKEY          A passwordless private key to be used for installation.
-                  This key will be copied over to the xenserver host, and will
-                  be used for migration/resize tasks if multiple XenServers
-                  used.
+ XENSERVER          The address of the XenServer
+ XENSERVER_PASS     The root password for the XenServer
+ PRIVKEY            A passwordless private key to be used for installation.
+                    This key will be copied over to the xenserver host, and will
+                    be used for migration/resize tasks if multiple XenServers
+                    used.
 
 optional arguments:
- TEST_TYPE        Type of the tests to run. One of [none, smoke, full]
-                  defaults to none
- DEVSTACK_TGZ     An URL pointing to a tar.gz snapshot of devstack. This
-                  defaults to the official devstack repository.
+ TEST_TYPE          Type of the tests to run. One of [none, smoke, full]
+                    defaults to none
+ DEVSTACK_TGZ       An URL pointing to a tar.gz snapshot of devstack. This
+                    defaults to the official devstack repository.
+ LOG_FILE_DIRECTORY The directory in which to store the devstack logs on failure.
 
 flags:
- -f               Force SR replacement. If your XenServer has an LVM type SR,
-                  it will be destroyed and replaced with an ext SR.
-                  WARNING: This will destroy your actual default SR !
+ -f                 Force SR replacement. If your XenServer has an LVM type SR,
+                    it will be destroyed and replaced with an ext SR.
+                    WARNING: This will destroy your actual default SR !
 
 An example run:
 
@@ -45,6 +46,7 @@ exit 1
 DEVSTACK_TGZ="https://github.com/openstack-dev/devstack/archive/master.tar.gz"
 TEST_TYPE="none"
 FORCE_SR_REPLACEMENT="false"
+LOG_FILE_DIRECTORY=""
 
 # Get Positional arguments
 set +u
@@ -61,7 +63,7 @@ REMAINING_OPTIONS="$#"
 
 # Get optional parameters
 set +e
-while getopts ":t:d:f" flag; do
+while getopts ":t:d:fl:" flag; do
     REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
     case "$flag" in
         t)
@@ -78,6 +80,9 @@ while getopts ":t:d:f" flag; do
         f)
             FORCE_SR_REPLACEMENT="true"
             ;;
+	l)
+	    LOG_FILE_DIRECTORY="$OPTARG"
+            REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
         \?)
             print_usage_and_die "Invalid option -$OPTARG"
             ;;
@@ -133,8 +138,9 @@ function copy_logs_on_failure()
     $@
     EXIT_CODE=$?
     set -e
-    if [ $EXIT_CODE -ne 0 ]; then
-	on_xenserver << END_OF_XENSERVER_COMMANDS
+    if [ -n "$LOG_FILE_DIRECTORY" ]; then 
+	if [ $EXIT_CODE -ne 0 ]; then
+	    on_xenserver << END_OF_XENSERVER_COMMANDS
 set -xu
 cd $TMPDIR
 cd devstack*
@@ -157,9 +163,10 @@ scp -q \
     stack@\$GUEST_IP:/tmp/devstack_logs.tgz \
     /root/artifacts/
 END_OF_XENSERVER_COMMANDS
-        mkdir ${BUILD_NUMBER}_output
-        scp -q -o BatchMode=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ${BUILD_NUMBER}.privkey $XENSERVER:artifacts/* ${BUILD_NUMBER}_output
-        exit $EXIT_CODE
+            mkdir -p $LOG_FILE_DIRECTORY
+	    scp $_SSH_OPTIONS $XENSERVER:artifacts/* $LOG_FILE_DIRECTORY
+	    exit $EXIT_CODE
+	fi
     fi
 }
 
