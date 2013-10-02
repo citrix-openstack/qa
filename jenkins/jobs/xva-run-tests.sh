@@ -100,6 +100,20 @@ function wait_for_devstack() {
     shift
 
     on_devstack $devstack_ip << EOF
+if service devstack status; then
+    # New-style devstack
+    while ! service devstack status | grep -q running; do
+        echo -n "."
+        sleep 2
+    done
+
+    while service devstack status | grep -q running; do
+        echo -n "."
+        sleep 2
+    done
+    exit 0
+fi
+
 while true; do
     if [ -e run.sh.log ]; then
         break
@@ -125,7 +139,13 @@ function devstack_succeeded() {
     shift
 
     on_devstack $devstack_ip << EOF
-grep -q 'stack.sh completed in' run.sh.log
+set -eu
+
+if service devstack status; then
+    test -e /var/run/devstack.succeeded
+else
+    grep -q 'stack.sh completed in' run.sh.log
+fi
 EOF
 }
 
