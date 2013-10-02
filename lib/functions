@@ -93,7 +93,7 @@ function public_repo() {
 
     reponame=$(echo "$repo" | cut -d" " -f 3)
 
-    echo "git://github.com/citrix-openstack/build-$reponame"
+    echo "git@github.com/citrix-openstack/build-$reponame"
 }
 
 function source_repo() {
