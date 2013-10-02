@@ -6,7 +6,7 @@ XENSERVERHOST=$1
 XENSERVERPASSWORD=$2
 
 function xecommand() {
-    xe -s $XENSERVERHOST -u root -pw $XENSERVERPASSWORD $@
+    xe -s $XENSERVERHOST -u root -pw $XENSERVERPASSWORD "$@"
 }
 
 # Find out the UUID of the VM
@@ -14,8 +14,10 @@ VMUUID=$(xecommand vm-list name-label=DevStackOSDomU params=uuid --minimal)
 
 # Add the host internal network
 HOSTINTERNALNETWORKUUID=$(xecommand network-list name-label=Host\ internal\ management\ network params=uuid --minimal)
-HOSTINTERNALNETWORKVIFUUID=$(xecommand vif-create device=3 network-uuid=$HOSTINTERNALNETWORKUUID vm-uuid=$VMUUID) || true
-xecommand vif-plug uuid=$HOSTINTERNALNETWORKVIFUUID || true
+[ -n "$HOSTINTERNALNETWORKUUID" ]
+HOSTINTERNALNETWORKVIFUUID=$(xecommand vif-create device=3 network-uuid=$HOSTINTERNALNETWORKUUID vm-uuid=$VMUUID)
+[ -n "$HOSTINTERNALNETWORKVIFUUID" ]
+xecommand vif-plug uuid=$HOSTINTERNALNETWORKVIFUUID
 
 # Find the IP of the VM
 VMIP=$(xecommand vm-param-get uuid=$VMUUID param-name=networks | sed -ne 's,^.*0/ip: \([0-9.]*\).*$,\1,p')
