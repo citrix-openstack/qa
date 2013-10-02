@@ -167,7 +167,7 @@ if [ -z "\$JEOS_TEMPLATE" ]; then
     exit 1
 fi
 rm -f /root/jeos-for-devstack.xva
-xe template-export template-uuid="\$JEOS_TEMPLATE" filename="/root/jeos-for-devstack.xva"
+xe template-export template-uuid="\$JEOS_TEMPLATE" filename="/root/jeos-for-devstack.xva" compress=true
 END_OF_EXPORT_COMMANDS
     echo "OK"
 
