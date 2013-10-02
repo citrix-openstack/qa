@@ -27,6 +27,8 @@ def create_repo(username, password, org, repo):
 
 def main():
     username, password, org, repo = sys.argv[1:]
+    assert repo.endswith('.git')
+    repo = repo[:-len('.git')]
     create_repo(username, password, org, repo)
 
 
