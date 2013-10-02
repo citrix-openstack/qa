@@ -100,7 +100,7 @@ function wait_for_devstack() {
     shift
 
     on_devstack $devstack_ip << EOF
-if service devstack status; then
+if service devstack status > /dev/null ; then
     # New-style devstack
     while ! service devstack status | grep -q running; do
         echo -n "."
@@ -141,7 +141,7 @@ function devstack_succeeded() {
     on_devstack $devstack_ip << EOF
 set -eu
 
-if service devstack status; then
+if service devstack status > /dev/null ; then
     test -e /var/run/devstack.succeeded
 else
     grep -q 'stack.sh completed in' run.sh.log
