@@ -42,8 +42,11 @@ An example run:
   # Create a passwordless ssh key
   ssh-keygen -t rsa -N "" -f devstack_key.priv
 
-  # Install devstack on XenServer 10.219.10.25
-  $0 10.219.10.25 mypassword devstack_key.priv
+  # Cache the XenServer's host key:
+  ssh-keyscan XENSERVER >> ~/.ssh/known_hosts
+
+  # Install devstack
+  $0 XENSERVER mypassword devstack_key.priv
 
 $@
 EOF
