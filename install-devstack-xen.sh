@@ -4,7 +4,7 @@ set -eu
 function print_usage_and_die
 {
 cat >&2 << EOF
-usage: $0 XENSERVER XENSERVER_PASS PRIVKEY [-t TEST_TYPE] [-d DEVSTACK_URL] [-f] [-l LOG_FILE_DIRECTORY] [-j JEOS_URL]
+usage: $0 XENSERVER XENSERVER_PASS PRIVKEY [-t TEST_TYPE] [-d DEVSTACK_URL] [-f] [-l LOG_FILE_DIRECTORY] [-j JEOS_URL] [-e JEOS_FILENAME]
 
 A simple script to use devstack to setup an OpenStack, and optionally
 run tests on it.
@@ -26,6 +26,11 @@ optional arguments:
  JEOS_URL           An URL for an xva containing an exported minimal OS template
                     with the name jeos_template_for_devstack, to be used
                     as a starting point.
+ JEOS_FILENAME      Save a JeOS xva to the given filename and quit. If this
+                    parameter is specified, no private key setup or devstack
+                    installation will be done. The exported file could be
+                    re-used later by putting it to a webserver, and specifying
+                    JEOS_URL
 
 flags:
  -f                 Force SR replacement. If your XenServer has an LVM type SR,
@@ -51,6 +56,7 @@ TEST_TYPE="none"
 FORCE_SR_REPLACEMENT="false"
 LOG_FILE_DIRECTORY=""
 JEOS_URL=""
+JEOS_FILENAME=""
 
 # Get Positional arguments
 set +u
@@ -67,7 +73,7 @@ REMAINING_OPTIONS="$#"
 
 # Get optional parameters
 set +e
-while getopts ":t:d:fl:j:" flag; do
+while getopts ":t:d:fl:j:e:" flag; do
     REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
     case "$flag" in
         t)
@@ -90,6 +96,10 @@ while getopts ":t:d:fl:j:" flag; do
             ;;
 	j)
 	    JEOS_URL="$OPTARG"
+            REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
+            ;;
+	e)
+	    JEOS_FILENAME="$OPTARG"
             REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
             ;;
         \?)
@@ -122,25 +132,59 @@ DEVSTACK_TGZ:   $DEVSTACK_TGZ
 
 FORCE_SR_REPLACEMENT: $FORCE_SR_REPLACEMENT
 JEOS_URL:             ${JEOS_URL:-template will not be imported}
+JEOS_FILENAME:        ${JEOS_FILENAME:-not exporting JeOS}
 EOF
-
-echo -n "Setup ssh keys on XenServer..."
-tmp_dir="$(mktemp -d)"
-ssh-keygen -y -f $PRIVKEY > "$tmp_dir/devstack.pub"
-sshpass -p "$XENSERVER_PASS" \
-    ssh-copy-id \
-        -i "$tmp_dir/devstack.pub" \
-        root@$XENSERVER > /dev/null 2>&1
-scp $_SSH_OPTIONS $PRIVKEY "root@$XENSERVER:.ssh/id_rsa"
-scp $_SSH_OPTIONS $tmp_dir/devstack.pub "root@$XENSERVER:.ssh/id_rsa.pub"
-rm -rf "$tmp_dir"
-unset tmp_dir
-echo "OK"
 
 # Helper function
 function on_xenserver() {
     ssh $_SSH_OPTIONS "root@$XENSERVER" bash -s --
 }
+
+if [ -z "$JEOS_FILENAME" ]; then
+    echo -n "Setup ssh keys on XenServer..."
+    tmp_dir="$(mktemp -d)"
+    ssh-keygen -y -f $PRIVKEY > "$tmp_dir/devstack.pub"
+    sshpass -p "$XENSERVER_PASS" \
+        ssh-copy-id \
+            -i "$tmp_dir/devstack.pub" \
+            root@$XENSERVER > /dev/null 2>&1
+    scp $_SSH_OPTIONS $PRIVKEY "root@$XENSERVER:.ssh/id_rsa"
+    scp $_SSH_OPTIONS $tmp_dir/devstack.pub "root@$XENSERVER:.ssh/id_rsa.pub"
+    rm -rf "$tmp_dir"
+    unset tmp_dir
+    echo "OK"
+else
+    echo -n "Exporting JeOS template..."
+    on_xenserver << END_OF_EXPORT_COMMANDS
+set -eu
+JEOS_TEMPLATE="\$(xe template-list name-label="jeos_template_for_devstack" --minimal)"
+
+if [ -z "\$JEOS_TEMPLATE" ]; then
+    echo "FATAL: jeos_template_for_devstack not found"
+    exit 1
+fi
+rm -f /root/jeos-for-devstack.xva
+xe template-export template-uuid="\$JEOS_TEMPLATE" filename="/root/jeos-for-devstack.xva"
+END_OF_EXPORT_COMMANDS
+    echo "OK"
+
+    echo -n "Copy exported template to local file..."
+    if scp $_SSH_OPTIONS "root@$XENSERVER:/root/jeos-for-devstack.xva" "$JEOS_FILENAME"; then
+        echo "OK"
+        RETURN_CODE=0
+    else
+        echo "FAILED"
+        RETURN_CODE=1
+    fi
+    echo "Cleanup: delete exported template from XenServer"
+    on_xenserver << END_OF_CLEANUP
+set -eu
+rm -f /root/jeos-for-devstack.xva
+END_OF_CLEANUP
+    echo "JeOS export done, exiting."
+    exit $RETURN_CODE
+fi
+
 
 function copy_logs_on_failure()
 {
