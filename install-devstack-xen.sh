@@ -297,6 +297,17 @@ if [ -z "$XENSERVER_IP" ]; then
 fi
 echo "OK"
 
+echo -n "Hack ISCSISR.py on XenServer (original saved to /root/ISCSISR.py.orig)..."
+on_xenserver << HACK_ISCSI_SR
+set -eu
+
+if ! [ -e "/root/ISCSISR.py.orig" ]; then
+    cp /opt/xensource/sm/ISCSISR.py /root/ISCSISR.py.orig
+fi
+sed -e "s/'phy'/'aio'/g" /root/ISCSISR.py.orig > /opt/xensource/sm/ISCSISR.py
+HACK_ISCSI_SR
+echo "OK"
+
 TMPDIR=$(echo "mktemp -d" | on_xenserver)
 
 if [ -n "$JEOS_URL" ]; then
