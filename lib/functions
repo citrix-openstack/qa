@@ -84,6 +84,17 @@ function dst_repo() {
     echo "git://gold.eng.hq.xensource.com/git/internal/builds/$reponame"
 }
 
+function public_repo() {
+    local repo
+
+    repo="$1"
+
+    local reponame
+
+    reponame=$(echo "$repo" | cut -d" " -f 3)
+
+    echo "git://github.com/citrix-openstack/build-$reponame"
+}
 
 function source_repo() {
     local repo
@@ -159,6 +170,21 @@ function add_build_remote() {
             cd "$varname"
             if ! git remote -v | grep -q "^build"; then
                 git remote add build $(dst_repo "$repo")
+            fi
+        )
+    done
+}
+
+function add_public_remote() {
+    local repo
+    local varname
+
+    generate_repos | while read repo; do
+        varname=$(var_name "$repo")
+        (
+            cd "$varname"
+            if ! git remote -v | grep -q "^public"; then
+                git remote add public $(public_repo "$repo")
             fi
         )
     done
