@@ -76,6 +76,23 @@ EOF
 }
 
 
+function perform_xenserver_hacks() {
+    local xenserver
+
+    xenserver="$1"
+    shift
+
+    remote_bash root@$xenserver << EOF
+set -eu
+rm -rf /images
+defaultSR=\$(xe pool-list params=default-SR minimal=true)
+mkdir -p /var/run/sr-mount/\$defaultSR/os-images
+ln -s /var/run/sr-mount/\$defaultSR/os-images /images
+EOF
+
+}
+
+
 function main() {
     local xenserver
     local xva_location
@@ -117,6 +134,9 @@ EOF
     echo "   Done" | log_info
     echo " - Displaying network configuration"
     show_devstack_network_config $xenserver
+    echo "   Done" | log_info
+    echo " - Performing XenServer hacks"
+    perform_xenserver_hacks $xenserver
     echo "   Done" | log_info
 }
 
