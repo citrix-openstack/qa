@@ -136,7 +136,7 @@ EOF
     show_devstack_network_config $xenserver
     echo "   Done" | log_info
     echo " - Performing XenServer hacks"
-    perform_xenserver_hacks $xenserver
+    # perform_xenserver_hacks $xenserver
     echo "   Done" | log_info
 }
 
