@@ -301,10 +301,18 @@ echo -n "Hack ISCSISR.py on XenServer (original saved to /root/ISCSISR.py.orig).
 on_xenserver << HACK_ISCSI_SR
 set -eu
 
-if ! [ -e "/root/ISCSISR.py.orig" ]; then
-    cp /opt/xensource/sm/ISCSISR.py /root/ISCSISR.py.orig
+iscsi_target_file=""
+for candidate_file in "/opt/xensource/sm/ISCSISR.py" "/usr/lib64/xcp-sm/ISCSISR.py"; do
+    if [ -e "$candidate_file" ]; then
+        iscsi_target_file=$candidate_file
+    fi
+done
+if [ -n "$iscsi_target_file" ]; then
+    if ! [ -e "/root/ISCSISR.py.orig" ]; then
+        cp $iscsi_target_file /root/ISCSISR.py.orig
+    fi
+    sed -e "s/'phy'/'aio'/g" /root/ISCSISR.py.orig > $iscsi_target_file
 fi
-sed -e "s/'phy'/'aio'/g" /root/ISCSISR.py.orig > /opt/xensource/sm/ISCSISR.py
 HACK_ISCSI_SR
 echo "OK"
 
