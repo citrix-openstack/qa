@@ -303,15 +303,15 @@ set -eu
 
 iscsi_target_file=""
 for candidate_file in "/opt/xensource/sm/ISCSISR.py" "/usr/lib64/xcp-sm/ISCSISR.py"; do
-    if [ -e "$candidate_file" ]; then
-        iscsi_target_file=$candidate_file
+    if [ -e "\$candidate_file" ]; then
+        iscsi_target_file=\$candidate_file
     fi
 done
-if [ -n "$iscsi_target_file" ]; then
+if [ -n "\$iscsi_target_file" ]; then
     if ! [ -e "/root/ISCSISR.py.orig" ]; then
-        cp $iscsi_target_file /root/ISCSISR.py.orig
+        cp \$iscsi_target_file /root/ISCSISR.py.orig
     fi
-    sed -e "s/'phy'/'aio'/g" /root/ISCSISR.py.orig > $iscsi_target_file
+    sed -e "s/'phy'/'aio'/g" /root/ISCSISR.py.orig > \$iscsi_target_file
 fi
 HACK_ISCSI_SR
 echo "OK"
