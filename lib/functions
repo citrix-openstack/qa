@@ -28,7 +28,7 @@ function generate_repos() {
             echo "DEVSTACK_REPO openstack-dev devstack.git"
         } | extract_var_user_repo | sed 's/$/ github/'
         non_git_repos | extract_var_user_repo | sed 's/$/ anongit/'
-    } | sort
+    } | sort | sed -e '/^BM_IMAGE_BUILD_REPO.*$/d'
 }
 
 function assert_no_new_repos() {
@@ -36,7 +36,6 @@ diff -u \
     <(generate_repos) \
     - \
     << EOF
-BM_IMAGE_BUILD_REPO stackforge diskimage-builder.git github
 BM_POSEUR_REPO tripleo bm_poseur.git github
 CEILOMETERCLIENT_REPO openstack python-ceilometerclient.git github
 CEILOMETER_REPO openstack ceilometer.git github
@@ -93,7 +92,7 @@ function public_repo() {
 
     reponame=$(echo "$repo" | cut -d" " -f 3)
 
-    echo "git@github.com:citrix-openstack/build-$reponame"
+    echo "git@github.com:citrix-openstack-build/$reponame"
 }
 
 function source_repo() {
@@ -183,9 +182,12 @@ function add_public_remote() {
         varname=$(var_name "$repo")
         (
             cd "$varname"
-            if ! git remote -v | grep -q "^public"; then
-                git remote add public $(public_repo "$repo")
+            if git remote -v | grep -q "^public"; then
+                echo "Removed public remote"
+                git remote rm public
             fi
+            echo "Add public remote"
+            git remote add public $(public_repo "$repo")
         )
     done
 }
