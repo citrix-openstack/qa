@@ -463,9 +463,9 @@ cd /opt/stack/devstack/
 
 cd /opt/stack/tempest 
 if [ "$TEST_TYPE" == "smoke" ]; then
-    nosetests -sv --nologcapture --attr=type=smoke tempest
+    ./run_tests.sh -s -N
 elif [ "$TEST_TYPE" == "full" ]; then
-    nosetests -sv tempest/api tempest/scenario tempest/thirdparty tempest/cli
+    ./run_tests.sh -N
 fi
 
 END_OF_DEVSTACK_COMMANDS
