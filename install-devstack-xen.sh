@@ -465,7 +465,7 @@ cd /opt/stack/tempest
 if [ "$TEST_TYPE" == "smoke" ]; then
     ./run_tests.sh -s -N
 elif [ "$TEST_TYPE" == "full" ]; then
-    ./run_tests.sh -N
+    nosetests -sv tempest/api tempest/scenario tempest/thirdparty tempest/cli
 fi
 
 END_OF_DEVSTACK_COMMANDS
