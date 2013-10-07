@@ -45,6 +45,7 @@ EOL
 #setup devstack
 sed -i '/XENAPI_CONNECTION_URL/d' /opt/stack/devstack/localrc
 sed -i '/VNCSERVER_PROXYCLIENT_ADDRESS/d' /opt/stack/devstack/localrc
+sed -i '/XENAPI_PASSWORD/d' /opt/stack/devstack/localrc
 cat <<"EOL" >> /opt/stack/devstack/localrc
 XENAPI_CONNECTION_URL="https://169.254.0.1"
 VNCSERVER_PROXYCLIENT_ADDRESS=169.254.0.1
