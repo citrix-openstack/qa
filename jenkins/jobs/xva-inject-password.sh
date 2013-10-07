@@ -19,7 +19,7 @@ if [ "halted" != "\$(xe vm-param-get param-name=power-state uuid=\$DEVSTACK)" ];
     xe vm-shutdown uuid=\$DEVSTACK
 fi
 
-ROOT_VBD=\$(xe vbd-list vm-uuid=\$DEVSTACK device=xvda --minimal)
+ROOT_VBD=\$(xe vbd-list vm-uuid=\$DEVSTACK userdevice=0 --minimal)
 ROOT_VDI=\$(xe vbd-param-get param-name=vdi-uuid uuid=\$ROOT_VBD)
 
 SLAVE=\$(xe vm-list name-label=slave --minimal)
@@ -56,7 +56,7 @@ DEVSTACK=\$(xe vm-list name-label=$DEVSTACK_NAME --minimal)
 
 SLAVE=\$(xe vm-list name-label=slave --minimal)
 
-SLAVE_VBD=\$(xe vbd-list vm-uuid=\$SLAVE device=xvdb --minimal)
+SLAVE_VBD=\$(xe vbd-list vm-uuid=\$SLAVE userdevice=1 --minimal)
 
 xe vbd-unplug uuid=\$SLAVE_VBD
 
