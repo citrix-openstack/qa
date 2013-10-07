@@ -11,7 +11,7 @@ function print_usage_and_die
 cat >&2 << EOF
 usage: $0 XENSERVERNAME
 
-Create a ceph box
+Build xenserver-core packages
 
 positional arguments:
  XENSERVERNAME     The name of the XenServer
