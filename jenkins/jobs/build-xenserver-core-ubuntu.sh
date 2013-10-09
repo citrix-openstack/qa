@@ -37,8 +37,7 @@ sudo apt-get update
 sudo apt-get dist-upgrade
 sudo apt-get install git
 
-#git clone https://github.com/xapi-project/xenserver-core.git -b deb-build-fixes xenserver-core
-git clone https://github.com/matelakat/xenserver-core.git -b mate-fixing-xsc xenserver-core
+git clone https://github.com/xapi-project/xenserver-core.git -b master xenserver-core
 
 cd xenserver-core
 
