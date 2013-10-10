@@ -23,9 +23,9 @@ XENSERVERNAME="${1-$(print_usage_and_die)}"
 
 set -x
 
-SLAVE_IP=$(cat $XSLIB/start-slave.sh | "$REMOTELIB/bash.sh" "root@$XENSERVERNAME")
+WORKER=$(cat $XSLIB/get-worker.sh | "$REMOTELIB/bash.sh" "root@$XENSERVERNAME" none raring raring)
 
-"$REMOTELIB/bash.sh" "ubuntu@$SLAVE_IP" << END_OF_XSCORE_BUILD_SCRIPT
+"$REMOTELIB/bash.sh" $WORKER << END_OF_XSCORE_BUILD_SCRIPT
 set -eux
 
 sudo tee /etc/apt/apt.conf.d/90-assume-yes << APT_ASSUME_YES
