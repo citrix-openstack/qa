@@ -35,7 +35,7 @@ APT_ASSUME_YES
 
 sudo apt-get update
 sudo apt-get dist-upgrade
-sudo apt-get install git
+sudo apt-get install git ocaml-nox
 
 git clone https://github.com/xapi-project/xenserver-core.git -b master xenserver-core
 
