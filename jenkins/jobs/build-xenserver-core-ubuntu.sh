@@ -23,9 +23,9 @@ XENSERVERNAME="${1-$(print_usage_and_die)}"
 
 set -x
 
-SLAVE_IP=$(cat $XSLIB/start-slave.sh | "$REMOTELIB/bash.sh" "root@$XENSERVERNAME")
+WORKER=$(cat $XSLIB/get-worker.sh | "$REMOTELIB/bash.sh" "root@$XENSERVERNAME" none raring raring)
 
-"$REMOTELIB/bash.sh" "ubuntu@$SLAVE_IP" << END_OF_XSCORE_BUILD_SCRIPT
+"$REMOTELIB/bash.sh" $WORKER << END_OF_XSCORE_BUILD_SCRIPT
 set -eux
 
 sudo tee /etc/apt/apt.conf.d/90-assume-yes << APT_ASSUME_YES
@@ -37,14 +37,13 @@ sudo apt-get update
 sudo apt-get dist-upgrade
 sudo apt-get install git
 
-#git clone https://github.com/xapi-project/xenserver-core.git -b deb-build-fixes xenserver-core
-git clone https://github.com/matelakat/xenserver-core.git -b deb-build-fixes xenserver-core
+git clone https://github.com/xapi-project/xenserver-core.git -b master xenserver-core
 
 cd xenserver-core
 
+sed -ie 's,http://gb.archive.ubuntu.com/ubuntu/,http://mirror.anl.gov/pub/ubuntu/,g' pbuilderrc.in
+
 cat >> pbuilderrc.in << EOF
-MIRRORSITE="http://mirror.anl.gov/pub/ubuntu/"
-OTHERMIRROR="deb file:@PWD@/RPMS/ ./|deb-src file:@PWD@/SRPMS/ ./|deb http://ppa.launchpad.net/louis-gesbert/ocp/ubuntu raring main|deb http://mirror.anl.gov/pub/ubuntu/ raring universe"
 export http_proxy=http://gold.eng.hq.xensource.com:8000
 EOF
 

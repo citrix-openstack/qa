@@ -5,6 +5,7 @@ NETWORKING="0=xenbr0,${1:-}"
 
 SLAVENAME="${2:-slave}"
 FRESHSLAVE="${SLAVENAME}-fresh"
+IMAGENAME="${3:-slave}"
 
 function resolve_to_network() {
     local name_or_bridge
@@ -71,7 +72,7 @@ then
     mkdir -p /mnt/exported-vms
 
     mount -t nfs copper.eng.hq.xensource.com:/exported-vms /mnt/exported-vms
-    VM=$(xe vm-import filename=/mnt/exported-vms/slave.xva)
+    VM=$(xe vm-import filename=/mnt/exported-vms/${IMAGENAME}.xva)
     umount /mnt/exported-vms
 
     xe vm-param-set uuid="$VM" name-label="$SLAVENAME"
