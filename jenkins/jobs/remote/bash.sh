@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eu
+set -eux
 
 function print_usage_and_die
 {
