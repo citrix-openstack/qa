@@ -17,7 +17,7 @@ def create_query_expression(owners):
 def query_for_extra_changes(changes):
     if changes:
         result = ' OR '
-        result += ' OR '.join('change:%s' % change for change in changes)
+        result += ' OR '.join('( change:%s AND status:open )' % change for change in changes)
         return result
     else:
         return ''
