@@ -14,6 +14,15 @@ def create_query_expression(owners):
     return '( ' + ' OR '.join('owner:%s' % owner for owner in owners) + ') '
 
 
+def query_for_extra_changes(changes):
+    if changes:
+        result = ' OR '
+        result += ' OR '.join('change:%s' % change for change in changes)
+        return result
+    else:
+        return ''
+
+
 def main(args):
     hostname = args.host
     port = int(args.port)
@@ -26,8 +35,8 @@ def main(args):
     client.set_missing_host_key_policy(paramiko.WarningPolicy())
     client.connect(hostname, port=port, username=username, key_filename=keyfile)
     stdin, stdout, stderr = client.exec_command(
-        "gerrit query --patch-sets --format=JSON status:open AND %s" %
-            create_query_expression(owners))
+        "gerrit query --patch-sets --format=JSON status:open AND %s %s" %
+            (create_query_expression(owners), query_for_extra_changes(args.change)))
 
 
     def to_change_record(change):
@@ -69,5 +78,7 @@ if __name__ == "__main__":
         help='Specify a host. default: review.openstack.org')
     parser.add_argument('--port', default='29418',
         help='Specify a port. default: 29418')
+    parser.add_argument('--change', action='append',
+        help='Extra change ids to pick')
     args = parser.parse_args()
     main(args)
