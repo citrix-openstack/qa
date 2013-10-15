@@ -51,8 +51,12 @@ function testing_trunk() {
     echo "$BRANCH_REF_NAME" | grep -q "os-trunk-test"
 }
 
+function neutron_setup() {
+    [ "$SETUP_TYPE" = "neutron" ]
+}
+
 # Set FLAT_NETWORK_BRIDGE, but only if we are not testing trunk
-if ! testing_trunk; then
+if ! testing_trunk && ! neutron_setup ; then
     echo "FLAT_NETWORK_BRIDGE=osvmnet" >> $EXTENSIONS
 fi
 
