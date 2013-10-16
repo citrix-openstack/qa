@@ -1,5 +1,5 @@
 #!/bin/bash
-set -eu
+set -eux
 
 THISDIR=$(cd $(dirname $(readlink -f "$0")) && pwd)
 . "$THISDIR/functions.sh"
