@@ -41,7 +41,7 @@ git clone https://github.com/xapi-project/xenserver-core.git -b master xenserver
 
 cd xenserver-core
 
-sed -ie 's,http://gb.archive.ubuntu.com/ubuntu/,http://mirror.anl.gov/pub/ubuntu/,g' pbuilderrc.in
+sed -ie 's,http://gb.archive.ubuntu.com/ubuntu/,http://mirror.anl.gov/pub/ubuntu/,g' scripts/deb/pbuilderrc.in
 
 cat >> pbuilderrc.in << EOF
 export http_proxy=http://gold.eng.hq.xensource.com:8000
