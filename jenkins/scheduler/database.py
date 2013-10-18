@@ -107,7 +107,7 @@ def lock_items(filename, lock, term_generator=None, lock_reason=None):
         raise ValueError("Invalid lock value: %s" % repr(lock))
 
     import sqlite3
-    conn = sqlite3.connect(filename)
+    conn = sqlite3.connect(filename, isolation_level='EXCLUSIVE')
 
     c = conn.cursor()
 
