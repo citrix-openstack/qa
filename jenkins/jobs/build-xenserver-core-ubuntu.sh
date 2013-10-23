@@ -9,21 +9,25 @@ TESTLIB=$(cd $(dirname $(readlink -f "$0")) && cd tests && pwd)
 function print_usage_and_die
 {
 cat >&2 << EOF
-usage: $0 XENSERVERNAME
+usage: $0 XENSERVERNAME SLAVE_PARAM_FILE
 
 Build xenserver-core packages
 
 positional arguments:
  XENSERVERNAME     The name of the XenServer
+ SLAVE_PARAM_FILE  The slave VM's parameters will be placed to this file
 EOF
 exit 1
 }
 
 XENSERVERNAME="${1-$(print_usage_and_die)}"
+SLAVE_PARAM_FILE="${2-$(print_usage_and_die)}"
 
 set -x
 
 WORKER=$(cat $XSLIB/get-worker.sh | "$REMOTELIB/bash.sh" "root@$XENSERVERNAME" none raring raring)
+
+echo "$WORKER" > $SLAVE_PARAM_FILE
 
 "$REMOTELIB/bash.sh" $WORKER << END_OF_XSCORE_BUILD_SCRIPT
 set -eux
