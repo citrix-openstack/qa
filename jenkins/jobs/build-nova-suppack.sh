@@ -30,7 +30,7 @@ DDK_ROOT_URL="${3-$(print_usage_and_die)}"
 GITBRANCH="${4-$(print_usage_and_die)}"
 
 echo "Spinning up virtual machine"
-WORKER=$(cat $XSLIB/get_worker.sh | remote_bash "root@$SERVERNAME")
+WORKER=$(cat $XSLIB/get-worker.sh | remote_bash "root@$SERVERNAME")
 echo "Starting job on $WORKER"
 run_bash_script_on "$WORKER" \
     "$BUILDLIB/build-nova-suppack.sh" "$GITREPO" "$DDK_ROOT_URL" "$GITBRANCH"
