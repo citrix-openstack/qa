@@ -1,6 +1,8 @@
 #!/bin/bash
 set -eux
 
+BUILD_VERSION="$1"
+
 apt-get -qy update
 apt-get -qy upgrade
 
@@ -10,8 +12,8 @@ git clone https://github.com/xapi-project/xenserver-core.git -b master xenserver
 
 cd xenserver-core
 
-rsync -a ubuntu@unsteve.eng.hq.xensource.com:/xenserver_core_debs/84/deb/ RPMS
-rsync -a ubuntu@unsteve.eng.hq.xensource.com:/xenserver_core_debs/84/deb-src/ SRPMS
+rsync -a xscore_deb_producer@unsteve.eng.hq.xensource.com:/xenserver_core_debs/$BUILD_VERSION/deb/ RPMS
+rsync -a xscore_deb_producer@unsteve.eng.hq.xensource.com:/xenserver_core_debs/$BUILD_VERSION/deb-src/ SRPMS
 
 # inject Keyfile for Launchpad PPA for Louis Gesbert
 apt-key add - << KEYFILE
@@ -30,4 +32,4 @@ KQ3afU1hlF6EsITRd5qGry7ftxoLKOrVp8qSw9O/PdFgBTTGvgE=
 -----END PGP PUBLIC KEY BLOCK-----
 KEYFILE
 
-bash scripts/deb/install.sh > installog.txt 2>&1 < /dev/null
+bash scripts/deb/install.sh
