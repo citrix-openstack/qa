@@ -3,11 +3,14 @@ set -exu
 
 JENKINS_URL="http://bronze.eng.hq.xensource.com:8080"
 
+USERNAME="$1"
+PASSWORD="$2"
+
 [ -e jenkins-cli.jar ] || wget "$JENKINS_URL/jnlpJars/jenkins-cli.jar"
 
 function cli
 {
-    java -jar jenkins-cli.jar  -s "$JENKINS_URL" "$@"
+    java -jar jenkins-cli.jar  -s "$JENKINS_URL" "$@" --username "$USERNAME" --password "$PASSWORD"
 }
 
 TEMPLATEJOB=`tempfile`
