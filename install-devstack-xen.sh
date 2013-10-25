@@ -144,10 +144,22 @@ function on_xenserver() {
     ssh $_SSH_OPTIONS "root@$XENSERVER" bash -s --
 }
 
+function assert_tool_exists() {
+    local tool_name
+
+    tool_name="$1"
+
+    if ! which "$tool_name" >/dev/null; then
+        echo "ERROR: $tool_name is required for this script, please install it on your system! " >&2
+        exit 1
+    fi
+}
+
 if [ -z "$JEOS_FILENAME" ]; then
     echo -n "Setup ssh keys on XenServer..."
     tmp_dir="$(mktemp -d)"
     ssh-keygen -y -f $PRIVKEY > "$tmp_dir/devstack.pub"
+    assert_tool_exists sshpass
     sshpass -p "$XENSERVER_PASS" \
         ssh-copy-id \
             -i "$tmp_dir/devstack.pub" \
