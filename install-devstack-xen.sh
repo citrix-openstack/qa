@@ -7,7 +7,8 @@ cat >&2 << EOF
 usage: $0 XENSERVER XENSERVER_PASS PRIVKEY [-t TEST_TYPE] [-d DEVSTACK_URL] [-f] [-l LOG_FILE_DIRECTORY] [-j JEOS_URL] [-e JEOS_FILENAME]
 
 A simple script to use devstack to setup an OpenStack, and optionally
-run tests on it.
+run tests on it. This script should be executed on an operator machine, and
+it will execute commands through ssh on the remote XenServer specified.
 
 positional arguments:
  XENSERVER          The address of the XenServer
