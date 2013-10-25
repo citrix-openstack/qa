@@ -60,6 +60,7 @@ OPENSTACKCLIENT_REPO openstack python-openstackclient.git github
 OSLOCFG_REPO openstack oslo.config.git github
 OSLOMSG_REPO openstack oslo.messaging.git github
 PBR_REPO openstack-dev pbr.git github
+PECAN_REPO stackforge pecan.git github
 REQUIREMENTS_REPO openstack requirements.git github
 RYU_REPO osrg ryu.git github
 SPICE_REPO spice spice-html5.git anongit
@@ -69,6 +70,7 @@ SWIFT_REPO openstack swift.git github
 TEMPEST_REPO openstack tempest.git github
 TROVECLIENT_REPO openstack python-troveclient.git github
 TROVE_REPO openstack trove.git github
+WSME_REPO stackforge wsme.git github
 EOF
 }
 
