@@ -208,8 +208,8 @@ function copy_logs_on_failure()
     $@
     EXIT_CODE=$?
     set -e
-    if [ -n "$LOG_FILE_DIRECTORY" ]; then 
-	if [ $EXIT_CODE -ne 0 ]; then
+    if [ $EXIT_CODE -ne 0 ]; then
+        if [ -n "$LOG_FILE_DIRECTORY" ]; then
 	    on_xenserver << END_OF_XENSERVER_COMMANDS
 set -xu
 cd $TMPDIR
@@ -235,8 +235,8 @@ scp -q \
 END_OF_XENSERVER_COMMANDS
             mkdir -p $LOG_FILE_DIRECTORY
 	    scp $_SSH_OPTIONS $XENSERVER:artifacts/* $LOG_FILE_DIRECTORY
-	    exit $EXIT_CODE
 	fi
+        exit $EXIT_CODE
     fi
 }
 
@@ -474,7 +474,7 @@ set -exu
 cd /opt/stack/devstack/
 ./exercise.sh
 
-cd /opt/stack/tempest 
+cd /opt/stack/tempest
 if [ "$TEST_TYPE" == "smoke" ]; then
     ./run_tests.sh -s -N
 elif [ "$TEST_TYPE" == "full" ]; then
