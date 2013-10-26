@@ -94,16 +94,16 @@ while getopts ":t:d:fl:j:e:" flag; do
         f)
             FORCE_SR_REPLACEMENT="true"
             ;;
-	l)
-	    LOG_FILE_DIRECTORY="$OPTARG"
+        l)
+            LOG_FILE_DIRECTORY="$OPTARG"
             REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
             ;;
-	j)
-	    JEOS_URL="$OPTARG"
+        j)
+            JEOS_URL="$OPTARG"
             REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
             ;;
-	e)
-	    JEOS_FILENAME="$OPTARG"
+        e)
+            JEOS_FILENAME="$OPTARG"
             REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
             ;;
         \?)
@@ -210,7 +210,7 @@ function copy_logs_on_failure()
     set -e
     if [ $EXIT_CODE -ne 0 ]; then
         if [ -n "$LOG_FILE_DIRECTORY" ]; then
-	    on_xenserver << END_OF_XENSERVER_COMMANDS
+            on_xenserver << END_OF_XENSERVER_COMMANDS
 set -xu
 cd $TMPDIR
 cd devstack*
@@ -234,8 +234,8 @@ scp -q \
     /root/artifacts/
 END_OF_XENSERVER_COMMANDS
             mkdir -p $LOG_FILE_DIRECTORY
-	    scp $_SSH_OPTIONS $XENSERVER:artifacts/* $LOG_FILE_DIRECTORY
-	fi
+            scp $_SSH_OPTIONS $XENSERVER:artifacts/* $LOG_FILE_DIRECTORY
+        fi
         exit $EXIT_CODE
     fi
 }
