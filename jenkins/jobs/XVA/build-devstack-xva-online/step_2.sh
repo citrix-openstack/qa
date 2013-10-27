@@ -17,7 +17,8 @@ scp -B -3 -o 'StrictHostKeyChecking no' \
 ssh $INTERNAL_HTTP_USER_HOST chmod 755 $INTERNAL_NOVAPLUGINS_PATH
 
 INTERNAL_XVA_PATH="$(internal_xva_path $XVA_INTERNAL_NAME)"
-scp -B -3 -o 'StrictHostKeyChecking no' ubuntu@$SLAVE_IP:~/devstack.xva \
+scp -B -3 -o 'StrictHostKeyChecking no' \
+    ubuntu@$SLAVE_IP:~/devstack.xva \
     $INTERNAL_HTTP_USER_HOST:$INTERNAL_XVA_PATH
 ssh $INTERNAL_HTTP_USER_HOST chmod 755 $INTERNAL_XVA_PATH
 
