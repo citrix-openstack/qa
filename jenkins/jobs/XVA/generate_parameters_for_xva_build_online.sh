@@ -23,11 +23,13 @@ if [ "$1" = "daily" ]; then
 else
     [ "$1" = "named" ]
 fi
+EDITED_SCRIPT="$2"
+
 
 # Edit the installer script, and replace the repos with the public ones.
 wget -qO - "$DEVSTACK_INSTALLER_SCRIPT_URL" |
     ./change-repos-of-generated-jobs-to-public.sh |
-    ./remove-ubunutu-install-settings.sh > ${BUILD_NUMBER}.sh
+    ./remove-ubunutu-install-settings.sh > $EDITED_SCRIPT
 
 # Copy the installer script to a web server
 scp ${BUILD_NUMBER}.sh "devstack_script_producer@unsteve.eng.hq.xensource.com:/devstack-scripts/${BUILD_TAG}.sh"
