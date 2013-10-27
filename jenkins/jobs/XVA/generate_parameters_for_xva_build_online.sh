@@ -20,6 +20,8 @@ if [ "$1" = "daily" ]; then
         echo "Build found for today"
         exit 1
     fi
+else
+    [ "$1" = "named" ]
 fi
 
 # Edit the installer script, and replace the repos with the public ones.
