@@ -1,39 +1,29 @@
 #!/bin/bash
 set -eux
 
+THISDIR="$(cd "$(dirname $0)" && pwd)"
+. "${THISDIR}/../lib.sh"
+
 . "$(pwd)/${BUILD_NUMBER}.properties"
 
-jenkins/jobs/xva-build.sh $HOST $XenServerPassword "$SETUPSCRIPT_URL" "$NOVA_REPO" "$NOVA_BRANCH" "$JEOS_URL"
+jenkins/jobs/xva-build.sh "$HOST" "$XenServerPassword" "$SETUPSCRIPT_URL" "$NOVA_REPO" "$NOVA_BRANCH" "$JEOS_URL"
 
 SLAVE_IP="$(cat jenkins/jobs/xslib/get-slave-ip.sh | jenkins/jobs/remote/bash.sh $HOST)"
 
-echo "Copying build result to internal copper"
-TODAY=$(date +"%m_%d_%Y")
-scp -B -3 -o 'StrictHostKeyChecking no' ubuntu@$SLAVE_IP:~/suppack/novaplugins.iso \
-    jenkinsoutput@copper.eng.hq.xensource.com:/usr/share/nginx/www/builds/novaplugins-$TODAY.iso
-ssh jenkinsoutput@copper.eng.hq.xensource.com chmod 755 /usr/share/nginx/www/builds/novaplugins-$TODAY.iso
+INTERNAL_NOVAPLUGINS_PATH="$(internal_novaplugins_path $XVA_INTERNAL_NAME)"
+scp -B -3 -o 'StrictHostKeyChecking no' \
+    ubuntu@$SLAVE_IP:~/suppack/novaplugins.iso \
+    $INTERNAL_HTTP_USER_HOST:$INTERNAL_NOVAPLUGINS_PATH
+ssh $INTERNAL_HTTP_USER_HOST chmod 755 $INTERNAL_NOVAPLUGINS_PATH
 
-scp -B -3 -o 'StrictHostKeyChecking no' ubuntu@$SLAVE_IP:~/devstack.xva \
-    jenkinsoutput@copper.eng.hq.xensource.com:/usr/share/nginx/www/builds/devstack-$TODAY.xva
-ssh jenkinsoutput@copper.eng.hq.xensource.com chmod 755 /usr/share/nginx/www/builds/devstack-$TODAY.xva
+INTERNAL_XVA_PATH="$(internal_xva_path $XVA_INTERNAL_NAME)"
+scp -B -3 -o 'StrictHostKeyChecking no' \
+    ubuntu@$SLAVE_IP:~/devstack.xva \
+    $INTERNAL_HTTP_USER_HOST:$INTERNAL_XVA_PATH
+ssh $INTERNAL_HTTP_USER_HOST chmod 755 $INTERNAL_XVA_PATH
 
-echo "Tidying up old builds on copper"
-SIXDAYSAGO=$(date --date="$(date)-5days" +"%m_%d_%Y")
-ssh jenkinsoutput@copper.eng.hq.xensource.com rm -f /usr/share/nginx/www/builds/novaplugins-$SIXDAYSAGO.iso || true
-ssh jenkinsoutput@copper.eng.hq.xensource.com rm -f /usr/share/nginx/www/builds/devstack-$SIXDAYSAGO.xva || true
-
-echo "The internal build result is now located at:"
-echo "    http://copper.eng.hq.xensource.com/builds/novaplugins-$TODAY.iso"
-echo "    http://copper.eng.hq.xensource.com/builds/devstack-$TODAY.xva"
-
-# Save internal build's details to a file
+# Save internal build's details to a file so it could be verified
 cat > ${BUILD_NUMBER}.internal.properties << EOF
-DEVSTACK_XVA_URL=http://copper.eng.hq.xensource.com/builds/devstack-$TODAY.xva
-DEVSTACK_SUPPACK_URL=http://copper.eng.hq.xensource.com/builds/novaplugins-$TODAY.iso
+DEVSTACK_XVA_URL=$(internal_xva_url $XVA_INTERNAL_NAME)
+DEVSTACK_SUPPACK_URL=$(internal_novaplugins_url $XVA_INTERNAL_NAME)
 EOF
-
-# Save environment variables
-cat > ${BUILD_NUMBER}.saveenv << ENV_VARS
-TODAY=$TODAY
-SIXDAYSAGO=$SIXDAYSAGO
-ENV_VARS
