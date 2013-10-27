@@ -24,6 +24,7 @@ else
     [ "$1" = "named" ]
 fi
 EDITED_SCRIPT="$2"
+PARAMETER_FILE="$3"
 
 
 # Edit the installer script, and replace the repos with the public ones.
@@ -34,7 +35,7 @@ wget -qO - "$DEVSTACK_INSTALLER_SCRIPT_URL" |
 # Copy the installer script to a web server
 scp ${BUILD_NUMBER}.sh "devstack_script_producer@unsteve.eng.hq.xensource.com:/devstack-scripts/${BUILD_TAG}.sh"
 
-cat > ${BUILD_NUMBER}.properties << EOF
+cat > $PARAMETER_FILE << EOF
 SETUPSCRIPT_URL=http://unsteve.eng.hq.xensource.com/build-results/devstack-scripts/${BUILD_TAG}.sh
 NOVA_REPO=https://github.com/citrix-openstack-build/nova.git
 NOVA_BRANCH=${REF_NAME}
