@@ -2,7 +2,6 @@
 
 import database
 import argparse
-import pprint
 import sys
 
 parser = argparse.ArgumentParser(description='Get all details of a single server')
