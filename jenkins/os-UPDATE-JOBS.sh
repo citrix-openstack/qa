@@ -40,7 +40,8 @@ cli get-job "os-ctx-test" |
 cli get-job "os-ctx-test" |
     sed \
         -e "s,ADD_CITRIX_CHANGES=true,ADD_CITRIX_CHANGES=false,g" \
-        -e "s,os-ctx-,os-havana-,g" |
+        -e "s,os-ctx-,os-havana-,g" \
+        -e "s,BASE_BRANCH=origin/master,BASE_BRANCH=stable/havana,g" |
             cli update-job "os-havana-test"
 
 rm -f $TEMPLATEJOB jenkins-cli.jar
