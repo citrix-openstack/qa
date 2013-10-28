@@ -21,7 +21,7 @@ function generate_job() {
     sed -e "s/TEST_TYPE_DEFAULT/$1/g" -e "s/SETUP_TYPE_DEFAULT/$2/g" -e "s/BRANCH_TYPE/$3/g" "$TEMPLATEJOB"
 }
 
-for branch in trunk ctx; do
+for branch in trunk ctx havana; do
     for test_type in smoke full; do
       for setup_type in nova-network neutron; do
         jobname="os-$branch-$setup_type-$test_type"
@@ -37,4 +37,10 @@ cli get-job "os-ctx-test" |
         -e "s,os-ctx-,os-trunk-,g" |
             cli update-job "os-trunk-test"
 
- rm -f $TEMPLATEJOB jenkins-cli.jar
+cli get-job "os-ctx-test" |
+    sed \
+        -e "s,ADD_CITRIX_CHANGES=true,ADD_CITRIX_CHANGES=false,g" \
+        -e "s,os-ctx-,os-havana-,g" |
+            cli update-job "os-havana-test"
+
+rm -f $TEMPLATEJOB jenkins-cli.jar
