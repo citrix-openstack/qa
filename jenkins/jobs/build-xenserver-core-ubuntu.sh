@@ -9,19 +9,21 @@ TESTLIB=$(cd $(dirname $(readlink -f "$0")) && cd tests && pwd)
 function print_usage_and_die
 {
 cat >&2 << EOF
-usage: $0 XENSERVERNAME SLAVE_PARAM_FILE
+usage: $0 XENSERVERNAME SLAVE_PARAM_FILE COMMIT
 
 Build xenserver-core packages
 
 positional arguments:
  XENSERVERNAME     The name of the XenServer
  SLAVE_PARAM_FILE  The slave VM's parameters will be placed to this file
+ COMMIT            The commit sha1 to be tested
 EOF
 exit 1
 }
 
 XENSERVERNAME="${1-$(print_usage_and_die)}"
 SLAVE_PARAM_FILE="${2-$(print_usage_and_die)}"
+COMMIT="${3-$(print_usage_and_die)}"
 
 set -x
 
@@ -42,8 +44,9 @@ sudo apt-get dist-upgrade
 sudo apt-get install git ocaml-nox
 
 git clone https://github.com/xapi-project/xenserver-core.git -b master xenserver-core
-
 cd xenserver-core
+git checkout $COMMIT
+git log -1 --pretty=format:%H
 
 sed -ie 's,http://gb.archive.ubuntu.com/ubuntu/,http://mirror.anl.gov/pub/ubuntu/,g' scripts/deb/pbuilderrc.in
 
