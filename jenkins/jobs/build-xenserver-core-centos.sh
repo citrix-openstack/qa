@@ -9,17 +9,19 @@ TESTLIB=$(cd $(dirname $(readlink -f "$0")) && cd tests && pwd)
 function print_usage_and_die
 {
 cat >&2 << EOF
-usage: $0 HOSTNAME
+usage: $0 HOSTNAME COMMIT
 
 Build xenserver-core packages
 
 positional arguments:
  HOSTNAME     The name of the CentOS host on which we are going to compile
+ COMMIT       The commit to use
 EOF
 exit 1
 }
 
 HOSTNAME="${1-$(print_usage_and_die)}"
+COMMIT="${2-$(print_usage_and_die)}"
 
 "$REMOTELIB/bash.sh" "root@$HOSTNAME" << END_OF_XSCORE_BUILD_SCRIPT
 set -eux
@@ -49,6 +51,8 @@ cat >> /home/mock/build.sh << EOF_BUILD_SCRIPT
 cd ~
 git clone git://github.com/xapi-project/xenserver-core.git
 cd xenserver-core
+git checkout $COMMIT
+git log -1 --pretty=format:%H
 
 ./configure.sh
 ./makemake.py > Makefile
