@@ -13,6 +13,7 @@
 ## To save it
 
     glance image-download --file streamer.vhd.tgz 068b1798-374f-452d-99e7-f8f7bf7b5d39
+    scp streamer.vhd.tgz ubuntu@copper.eng.hq.xensource.com:/usr/share/nginx/www/havana-demo/
 
 ## To load it
 
