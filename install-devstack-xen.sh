@@ -19,7 +19,7 @@ positional arguments:
                     used.
 
 optional arguments:
- TEST_TYPE          Type of the tests to run. One of [none, smoke, full]
+ TEST_TYPE          Type of the tests to run. One of [none, exercise, smoke, full]
                     defaults to none
  DEVSTACK_TGZ       An URL pointing to a tar.gz snapshot of devstack. This
                     defaults to the official devstack repository.
@@ -83,7 +83,7 @@ while getopts ":t:d:fl:j:e:" flag; do
         t)
             TEST_TYPE="$OPTARG"
             REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
-            if ! [ "$TEST_TYPE" = "none" -o "$TEST_TYPE" = "smoke" -o "$TEST_TYPE" = "full" ]; then
+            if ! [ "$TEST_TYPE" = "none" -o "$TEST_TYPE" = "smoke" -o "$TEST_TYPE" = "full" -o "$TEST_TYPE" = "exercise" ]; then
                 print_usage_and_die "$TEST_TYPE - Invalid value for TEST_TYPE"
             fi
             ;;
@@ -473,6 +473,10 @@ set -exu
 
 cd /opt/stack/devstack/
 ./exercise.sh
+
+if [ "$TEST_TYPE" == "exercise" ]; then
+    exit 0
+fi
 
 cd /opt/stack/tempest
 if [ "$TEST_TYPE" == "smoke" ]; then
