@@ -12,6 +12,7 @@
 
     mplayer http://localhost:5454/trailer_480p.mov
     mplayer http://localhost:5454/the-xen-movie.mp4
+    mplayer -cache 8192 http://10.219.4.132:1235/the-xen-movie.mp4
 
 # The image
 
@@ -62,3 +63,8 @@
         --name=centos
 
     nova boot --flavor m1.tiny --image tarred tarred
+
+## Proxy
+
+    sudo apt-get -qy install simpleproxy
+    simpleproxy -d -L 1235 -R 10.0.0.2:80

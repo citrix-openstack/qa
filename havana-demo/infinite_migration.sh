@@ -148,6 +148,10 @@ wait_for_active "demo-instance"
 
 sudo iptables -t nat -A PREROUTING  -p tcp --dport 1234 -j DNAT --to-destination "$(print_vm_ip demo-instance):80" || true
 
+sudo apt-get -qy install simpleproxy
+
+simpleproxy -d -L 1235 -R 10.0.0.2:80
+
 list_hosts_forever | while read host; do
     if vm_is_on_host "demo-instance" "$host"; then
         continue
