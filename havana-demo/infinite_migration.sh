@@ -44,6 +44,10 @@ function wait_for_active() {
     
     vm_name="$1"
 
+    if nova list | grep "$vm_name" | grep -q ACTIVE; then
+        return
+    fi
+
     echo -n "Waiting for ACTIVE status"
     while ! nova list | grep "$vm_name" | grep -q ACTIVE; do
         echo -n "."
