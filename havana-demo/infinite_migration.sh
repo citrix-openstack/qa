@@ -147,6 +147,8 @@ start_vm "demo-instance" "demo-image"
 
 wait_for_active "demo-instance"
 
+socat TCP-LISTEN:1234,fork "TCP:$(print_vm_ip demo-instance)" &
+
 list_hosts_forever | while read host; do
     if vm_is_on_host "demo-instance" "$host"; then
         continue
