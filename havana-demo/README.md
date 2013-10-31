@@ -20,7 +20,7 @@
     glance image-create \
         --disk-format=vhd \
         --container-format=ovf \
-        --copy-from=http://copper.eng.hq.xensource.com/havana-demo/streamer.vhd.tgz \
+        --copy-from=http://copper.eng.hq.xensource.com/havana-demo/streamer-coalesced.vhd.tgz \
         --is-public=True \
         --name=streamer
 
@@ -33,11 +33,10 @@
     tar -xzf streamer.vhd.tgz
     vhd-util modify -n 0.vhd -p 1.vhd
     vhd-util modify -n 1.vhd -p 2.vhd
-    vhd-util colaesce -n 0.vhd
-    vhd-util resize -n 2.vhd -s 40960 -j jounral
+    vhd-util coalesce -n 0.vhd
+    vhd-util resize -n 2.vhd -s $(vhd-util query -n 1.vhd -v) -j jounral
     vhd-util coalesce -n 1.vhd
-    rm streamer.vhd.tgz
     rm 0.vhd 1.vhd
     mv 2.vhd 0.vhd
-    tar -czf streamer.vhd.tgz 0.vhd
     vhd-util set -f hidden -v 0 -n 0.vhd
+    tar -czf streamer-coalesced.vhd.tgz 0.vhd
