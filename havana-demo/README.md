@@ -1,6 +1,10 @@
 # Tunneling
 
     ssh -L 5454:instance_ip:80 devstack_ip
+    
+    or
+    
+    iptables -t nat -A PREROUTING  -p tcp --dport 1234 -j DNAT --to-destination 10.0.0.2:80 (on the Devstack domU)
 
 # The Movie
 
