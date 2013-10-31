@@ -44,7 +44,7 @@ function wait_for_active() {
     
     vm_name="$1"
 
-    echo -n "Waiting for the instance to become ACTIVE"
+    echo -n "Waiting for ACTIVE status"
     while ! nova list | grep "$vm_name" | grep -q ACTIVE; do
         echo -n "."
         sleep 1
@@ -53,15 +53,19 @@ function wait_for_active() {
 }
 
 
-start_vm "testbox"
+MIGRATION_COUNTER=0
+SECONDS_AT_SERVER=10
+
+start_vm "demo-instance"
 list_hosts_forever | while read host; do
-    wait_for_active "testbox"
-    if vm_is_on_host "testbox" "$host"; then
-        echo "Instance is on [$host]"
+    wait_for_active "demo-instance"
+    if vm_is_on_host "demo-instance" "$host"; then
+        continue
     else
-        echo "Waiting 10 seconds"
-        sleep 10
-        echo "Asking for live migration to [$host]"
-        nova live-migration --block-migrate "testbox" "$host"
+        echo "Waiting $SECONDS_AT_SERVER seconds"
+        sleep $SECONDS_AT_SERVER
+        echo "Asking for live migration to [$host] $MIGRATION_COUNTER migrations so far"
+        nova live-migration --block-migrate "demo-instance" "$host"
+        MIGRATION_COUNTER=$(expr $MIGRATION_COUNTER + 1)
     fi
 done
