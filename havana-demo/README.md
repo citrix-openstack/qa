@@ -40,3 +40,18 @@
     mv 2.vhd 0.vhd
     vhd-util set -f hidden -v 0 -n 0.vhd
     tar -czf streamer-coalesced.vhd.tgz 0.vhd
+
+## SSH keypair
+
+    ssh-keygen -f somekey.priv -N "" -t rsa
+    nova keypair-add --pub-key somekey.priv.pub demo-keypair
+
+
+    glance image-create \
+        --disk-format=vhd \
+        --container-format=ovf \
+        --copy-from=http://copper.eng.hq.xensource.com/havana-demo/centos.tgz \
+        --is-public=True \
+        --name=centos
+
+    nova boot --flavor m1.tiny --image tarred tarred
