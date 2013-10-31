@@ -11,6 +11,7 @@
 # The Movie
 
     mplayer http://localhost:5454/trailer_480p.mov
+    mplayer http://localhost:5454/the-xen-movie.mp4
 
 # The image
 
