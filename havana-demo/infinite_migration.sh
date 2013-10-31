@@ -134,7 +134,6 @@ function remove_vm() {
 MIGRATION_COUNTER=0
 SECONDS_AT_SERVER=10
 
-
 remove_image "demo-image"
 
 upload_image \
@@ -146,6 +145,8 @@ remove_vm "demo-instance"
 start_vm "demo-instance" "demo-image"
 
 wait_for_active "demo-instance"
+
+sudo iptables -t nat -A PREROUTING  -p tcp --dport 1234 -j DNAT --to-destination "$(print_vm_ip demo-instance):80" || true
 
 list_hosts_forever | while read host; do
     if vm_is_on_host "demo-instance" "$host"; then
