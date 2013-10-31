@@ -5,6 +5,8 @@
     or
     
     iptables -t nat -A PREROUTING  -p tcp --dport 1234 -j DNAT --to-destination 10.0.0.2:80 (on the Devstack domU)
+    
+    view with iptables -t nat -L PREROUTING
 
 # The Movie
 
