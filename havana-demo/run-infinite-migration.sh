@@ -1,6 +1,8 @@
 #!/bin/bash
 set -eux
 
+HOST_2="$1"
+
 [ -n "$HOST_2" ]
 
 DEVSTACK_2=$(ssh -q -o BatchMode=yes $HOST_2 bash -s -- << EOF
