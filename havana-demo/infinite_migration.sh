@@ -1,6 +1,8 @@
 #!/bin/bash
 set -eu
 
+IMAGE_NAME="$1"
+
 cd /opt/stack/devstack
 
 
@@ -18,7 +20,7 @@ function start_vm() {
         exit 1
     fi
 
-    nova boot --image cirros-0.3.0-x86_64-disk --flavor m1.tiny "$vm_name" > /dev/null
+    nova boot --image "$IMAGE_NAME" --flavor m1.tiny "$vm_name" > /dev/null
 }
 
 function list_hosts_forever() {
