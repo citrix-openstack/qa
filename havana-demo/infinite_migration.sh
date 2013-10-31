@@ -152,7 +152,7 @@ list_hosts_forever | while read host; do
         continue
     else
         echo "Private address of the vm is: $(print_vm_ip demo-instance)"
-        echo "Asking for live migration to [$host] $MIGRATION_COUNTER migrations so far"
+        echo "Asking for live migration to [$host] ($MIGRATION_COUNTER migrations so far)"
         nova live-migration --block-migrate "demo-instance" "$host"
         MIGRATION_COUNTER=$(expr $MIGRATION_COUNTER + 1)
         wait_for_active "demo-instance"
