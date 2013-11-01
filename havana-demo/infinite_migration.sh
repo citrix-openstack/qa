@@ -137,7 +137,7 @@ SECONDS_AT_SERVER=10
 remove_image "demo-image"
 
 upload_image \
-    "http://copper.eng.hq.xensource.com/havana-demo/streamer-2013.10.31-coalesced.vhd.tgz" \
+    "http://copper.eng.hq.xensource.com/havana-demo/streamer-2013.11.01-coalesced.vhd.tgz" \
     "demo-image"
 
 remove_vm "demo-instance"
