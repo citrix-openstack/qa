@@ -15,9 +15,9 @@ sed -i 's/^PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd
 service sshd restart
 
 export http_proxy=http://10.0.0.3:3128
-curl -o /usr/share/nginx/html/the-xen-movie-android.mp4 http://http://copper.eng.hq.xensource.com/havana-demo/the-xen-movie-android.mp4
-curl -o /usr/share/nginx/html/the-xen-movie-iphone.mp4 http://http://copper.eng.hq.xensource.com/havana-demo/the-xen-movie-iphone.mp4
-curl -o /usr/share/nginx/html/the-xen-movie-ipod.mp4 http://http://copper.eng.hq.xensource.com/havana-demo/the-xen-movie-ipod.mp4
+curl -o /usr/share/nginx/html/the-xen-movie-android.mp4 http://copper.eng.hq.xensource.com/havana-demo/the-xen-movie-android.mp4
+curl -o /usr/share/nginx/html/the-xen-movie-iphone.mp4 http://copper.eng.hq.xensource.com/havana-demo/the-xen-movie-iphone.mp4
+curl -o /usr/share/nginx/html/the-xen-movie-ipod.mp4 http://copper.eng.hq.xensource.com/havana-demo/the-xen-movie-ipod.mp4
 
 useradd -G wheel citrix
 echo citrix | passwd citrix --stdin
