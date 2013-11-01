@@ -23,8 +23,9 @@ forth in an infinite loop.
 
 The webserver is serving two video files:
 
-http://$DEVSTACK_2:1235/trailer_480p.mov
-http://$DEVSTACK_2:1235/the-xen-movie.mp4
+http://$DEVSTACK_2:1235/the-xen-movie-android.mp4
+http://$DEVSTACK_2:1235/the-xen-movie-iphone.mp4
+http://$DEVSTACK_2:1235/the-xen-movie-ipod.mp4
 
 EOF
 set -x
