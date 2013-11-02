@@ -51,7 +51,7 @@ EOF_SUDOERS
 # The rest of the script needs to run as the mock user
 cat >> /home/mock/build.sh << EOF_BUILD_SCRIPT
 cd ~
-git clone $REPO_URL
+git clone $REPO_URL xenserver-core
 cd xenserver-core
 git checkout $COMMIT
 git log -1 --pretty=format:%H

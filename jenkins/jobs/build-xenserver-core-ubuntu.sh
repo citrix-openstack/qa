@@ -45,7 +45,7 @@ sudo apt-get update
 sudo apt-get dist-upgrade
 sudo apt-get install git ocaml-nox
 
-git clone $REPO_URL -b master xenserver-core
+git clone $REPO_URL xenserver-core
 cd xenserver-core
 git checkout $COMMIT
 git log -1 --pretty=format:%H
