@@ -17,6 +17,7 @@ positional arguments:
  XENSERVERNAME     The name of the XenServer
  SLAVE_PARAM_FILE  The slave VM's parameters will be placed to this file
  COMMIT            The commit sha1 to be tested
+ REPO_URL          xenserver-core repository location
 EOF
 exit 1
 }
@@ -24,6 +25,7 @@ exit 1
 XENSERVERNAME="${1-$(print_usage_and_die)}"
 SLAVE_PARAM_FILE="${2-$(print_usage_and_die)}"
 COMMIT="${3-$(print_usage_and_die)}"
+REPO_URL="${4-$(print_usage_and_die)}"
 
 set -x
 
@@ -43,7 +45,7 @@ sudo apt-get update
 sudo apt-get dist-upgrade
 sudo apt-get install git ocaml-nox
 
-git clone https://github.com/xapi-project/xenserver-core.git -b master xenserver-core
+git clone $REPO_URL -b master xenserver-core
 cd xenserver-core
 git checkout $COMMIT
 git log -1 --pretty=format:%H
