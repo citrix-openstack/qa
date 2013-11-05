@@ -55,7 +55,6 @@ git checkout $COMMIT
 git log -1 --pretty=format:%H
 
 ./configure.sh
-./makemake.py > Makefile
 make
 EOF_BUILD_SCRIPT
 su - mock -c "bash /home/mock/build.sh"
