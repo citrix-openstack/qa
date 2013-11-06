@@ -57,5 +57,6 @@ export http_proxy=http://gold.eng.hq.xensource.com:8000
 EOF
 
 sudo ./configure.sh
+./makemake.py > Makefile
 sudo make
 END_OF_XSCORE_BUILD_SCRIPT
