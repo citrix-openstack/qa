@@ -202,23 +202,18 @@ set -xu
 cd $TMPDIR
 cd devstack*
 
+mkdir /root/artifacts
+
 GUEST_IP=\$(. "tools/xen/functions" && find_ip_by_name DevStackOSDomU 0)
 if [ -n \$GUEST_IP ]; then
-ssh -q \
-    -o Batchmode=yes \
-    -o StrictHostKeyChecking=no \
-    -o UserKnownHostsFile=/dev/null \
-    "stack@\$GUEST_IP" bash -s -- << END_OF_DEVSTACK_COMMANDS
-tar zcfp /tmp/devstack_logs.tgz /tmp/devstack
-END_OF_DEVSTACK_COMMANDS
-fi
-mkdir /root/artifacts
 scp -q \
     -o Batchmode=yes \
     -o StrictHostKeyChecking=no \
     -o UserKnownHostsFile=/dev/null \
-    stack@\$GUEST_IP:/tmp/devstack_logs.tgz \
+    stack@\$GUEST_IP:/tmp/devstack/log/* \
     /root/artifacts/
+fi
+cp /var/log/messages* /var/log/xensource* /var/log/SM* /root/artifacts || true
 END_OF_XENSERVER_COMMANDS
             mkdir -p $LOG_FILE_DIRECTORY
 	    scp $_SSH_OPTIONS $XENSERVER:artifacts/* $LOG_FILE_DIRECTORY
