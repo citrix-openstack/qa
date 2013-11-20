@@ -12,6 +12,9 @@ sudo apt-get update
 sudo apt-get -qy upgrade
 sudo apt-get install -qy git rpm
 
+# Check out rpm packaging
+git clone https://github.com/citrix-openstack/xenserver-nova-suppack-builder
+
 # Create rpm file
 
 ## Check out Nova
@@ -20,6 +23,8 @@ cd nova
 git fetch origin "$GITBRANCH"
 git checkout FETCH_HEAD
 cd ..
+
+cp -r xenserver-nova-suppack-builder/plugins/* nova/plugins/
 
 cd nova/plugins/xenserver/xenapi/contrib
 ./build-rpm.sh

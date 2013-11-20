@@ -124,10 +124,10 @@ def lock_items(filename, lock, term_generator=None, lock_reason=None):
             c.execute('UPDATE stuff SET lock = :lock, lock_date = datetime(\'now\') WHERE id = :id', dict(lock=lock, id=id))
             assert c.rowcount == 1
             results.append(item)
-            
-            if lock_reason:
-                c.execute('UPDATE stuff SET lock_reason = :lock_reason WHERE id = :id', dict(lock_reason=lock_reason, id=id))
-                assert c.rowcount == 1
+
+            lock_reason = lock_reason or ''
+            c.execute('UPDATE stuff SET lock_reason = :lock_reason WHERE id = :id', dict(lock_reason=lock_reason, id=id))
+            assert c.rowcount == 1
 
     conn.commit()
     conn.close()

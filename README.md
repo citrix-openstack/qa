@@ -32,3 +32,10 @@ Scripts that are useful for Jenkins jobs:
 
     ./with-all-repos-in-workspace.sh \
       git diff refs/citrix-builds/test1..refs/citrix-builds/test2
+
+## If a new repo comes
+
+ - amend `lib/functions`
+ - execute `create_repos.sh`
+ - amend puppet maifests
+ - kick puppet

@@ -7,7 +7,8 @@ cat >&2 << EOF
 usage: $0 XENSERVER XENSERVER_PASS PRIVKEY [-t TEST_TYPE] [-d DEVSTACK_URL] [-f] [-l LOG_FILE_DIRECTORY] [-j JEOS_URL] [-e JEOS_FILENAME]
 
 A simple script to use devstack to setup an OpenStack, and optionally
-run tests on it.
+run tests on it. This script should be executed on an operator machine, and
+it will execute commands through ssh on the remote XenServer specified.
 
 positional arguments:
  XENSERVER          The address of the XenServer
@@ -18,7 +19,7 @@ positional arguments:
                     used.
 
 optional arguments:
- TEST_TYPE          Type of the tests to run. One of [none, smoke, full]
+ TEST_TYPE          Type of the tests to run. One of [none, exercise, smoke, full]
                     defaults to none
  DEVSTACK_TGZ       An URL pointing to a tar.gz snapshot of devstack. This
                     defaults to the official devstack repository.
@@ -82,7 +83,7 @@ while getopts ":t:d:fl:j:e:" flag; do
         t)
             TEST_TYPE="$OPTARG"
             REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
-            if ! [ "$TEST_TYPE" = "none" -o "$TEST_TYPE" = "smoke" -o "$TEST_TYPE" = "full" ]; then
+            if ! [ "$TEST_TYPE" = "none" -o "$TEST_TYPE" = "smoke" -o "$TEST_TYPE" = "full" -o "$TEST_TYPE" = "exercise" ]; then
                 print_usage_and_die "$TEST_TYPE - Invalid value for TEST_TYPE"
             fi
             ;;
@@ -93,16 +94,16 @@ while getopts ":t:d:fl:j:e:" flag; do
         f)
             FORCE_SR_REPLACEMENT="true"
             ;;
-	l)
-	    LOG_FILE_DIRECTORY="$OPTARG"
+        l)
+            LOG_FILE_DIRECTORY="$OPTARG"
             REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
             ;;
-	j)
-	    JEOS_URL="$OPTARG"
+        j)
+            JEOS_URL="$OPTARG"
             REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
             ;;
-	e)
-	    JEOS_FILENAME="$OPTARG"
+        e)
+            JEOS_FILENAME="$OPTARG"
             REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
             ;;
         \?)
@@ -143,10 +144,22 @@ function on_xenserver() {
     ssh $_SSH_OPTIONS "root@$XENSERVER" bash -s --
 }
 
+function assert_tool_exists() {
+    local tool_name
+
+    tool_name="$1"
+
+    if ! which "$tool_name" >/dev/null; then
+        echo "ERROR: $tool_name is required for this script, please install it on your system! " >&2
+        exit 1
+    fi
+}
+
 if [ -z "$JEOS_FILENAME" ]; then
     echo -n "Setup ssh keys on XenServer..."
     tmp_dir="$(mktemp -d)"
     ssh-keygen -y -f $PRIVKEY > "$tmp_dir/devstack.pub"
+    assert_tool_exists sshpass
     sshpass -p "$XENSERVER_PASS" \
         ssh-copy-id \
             -i "$tmp_dir/devstack.pub" \
@@ -195,9 +208,9 @@ function copy_logs_on_failure()
     $@
     EXIT_CODE=$?
     set -e
-    if [ -n "$LOG_FILE_DIRECTORY" ]; then 
-	if [ $EXIT_CODE -ne 0 ]; then
-	    on_xenserver << END_OF_XENSERVER_COMMANDS
+    if [ $EXIT_CODE -ne 0 ]; then
+        if [ -n "$LOG_FILE_DIRECTORY" ]; then
+            on_xenserver << END_OF_XENSERVER_COMMANDS
 set -xu
 cd $TMPDIR
 cd devstack*
@@ -216,9 +229,9 @@ fi
 cp /var/log/messages* /var/log/xensource* /var/log/SM* /root/artifacts || true
 END_OF_XENSERVER_COMMANDS
             mkdir -p $LOG_FILE_DIRECTORY
-	    scp $_SSH_OPTIONS $XENSERVER:artifacts/* $LOG_FILE_DIRECTORY
-	    exit $EXIT_CODE
-	fi
+            scp $_SSH_OPTIONS $XENSERVER:artifacts/* $LOG_FILE_DIRECTORY
+        fi
+        exit $EXIT_CODE
     fi
 }
 
@@ -456,7 +469,11 @@ set -exu
 cd /opt/stack/devstack/
 ./exercise.sh
 
-cd /opt/stack/tempest 
+if [ "$TEST_TYPE" == "exercise" ]; then
+    exit 0
+fi
+
+cd /opt/stack/tempest
 if [ "$TEST_TYPE" == "smoke" ]; then
     ./run_tests.sh -s -N
 elif [ "$TEST_TYPE" == "full" ]; then
