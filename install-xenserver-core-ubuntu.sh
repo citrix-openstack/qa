@@ -12,8 +12,10 @@ git clone https://github.com/xapi-project/xenserver-core.git -b master xenserver
 
 cd xenserver-core
 
-rsync -a xscore_deb_producer@unsteve.eng.hq.xensource.com:/xenserver_core_debs/$BUILD_VERSION/deb/ RPMS
-rsync -a xscore_deb_producer@unsteve.eng.hq.xensource.com:/xenserver_core_debs/$BUILD_VERSION/deb-src/ SRPMS
+if [ -z "${PKG_REPO_LOCATION:-}" ]; then
+    rsync -a xscore_deb_producer@unsteve.eng.hq.xensource.com:/xenserver_core_debs/$BUILD_VERSION/deb/ RPMS
+    rsync -a xscore_deb_producer@unsteve.eng.hq.xensource.com:/xenserver_core_debs/$BUILD_VERSION/deb-src/ SRPMS
+fi
 
 # inject Keyfile for Launchpad PPA for Louis Gesbert
 apt-key add - << KEYFILE
