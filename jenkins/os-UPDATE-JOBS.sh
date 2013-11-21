@@ -21,8 +21,6 @@ function generate_xenserver_core_test_job() {
     sed -e "s/@DISTRO@/$1/g" -e "s/@TEST_TYPE@/$2/g" "$TEMPLATEJOB"
 }
 
-TEMPLATEJOB=`tempfile`
-
 function generate_os_test_jobs() {
     cli get-job "os-TEMPLATE_JOB" > "$TEMPLATEJOB"
 
@@ -65,6 +63,9 @@ function generate_xenserver_core_test_jobs() {
         done
     done
 }
+
+
+TEMPLATEJOB=`tempfile`
 
 if [ -z "${3:-}" ]; then
     generate_os_test_jobs
