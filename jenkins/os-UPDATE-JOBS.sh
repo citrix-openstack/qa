@@ -66,9 +66,13 @@ for distro in ubuntu centos; do
 done
 }
 
-generate_os_test_jobs
-generate_os_high_level_jobs
-generate_os_high_level_branch_jobs
-generate_xenserver_core_test_jobs
+if [ -z "${3:-}" ]; then
+    generate_os_test_jobs
+    generate_os_high_level_jobs
+    generate_os_high_level_branch_jobs
+    generate_xenserver_core_test_jobs
+else
+    $3
+fi
 
 rm -f $TEMPLATEJOB jenkins-cli.jar
