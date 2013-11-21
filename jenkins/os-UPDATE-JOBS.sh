@@ -13,10 +13,6 @@ function cli
     java -jar jenkins-cli.jar  -s "$JENKINS_URL" "$@" --username "$USERNAME" --password "$PASSWORD"
 }
 
-TEMPLATEJOB=`tempfile`
-
-cli get-job "os-TEMPLATE_JOB" > "$TEMPLATEJOB"
-
 function generate_job() {
     sed -e "s/TEST_TYPE_DEFAULT/$1/g" -e "s/SETUP_TYPE_DEFAULT/$2/g" -e "s/BRANCH_TYPE/$3/g" "$TEMPLATEJOB"
 }
@@ -24,6 +20,10 @@ function generate_job() {
 function generate_xenserver_core_test_job() {
     sed -e "s/@DISTRO@/$1/g" -e "s/@TEST_TYPE@/$2/g" "$TEMPLATEJOB"
 }
+
+TEMPLATEJOB=`tempfile`
+
+cli get-job "os-TEMPLATE_JOB" > "$TEMPLATEJOB"
 
 for branch in trunk ctx havana; do
     for test_type in smoke full; do
