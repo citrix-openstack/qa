@@ -23,6 +23,7 @@ function generate_xenserver_core_test_job() {
 
 TEMPLATEJOB=`tempfile`
 
+function generate_os_test_jobs() {
 cli get-job "os-TEMPLATE_JOB" > "$TEMPLATEJOB"
 
 for branch in trunk ctx havana; do
@@ -34,21 +35,28 @@ for branch in trunk ctx havana; do
       done
     done
 done
+}
 
+function generate_os_high_level_jobs() {
 cli get-job "os-ctx-test" |
     sed \
         -e "s,ADD_CITRIX_CHANGES=true,ADD_CITRIX_CHANGES=false,g" \
         -e "s,os-ctx-,os-trunk-,g" |
             cli update-job "os-trunk-test"
+}
 
+function generate_os_high_level_branch_jobs() {
 cli get-job "os-ctx-test" |
     sed \
         -e "s,ADD_CITRIX_CHANGES=true,ADD_CITRIX_CHANGES=false,g" \
         -e "s,os-ctx-,os-havana-,g" \
         -e "s,BASE_BRANCH=origin/master,BASE_BRANCH=stable/havana,g" |
             cli update-job "os-havana-test"
+}
 
+function generate_xenserver_core_test_jobs() {
 cli get-job "TEMPLATE-test-xenserver-core-with-os" > "$TEMPLATEJOB"
+
 for distro in ubuntu centos; do
     for test_type in exercise smoke none; do
         jobname="xenserver-core-$distro-os-$test_type"
@@ -56,5 +64,11 @@ for distro in ubuntu centos; do
           || generate_xenserver_core_test_job $distro $test_type | cli create-job "$jobname"
     done
 done
+}
+
+generate_os_test_jobs
+generate_os_high_level_jobs
+generate_os_high_level_branch_jobs
+generate_xenserver_core_test_jobs
 
 rm -f $TEMPLATEJOB jenkins-cli.jar
