@@ -21,7 +21,7 @@ function generate_xenserver_core_test_job() {
     sed -e "s/@DISTRO@/$1/g" -e "s/@TEST_TYPE@/$2/g" "$TEMPLATEJOB"
 }
 
-function generate_xenserver_core_install_job() {
+function replace_distro_with() {
     sed -e "s/@DISTRO@/$1/g" "$TEMPLATEJOB"
 }
 
@@ -73,8 +73,18 @@ function generate_xenserver_core_install_jobs() {
 
     for distro in ubuntu centos; do
         jobname="install-xenserver-core-on-$distro"
-        generate_xenserver_core_install_job $distro | cli update-job "$jobname"\
-          || generate_xenserver_core_install_job $distro | cli create-job "$jobname"
+        replace_distro_with $distro | cli update-job "$jobname"\
+          || replace_distro_with $distro | cli create-job "$jobname"
+    done
+}
+
+function generate_xenserver_core_high_level_jobs() {
+    cli get-job "TEMPLATE-test-xenserver-core-packages" > "$TEMPLATEJOB"
+
+    for distro in ubuntu centos; do
+        jobname="test-xenserver-core-$distro"
+        replace_distro_with $distro | cli update-job "$jobname"\
+          || replace_distro_with $distro | cli create-job "$jobname"
     done
 }
 
@@ -86,6 +96,7 @@ if [ -z "${3:-}" ]; then
     generate_os_high_level_branch_jobs
     generate_xenserver_core_test_jobs
     generate_xenserver_core_install_jobs
+    generate_xenserver_core_high_level_jobs
 else
     $3
 fi
