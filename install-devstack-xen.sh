@@ -228,7 +228,7 @@ scp -q \
     -o Batchmode=yes \
     -o StrictHostKeyChecking=no \
     -o UserKnownHostsFile=/dev/null \
-    stack@\$GUEST_IP:/tmp/devstack/log/* \
+    stack@\$GUEST_IP:/tmp/devstack/log/* /opt/stack/tempest/*.xml \
     /root/artifacts/
 fi
 cp /var/log/messages* /var/log/xensource* /var/log/SM* /root/artifacts || true
@@ -480,7 +480,7 @@ cd /opt/stack/tempest
 if [ "$TEST_TYPE" == "smoke" ]; then
     ./run_tests.sh -s -N
 elif [ "$TEST_TYPE" == "full" ]; then
-    nosetests -sv tempest/api tempest/scenario tempest/thirdparty tempest/cli
+    nosetests -sv --with-xunit --xunit-file=tempest-full.xml tempest/api tempest/scenario tempest/thirdparty tempest/cli
 fi
 
 END_OF_DEVSTACK_COMMANDS
