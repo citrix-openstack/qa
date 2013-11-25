@@ -202,15 +202,20 @@ END_OF_CLEANUP
 fi
 
 
-function copy_logs_on_failure()
-{
+function copy_logs_on_failure() {
     set +e
     $@
     EXIT_CODE=$?
     set -e
     if [ $EXIT_CODE -ne 0 ]; then
-        if [ -n "$LOG_FILE_DIRECTORY" ]; then
-            on_xenserver << END_OF_XENSERVER_COMMANDS
+        copy_logs
+        exit $EXIT_CODE
+    fi
+}
+
+function copy_logs() {
+    if [ -n "$LOG_FILE_DIRECTORY" ]; then
+        on_xenserver << END_OF_XENSERVER_COMMANDS
 set -xu
 cd $TMPDIR
 cd devstack*
@@ -228,10 +233,8 @@ scp -q \
 fi
 cp /var/log/messages* /var/log/xensource* /var/log/SM* /root/artifacts || true
 END_OF_XENSERVER_COMMANDS
-            mkdir -p $LOG_FILE_DIRECTORY
-            scp $_SSH_OPTIONS $XENSERVER:artifacts/* $LOG_FILE_DIRECTORY
-        fi
-        exit $EXIT_CODE
+        mkdir -p $LOG_FILE_DIRECTORY
+        scp $_SSH_OPTIONS $XENSERVER:artifacts/* $LOG_FILE_DIRECTORY
     fi
 }
 
