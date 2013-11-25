@@ -69,7 +69,7 @@ xs = Requires(originator='xs', name='main', test='ge',
                product='XenServer', version='5.6.100',
                build='39265p')
 
-setup(originator='xs', name='novaplugins', product=options.product_name,
+setup(originator='xs', name='novaplugins', product='XenServer',
       version=options.product_version, build=options.build, vendor='Citrix Systems, Inc.',
       description="OpenStack Nova Plugins", packages=args, requires=[xs],
       outdir=options.outdir, output=['iso'])
