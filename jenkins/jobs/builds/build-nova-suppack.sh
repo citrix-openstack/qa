@@ -66,7 +66,7 @@ parser.add_option('--out', dest="outdir")
 (options, args) = parser.parse_args()
 
 xs = Requires(originator='xs', name='main', test='ge',
-               product=options.product_name, version='5.6.100',
+               product='XenServer', version='5.6.100',
                build='39265p')
 
 setup(originator='xs', name='novaplugins', product=options.product_name,
