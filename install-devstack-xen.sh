@@ -228,7 +228,7 @@ ssh -q \
     -o Batchmode=yes \
     -o StrictHostKeyChecking=no \
     -o UserKnownHostsFile=/dev/null \
-    stack@\$GUEST_IP "tar -czf - /tmp/devstack/log/* /opt/stack/tempest/*.xml" >
+    stack@\$GUEST_IP "tar -czf - /tmp/devstack/log/* /opt/stack/tempest/*.xml" > \
     /root/artifacts/domU.tgz
 fi
 tar -czf /root/artifacts/dom0.tgz /var/log/messages* /var/log/xensource* /var/log/SM* || true
