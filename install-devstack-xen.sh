@@ -235,8 +235,8 @@ tar -czf /root/artifacts/dom0.tgz /var/log/messages* /var/log/xensource* /var/lo
 END_OF_XENSERVER_COMMANDS
         mkdir -p $LOG_FILE_DIRECTORY
         scp $_SSH_OPTIONS $XENSERVER:artifacts/* $LOG_FILE_DIRECTORY
-        tar -xzf $LOG_FILE_DIRECTORY/domU.tgz opt/stack/tempest/tempest-full.xml -O >
-        $LOG_FILE_DIRECTORY/tempest-full.xml || true
+        tar -xzf $LOG_FILE_DIRECTORY/domU.tgz opt/stack/tempest/tempest-full.xml -O \
+        > $LOG_FILE_DIRECTORY/tempest-full.xml || true
     fi
 }
 
