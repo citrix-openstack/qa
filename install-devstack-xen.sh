@@ -231,7 +231,7 @@ ssh -q \
     stack@\$GUEST_IP "tar --ignore-failed-read -czf - /tmp/devstack/log/* /opt/stack/tempest/*.xml" > \
     /root/artifacts/domU.tgz || true
 fi
-tar -czf /root/artifacts/dom0.tgz /var/log/messages* /var/log/xensource* /var/log/SM* || true
+tar --ignore-failed-read -czf /root/artifacts/dom0.tgz /var/log/messages* /var/log/xensource* /var/log/SM* || true
 END_OF_XENSERVER_COMMANDS
         mkdir -p $LOG_FILE_DIRECTORY
         scp $_SSH_OPTIONS $XENSERVER:artifacts/* $LOG_FILE_DIRECTORY
