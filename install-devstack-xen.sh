@@ -478,6 +478,8 @@ if [ "$TEST_TYPE" == "exercise" ]; then
     exit 0
 fi
 
+sudo pip install tox
+
 cd /opt/stack/tempest
 if [ "$TEST_TYPE" == "smoke" ]; then
     #./run_tests.sh -s -N
