@@ -9,7 +9,7 @@ if [ "$1" = "daily" ]; then
     [ -n "$DEVSTACK_INSTALLER_SCRIPT_URL" ]
 
     # This is a daily build
-    TODAY=$(date +"%m_%d_%Y")
+    TODAY=$(date +"%Y_%m_%d")
     XVA_NAME="${TODAY}"
     NOVAPLUGINS_URL="$PublicHttpServerOpenStackLocation/$(novaplugins_name $XVA_NAME)"
 
