@@ -480,9 +480,11 @@ fi
 
 cd /opt/stack/tempest
 if [ "$TEST_TYPE" == "smoke" ]; then
-    ./run_tests.sh -s -N
+    #./run_tests.sh -s -N
+    tox -esmoke
 elif [ "$TEST_TYPE" == "full" ]; then
-    nosetests -sv --with-xunit --xunit-file=tempest-full.xml tempest/api tempest/scenario tempest/thirdparty tempest/cli
+    #nosetests -sv --with-xunit --xunit-file=tempest-full.xml tempest/api tempest/scenario tempest/thirdparty tempest/cli
+    tox -efull
 fi
 
 END_OF_DEVSTACK_COMMANDS
