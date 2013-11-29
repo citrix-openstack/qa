@@ -39,12 +39,22 @@ sudo mkdir -p /mnt/ubuntu
 sudo mount /dev/xvdb1 /mnt/ubuntu
 
 sudo apt-get install -qy debootstrap
-sudo http_proxy=http://gold.eng.hq.xensource.com:8000 debootstrap \
-     --arch=amd64 \
-     --include=openssh-server,language-pack-en,linux-image-virtual,grub-pc \
-     precise \
-     /mnt/ubuntu \
-     http://mirror.anl.gov/pub/ubuntu/
+
+sudo mkdir -p /var/jeos
+JEOS_CACHE="/var/jeos/cache.tgz"
+
+if [ -e "$JEOS_CACHE" ]; then
+    sudo tar -xzf "$JEOS_CACHE" -C /mnt/ubuntu
+else
+    sudo http_proxy=http://gold.eng.hq.xensource.com:8000 debootstrap \
+         --arch=amd64 \
+         --include=openssh-server,language-pack-en,linux-image-virtual,grub-pc \
+         precise \
+         /mnt/ubuntu \
+         http://mirror.anl.gov/pub/ubuntu/
+    echo "Saving cache..."
+    sudo tar -czf "$JEOS_CACHE" -C /mnt/ubuntu ./
+fi
 
 # Unmount
 while mount | grep "/mnt/ubuntu";

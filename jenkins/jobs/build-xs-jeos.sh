@@ -21,8 +21,11 @@ exit 1
 
 SERVERNAME="${1-$(print_usage_and_die)}"
 
-echo "Spinning up virtual machine"
-SLAVE_IP=$(cat "$XSLIB/start-slave.sh" | $REMOTELIB/bash.sh root@$SERVERNAME)
+SLAVE_IP=$(cat $XSLIB/get-slave-ip.sh | $REMOTELIB/bash.sh root@$SERVERNAME)
+if [ -z "$SLAVE_IP" ]; then
+    echo "Spinning up virtual machine"
+    SLAVE_IP=$(cat "$XSLIB/start-slave.sh" | $REMOTELIB/bash.sh root@$SERVERNAME)
+fi
 echo "Starting job on $SLAVE_IP"
 
 cat $XSLIB/add-extra-hdd.sh | $REMOTELIB/bash.sh root@$SERVERNAME slave 10GiB
