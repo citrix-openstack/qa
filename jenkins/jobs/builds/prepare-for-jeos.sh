@@ -41,6 +41,7 @@ sudo mount /dev/xvdb1 /mnt/ubuntu
 sudo apt-get install -qy debootstrap
 sudo http_proxy=http://gold.eng.hq.xensource.com:8000 debootstrap \
      --arch=amd64 \
+     --include=openssh-server,language-pack-en,linux-image-virtual,grub-pc \
      precise \
      /mnt/ubuntu \
      http://mirror.anl.gov/pub/ubuntu/
