@@ -16,9 +16,6 @@ xe vm-param-set uuid=$VM PV-bootloader=pygrub
 
 NETWORK=$(xe network-list name-label="Pool-wide network associated with eth0" --minimal)
 xe vif-create device=0 network-uuid=$NETWORK vm-uuid=$VM
-
-xe vm-start uuid=$VM || true
-
 } >&2
 
 echo "$VM"
