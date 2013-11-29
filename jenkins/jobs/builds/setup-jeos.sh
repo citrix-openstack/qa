@@ -34,7 +34,7 @@ sudo LANG=C chroot /mnt/ubuntu /bin/bash -c \
     chown -R $USERNAME:$USERNAME /home/$USERNAME/.ssh && \
     chmod 0700 /home/$USERNAME/.ssh && \
     chmod 0600 /home/$USERNAME/.ssh/authorized_keys" << EOF
-ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCk6uIjjgBzz7reAtb3w9edrkSEFFhsvXZB2GaRsZZJ/Mzo5O1V/Uw7H0NgrE9yvGhlt0dEq7YIrPGpl5j3J4gsTkF65VGhOOA3q6nlNLdyHGdt0+J4h4ZztslUr0CKfga9xVDpQ0tkRe82Cs2bXuM5sb9eyEGYTz1th7KoBkwLquDksYC4P7GGDlCUgy8Bs0VzeHnh1Dj8kp0f9IUC+/4QDaTQivE61sj26H9bZ3Ea5Mm/2hxD7m7YmBLfU3asoiphoqikKB+RwJhVX0vOY6MmuNbeKBPciz3jTo15cpUlBaiYrpi8WaUzJJ+uByGVFOP02oX5Y+ioofC8Fs2tuxaj mate.lakat@citrix.com
+# Empty now, will be populated by /root/update_authorized_keys.sh
 EOF
 
 ### Enable sudo
@@ -49,6 +49,26 @@ sudo LANG=C chroot /mnt/ubuntu /bin/bash -c \
     "/etc/init.d/xe-linux-distribution stop"
 
 sudo cp /etc/init/hvc0.conf /mnt/ubuntu/etc/init/
+
+{
+cat << EOF
+#!/bin/bash
+set -eux
+
+DOMID=\$(xenstore-read domid)
+xenstore-exists /local/\$DOMID/authorized_keys/$USERNAME
+xenstore-read /local/\$DOMID/authorized_keys/$USERNAME > /home/$USERNAME/xenstore_value
+cat /home/$USERNAME/xenstore_value > /home/$USERNAME/.ssh/authorized_keys
+EOF
+} sudo tee /mnt/ubuntu/root/update_authorized_keys.sh
+sudo chmod +x /mnt/ubuntu/root/update_authorized_keys.sh
+
+{
+cat << EOF
+* * * * * /root/update_authorized_keys.sh
+EOF
+} sudo LANG=C chroot /mnt/ubuntu /bin/bash -c \
+    "crontab -"
 
 # Set hostname
 echo "$HNAME" | sudo tee /mnt/ubuntu/etc/hostname
