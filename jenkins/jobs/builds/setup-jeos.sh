@@ -38,7 +38,7 @@ sudo LANG=C chroot /mnt/ubuntu /bin/bash -c \
 EOF
 
 ### Enable sudo
-echo "$USERNAME ALL = (ALL) ALL" | sudo tee "/mnt/ubuntu/etc/sudoers.d/allow_$USERNAME"
+echo "$USERNAME ALL = NOPASSWD: ALL" | sudo tee "/mnt/ubuntu/etc/sudoers.d/allow_$USERNAME"
 sudo chmod 0440 "/mnt/ubuntu/etc/sudoers.d/allow_$USERNAME"
 
 # Install xenserver tools
