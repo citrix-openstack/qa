@@ -52,18 +52,18 @@ cat << EOF
 set -eux
 
 DOMID=\$(xenstore-read domid)
-xenstore-exists /local/\$DOMID/authorized_keys/$USERNAME
-xenstore-read /local/\$DOMID/authorized_keys/$USERNAME > /home/$USERNAME/xenstore_value
+xenstore-exists /local/domain/\$DOMID/authorized_keys/$USERNAME
+xenstore-read /local/domain/\$DOMID/authorized_keys/$USERNAME > /home/$USERNAME/xenstore_value
 cat /home/$USERNAME/xenstore_value > /home/$USERNAME/.ssh/authorized_keys
 EOF
-} sudo tee /mnt/ubuntu/root/update_authorized_keys.sh
+} | sudo tee /mnt/ubuntu/root/update_authorized_keys.sh
 sudo chmod +x /mnt/ubuntu/root/update_authorized_keys.sh
 
 {
 cat << EOF
 * * * * * /root/update_authorized_keys.sh
 EOF
-} sudo LANG=C chroot /mnt/ubuntu /bin/bash -c \
+} | sudo LANG=C chroot /mnt/ubuntu /bin/bash -c \
     "crontab -"
 
 # Set hostname
@@ -74,10 +74,6 @@ sudo sed -i "1 s/\$/ $HNAME/" /mnt/ubuntu/etc/hosts
 
 # Disable DNS with ssh
 echo "UseDNS no" | sudo tee /mnt/ubuntu/etc/ssh/sshd_config
-
-# Enable sudo
-echo "$USERNAME ALL = (ALL) ALL" | sudo tee "/mnt/ubuntu/etc/sudoers.d/allow_$USERNAME"
-sudo chmod 0440 "/mnt/ubuntu/etc/sudoers.d/allow_$USERNAME"
 
 (
 cat << EOF
