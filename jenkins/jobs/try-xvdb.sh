@@ -25,7 +25,8 @@ VDI="${2-$(print_usage_and_die)}"
 
 while true
 do
-    VM=$(cat $XSLIB/start-vm-with-vdi.sh | $REMOTELIB/bash.sh root@$SERVERNAME "$VDI")
+    VM=$(cat $XSLIB/create-vm-with-vdi.sh | $REMOTELIB/bash.sh root@$SERVERNAME "$VDI")
+    xe vm-start uuid=$VM
 
     echo "VM launched. Please press Enter as finished (temp VM is $VM)"
     read

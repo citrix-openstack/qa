@@ -56,6 +56,13 @@ echo "$HNAME" | sudo tee /mnt/ubuntu/etc/hostname
 # Configure hosts file, so that hostname could be resolved
 sudo sed -i "1 s/\$/ $HNAME/" /mnt/ubuntu/etc/hosts
 
+# Disable DNS with ssh
+echo "UseDNS no" | sudo tee /mnt/ubuntu/etc/ssh/sshd_config
+
+# Enable sudo
+echo "$USERNAME ALL = (ALL) ALL" | sudo tee "/mnt/ubuntu/etc/sudoers.d/allow_$USERNAME"
+sudo chmod 0440 "/mnt/ubuntu/etc/sudoers.d/allow_$USERNAME"
+
 (
 cat << EOF
 auto lo
