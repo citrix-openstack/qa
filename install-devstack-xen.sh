@@ -229,14 +229,15 @@ ssh -q \
     -o StrictHostKeyChecking=no \
     -o UserKnownHostsFile=/dev/null \
     stack@\$GUEST_IP "tar --ignore-failed-read -czf - /tmp/devstack/log/* /opt/stack/tempest/*.xml" > \
-    /root/artifacts/domU.tgz || true
+    /root/artifacts/domU.tgz < /dev/null || true
 fi
 tar --ignore-failed-read -czf /root/artifacts/dom0.tgz /var/log/messages* /var/log/xensource* /var/log/SM* || true
 END_OF_XENSERVER_COMMANDS
+
         mkdir -p $LOG_FILE_DIRECTORY
         scp $_SSH_OPTIONS $XENSERVER:artifacts/* $LOG_FILE_DIRECTORY
         tar -xzf $LOG_FILE_DIRECTORY/domU.tgz opt/stack/tempest/tempest-full.xml -O \
-        > $LOG_FILE_DIRECTORY/tempest-full.xml || true
+	    > $LOG_FILE_DIRECTORY/tempest-full.xml || true
     fi
 }
 
