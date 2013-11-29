@@ -1,5 +1,4 @@
 USERNAME="user"
-PASSWORD="simplepass"
 HNAME="jeos"
 
 (
@@ -23,9 +22,6 @@ sudo LANG=C chroot /mnt/ubuntu /bin/bash -c \
 sudo LANG=C chroot /mnt/ubuntu /bin/bash -c \
     "DEBIAN_FRONTEND=noninteractive \
     adduser --disabled-password --quiet $USERNAME --gecos $USERNAME"
-
-# Set password for user
-echo "$USERNAME:$PASSWORD" | sudo LANG=C chroot /mnt/ubuntu chpasswd
 
 ### Configure ssh keys
 sudo LANG=C chroot /mnt/ubuntu /bin/bash -c \
