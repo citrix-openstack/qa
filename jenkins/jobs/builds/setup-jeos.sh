@@ -83,3 +83,10 @@ auto eth0
 iface eth0 inet dhcp
 EOF
 ) | sudo tee /mnt/ubuntu/etc/network/interfaces
+
+{
+cat << EOF
+deb http://archive.ubuntu.com/ubuntu precise main
+deb http://archive.ubuntu.com/ubuntu precise universe
+EOF
+} | sudo tee /mnt/ubuntu/etc/apt/sources.list
