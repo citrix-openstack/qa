@@ -6,11 +6,11 @@ wget -qO - https://raw.github.com/openstack-dev/devstack/master/stackrc |
 }
 
 function non_git_repos() {
-    repo_lines | grep -v GIT_BASE
+    repo_lines | grep -v GIT_BASE | grep -v "//github.com/"
 }
 
 function git_repos() {
-    repo_lines | grep GIT_BASE
+    repo_lines | grep -e '\(GIT_BASE\|//github.com/\)'
 }
 
 function extract_bash_default() {
