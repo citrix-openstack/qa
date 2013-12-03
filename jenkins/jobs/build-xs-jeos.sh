@@ -28,7 +28,7 @@ if [ -z "$SLAVE_IP" ]; then
 fi
 echo "Starting job on $SLAVE_IP"
 
-cat $XSLIB/add-extra-hdd.sh | $REMOTELIB/bash.sh root@$SERVERNAME slave 10GiB
+cat $XSLIB/add-extra-hdd.sh | $REMOTELIB/bash.sh root@$SERVERNAME slave 10GiB boot-disk-for-staging-vm
 cat $BUILDLIB/prepare-for-jeos.sh | $REMOTELIB/bash.sh ubuntu@$SLAVE_IP 
 cat $BUILDLIB/enter-jeos-chroot.sh | $REMOTELIB/bash.sh ubuntu@$SLAVE_IP 
 cat $BUILDLIB/setup-jeos.sh | $REMOTELIB/bash.sh ubuntu@$SLAVE_IP 

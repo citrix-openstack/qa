@@ -2,6 +2,7 @@ set -eux
 
 MACHINE_NAME="$1"
 DISK_SIZE="$2"
+NAME_LABEL="${3:-extra-disk-for-os-volumes}"
 
 VM=$(xe vm-list name-label="$MACHINE_NAME" --minimal)
 
@@ -18,7 +19,7 @@ VM=$(xe vm-list name-label="$MACHINE_NAME" --minimal)
 #done
 
 LOCALSR=$(xe sr-list name-label="Local storage" --minimal)
-EXTRA_VDI=$(xe vdi-create name-label=extra-disk-for-os-volumes virtual-size="$DISK_SIZE" sr-uuid=$LOCALSR type=user)
+EXTRA_VDI=$(xe vdi-create name-label="$NAME_LABEL" virtual-size="$DISK_SIZE" sr-uuid=$LOCALSR type=user)
 EXTRA_VBD=$(xe vbd-create vm-uuid=$VM vdi-uuid=$EXTRA_VDI device=autodetect)
 xe vbd-plug uuid=$EXTRA_VBD
 

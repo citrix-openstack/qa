@@ -23,7 +23,7 @@ exit 1
 SERVERNAME="${1-$(print_usage_and_die)}"
 VDI="${2-$(print_usage_and_die)}"
 
-VM=$(cat $XSLIB/create-vm-with-vdi.sh | $REMOTELIB/bash.sh root@$SERVERNAME "$VDI")
+VM=$(cat $XSLIB/create-vm-with-vdi.sh | $REMOTELIB/bash.sh root@$SERVERNAME "$VDI" "256MiB" "no")
 
 $REMOTELIB/bash.sh root@$SERVERNAME << EOF
 set -eux
