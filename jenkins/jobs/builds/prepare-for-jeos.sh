@@ -43,19 +43,21 @@ sudo apt-get install -qy debootstrap
 sudo mkdir -p /var/jeos
 JEOS_CACHE="/var/jeos/cache.tgz"
 
-if [ -e "$JEOS_CACHE" ]; then
-    sudo tar -xzf "$JEOS_CACHE" -C /mnt/ubuntu
-else
+if ! [ -e "$JEOS_CACHE" ]; then
+    rm -rf /ubuntu_chroot
+    mkdir -p /ubuntu_chroot
     sudo http_proxy=http://gold.eng.hq.xensource.com:8000 debootstrap \
          --arch=amd64 \
          --components=main,universe \
          --include=openssh-server,language-pack-en,linux-image-virtual,grub-pc,sshpass,wget,shorewall,dnsmasq \
          precise \
-         /mnt/ubuntu \
+         /ubuntu_chroot \
          http://mirror.anl.gov/pub/ubuntu/
     echo "Saving cache..."
-    sudo tar -czf "$JEOS_CACHE" -C /mnt/ubuntu ./
+    sudo tar -czf "$JEOS_CACHE" -C /ubuntu_chroot ./
 fi
+
+sudo tar -xzf "$JEOS_CACHE" -C /mnt/ubuntu
 
 # Unmount
 while mount | grep "/mnt/ubuntu";
