@@ -48,7 +48,8 @@ if [ -e "$JEOS_CACHE" ]; then
 else
     sudo http_proxy=http://gold.eng.hq.xensource.com:8000 debootstrap \
          --arch=amd64 \
-         --include=openssh-server,language-pack-en,linux-image-virtual,grub-pc \
+         --components=main,universe \
+         --include=openssh-server,language-pack-en,linux-image-virtual,grub-pc,sshpass,wget,shorewall,dnsmasq \
          precise \
          /mnt/ubuntu \
          http://mirror.anl.gov/pub/ubuntu/
