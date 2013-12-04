@@ -396,9 +396,6 @@ XEN_INT_BRIDGE_OR_NET_NAME="osintnet"
 # Do not use secure delete
 CINDER_SECURE_DELETE=False
 
-# Tempest
-DEFAULT_INSTANCE_TYPE="m1.tiny"
-
 # Compute settings
 EXTRA_OPTS=("xenapi_disable_agent=True")
 API_RATE_LIMIT=False
