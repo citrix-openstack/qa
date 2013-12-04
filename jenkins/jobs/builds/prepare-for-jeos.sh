@@ -44,8 +44,8 @@ sudo mkdir -p /var/jeos
 JEOS_CACHE="/var/jeos/cache.tgz"
 
 if ! [ -e "$JEOS_CACHE" ]; then
-    rm -rf /ubuntu_chroot
-    mkdir -p /ubuntu_chroot
+    sudo rm -rf /ubuntu_chroot
+    sudo mkdir -p /ubuntu_chroot
     sudo http_proxy=http://gold.eng.hq.xensource.com:8000 debootstrap \
          --arch=amd64 \
          --components=main,universe \
