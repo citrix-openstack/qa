@@ -158,6 +158,7 @@ function assert_tool_exists() {
 if [ -z "$JEOS_FILENAME" ]; then
     echo -n "Setup ssh keys on XenServer..."
     tmp_dir="$(mktemp -d)"
+    cp $PRIVKEY "$tmp_dir/devstack"
     ssh-keygen -y -f $PRIVKEY > "$tmp_dir/devstack.pub"
     assert_tool_exists sshpass
     sshpass -p "$XENSERVER_PASS" \
