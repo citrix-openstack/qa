@@ -1,4 +1,3 @@
-USERNAME="user"
 HNAME="jeos"
 
 (
@@ -18,24 +17,12 @@ sudo LANG=C chroot /mnt/ubuntu /bin/bash -c \
 sudo LANG=C chroot /mnt/ubuntu /bin/bash -c \
     "apt-get clean"
 
-# Add a user
-sudo LANG=C chroot /mnt/ubuntu /bin/bash -c \
-    "DEBIAN_FRONTEND=noninteractive \
-    adduser --disabled-password --quiet $USERNAME --gecos $USERNAME"
-
-### Configure ssh keys
-sudo LANG=C chroot /mnt/ubuntu /bin/bash -c \
-    "mkdir /home/$USERNAME/.ssh && \
-    cat - > /home/$USERNAME/.ssh/authorized_keys && \
-    chown -R $USERNAME:$USERNAME /home/$USERNAME/.ssh && \
-    chmod 0700 /home/$USERNAME/.ssh && \
-    chmod 0600 /home/$USERNAME/.ssh/authorized_keys" << EOF
+sudo mkdir -p /mnt/ubuntu/root/.ssh
+sudo chmod 0700 /mnt/ubuntu/root/.ssh
+sudo tee /mnt/ubuntu/root/.ssh/authorized_keys << EOF
 # Empty now, will be populated by /root/update_authorized_keys.sh
 EOF
-
-### Enable sudo
-echo "$USERNAME ALL = NOPASSWD: ALL" | sudo tee "/mnt/ubuntu/etc/sudoers.d/allow_$USERNAME"
-sudo chmod 0440 "/mnt/ubuntu/etc/sudoers.d/allow_$USERNAME"
+sudo chmod 0600 /mnt/ubuntu/root/.ssh/authorized_keys
 
 # Install xenserver tools
 sudo wget -qO /mnt/ubuntu/xstools http://downloads.vmd.citrix.com/OpenStack/xe-guest-utilities/xe-guest-utilities_6.2.0-1120_amd64.deb
@@ -52,9 +39,9 @@ cat << EOF
 set -eux
 
 DOMID=\$(xenstore-read domid)
-xenstore-exists /local/domain/\$DOMID/authorized_keys/$USERNAME
-xenstore-read /local/domain/\$DOMID/authorized_keys/$USERNAME > /home/$USERNAME/xenstore_value
-cat /home/$USERNAME/xenstore_value > /home/$USERNAME/.ssh/authorized_keys
+xenstore-exists /local/domain/\$DOMID/authorized_keys/root
+xenstore-read /local/domain/\$DOMID/authorized_keys/root > /root/xenstore_value
+cat /root/xenstore_value > /root/.ssh/authorized_keys
 EOF
 } | sudo tee /mnt/ubuntu/root/update_authorized_keys.sh
 sudo chmod +x /mnt/ubuntu/root/update_authorized_keys.sh
