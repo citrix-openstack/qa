@@ -42,18 +42,20 @@ def resolve_host(hostname):
      return socket.gethostbyname(hostname)
 
 
-def devstack_readme_stream():
-    return urllib2.urlopen("https://raw.github.com/openstack-dev/devstack/master/tools/xen/README.md")
+def devstack_readme_stream(readme_url):
+    return urllib2.urlopen(readme_url)
 
 
 def main():
     parser = argparse.ArgumentParser(description="Get official instructions for devstack")
     parser.add_argument('host', help='Hypervisor to use')
     parser.add_argument('password', help='Password for the hypervisor')
+    parser.add_argument('--readme', help='URL for readme file',
+                        default="https://raw.github.com/openstack-dev/devstack/master/tools/xen/README.md")
     args = parser.parse_args()
 
     generate_test(
-        devstack_readme_stream(),
+        devstack_readme_stream(args.readme),
         sys.stdout,
         resolve_host(args.host),
         args.password)
