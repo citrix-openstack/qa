@@ -382,7 +382,7 @@ XENAPI_PASSWORD="$XENSERVER_PASS"
 SWIFT_HASH="66a3d6b56c1f479c8b4e70ab5c2000f5"
 
 # Use xvdb for backing cinder volumes
-XEN_XVDB_SIZE_GB=10
+XEN_XVDB_SIZE_GB=20
 VOLUME_BACKING_DEVICE=/dev/xvdb
 
 # Nice short names, so we could export an XVA
@@ -445,6 +445,7 @@ XEN_FIREWALL_DRIVER=nova.virt.firewall.NoopFirewallDriver
 SWIFT_LOOPBACK_DISK_SIZE=9000000
 
 # Additional Localrc parameters here
+INSTALL_TESTONLY_PACKAGES=True
 
 LOCALRC_CONTENT_ENDS_HERE
 
