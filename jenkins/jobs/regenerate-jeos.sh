@@ -44,7 +44,7 @@ sshpass -p ubuntu \
     -o UserKnownHostsFile=/dev/null \
     \$FNAME ubuntu@copper.eng.hq.xensource.com:/usr/share/nginx/www/jeos
 
-shpass -p ubuntu \
+sshpass -p ubuntu \
   ssh \
     -o StrictHostKeyChecking=no \
     -o UserKnownHostsFile=/dev/null \
