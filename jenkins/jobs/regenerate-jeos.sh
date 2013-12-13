@@ -30,7 +30,7 @@ if [ "$USE_EXTERNAL_UBUNTU_REPO" = "yes" ]; then
     PREFIX="external"
 fi
 
-FNAME="\$PREFIX-\$UBUNTU_DISTRO.xva"
+FNAME="\$PREFIX-$UBUNTU_DISTRO.xva"
 
 ./generate-citrix-job.sh "$REFERENCE" -u "$UBUNTU_DISTRO" \$EXTRA_OPT > installer.sh
 
