@@ -14,7 +14,7 @@ positional arguments:
  SETUP_TYPE       Type of setup, one of [nova-network, neutron] defaults to
                   nova-network.
  UBUNTU_DISTRO    The ubuntu distribution to use [precise, saucy] defaults to
-                  precise.
+                  not specifying, so use whatever is defined in localrc/xenrc.
 
 flags:
  -x               Use external ubuntu repos. If this flag is specified, the
@@ -37,7 +37,7 @@ TEMPLATE_NAME="$THIS_DIR/install-devstack-xen.sh"
 
 # Defaults for options
 SETUP_TYPE="nova-network"
-UBUNTU_DISTRO="precise"
+UBUNTU_DISTRO=""
 USE_INTERNAL_REPOS="true"
 
 # Get positiona arguments
@@ -127,8 +127,10 @@ if [ "$SETUP_TYPE" == "nova-vlan" ]; then
 fi
 
 # Configure distribution
-echo "UBUNTU_INST_RELEASE=$UBUNTU_DISTRO" >> $EXTENSIONS
-echo "UBUNTU_INST_TEMPLATE_NAME=devstack_$UBUNTU_DISTRO" >> $EXTENSIONS
+if [ -n "$UBUNTU_DISTRO" ]; then
+    echo "UBUNTU_INST_RELEASE=$UBUNTU_DISTRO" >> $EXTENSIONS
+    echo "UBUNTU_INST_TEMPLATE_NAME=devstack_$UBUNTU_DISTRO" >> $EXTENSIONS
+fi
 
 # Extend template
 sed \
