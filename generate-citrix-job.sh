@@ -5,7 +5,7 @@ set -eu
 function print_usage_and_die
 {
 cat >&2 << EOF
-usage: $0 BRANCH_REF_NAME [SETUP_TYPE]
+usage: $0 BRANCH_REF_NAME [-t SETUP_TYPE] [-u UBUNTU_DISTRO] [-x]
 
 Generate a test script to the standard output
 
@@ -13,10 +13,18 @@ positional arguments:
  BRANCH_REF_NAME  Name of the ref/branch to be used.
  SETUP_TYPE       Type of setup, one of [nova-network, neutron] defaults to
                   nova-network.
+ UBUNTU_DISTRO    The ubuntu distribution to use [precise, saucy] defaults to
+                  precise.
+
+flags:
+ -x               Use external ubuntu repos. If this flag is specified, the
+                  ubuntu repositories won't be overriden.
 
 An example run:
 
-$0 build-1373962961 nova-network
+$0 build-1373962961
+
+$@
 EOF
 exit 1
 }
@@ -26,14 +34,62 @@ THIS_DIR=$(cd $(dirname "$0") && pwd)
 . $THIS_DIR/lib/functions
 
 TEMPLATE_NAME="$THIS_DIR/install-devstack-xen.sh"
-BRANCH_REF_NAME="${1-$(print_usage_and_die)}"
-SETUP_TYPE="${2-"nova-network"}"
+
+# Defaults for options
+SETUP_TYPE="nova-network"
+UBUNTU_DISTRO="precise"
+USE_INTERNAL_REPOS="true"
+
+# Get positiona arguments
+set +u
+BRANCH_REF_NAME="$1"
+shift || print_usage_and_die "ERROR: Please specify a branch name"
+set -u
+
+# Number of options passed to this script
+REMAINING_OPTIONS="$#"
+
+# Get optional parameters
+set +e
+while getopts ":t:u:x" flag; do
+    REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
+    case "$flag" in
+        t)
+            SETUP_TYPE="$OPTARG"
+            if ! [ "$SETUP_TYPE" = "nova-network" -o "$SETUP_TYPE" = "neutron" ]; then
+                print_usage_and_die "ERROR: invalid value for SETUP_TYPE: $SETUP_TYPE"
+            fi
+            REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
+            ;;
+        u)
+            UBUNTU_DISTRO="$OPTARG"
+            if ! [ "$UBUNTU_DISTRO" = "precise" -o "$UBUNTU_DISTRO" = "saucy" ]; then
+                print_usage_and_die "ERROR: invalid value for UBUNTU_DISTRO: $UBUNTU_DISTRO"
+            fi
+            REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
+            ;;
+        x)
+            USE_INTERNAL_REPOS="false"
+            ;;
+        \?)
+            print_usage_and_die "Invalid option -$OPTARG"
+            ;;
+    esac
+done
+set -e
+
+# Make sure that all options processed
+if [ "0" != "$REMAINING_OPTIONS" ]; then
+    print_usage_and_die "ERROR: some arguments were not recognised!"
+fi
 
 EXTENSION_POINT="^# Additional Localrc parameters here$"
 EXTENSIONS=$(mktemp)
 
 # Set ubuntu install proxy
-cat "$THIS_DIR/modifications/add-ubuntu-proxy-repos" >> $EXTENSIONS
+if [ "true" = "$USE_INTERNAL_REPOS" ]; then
+    cat "$THIS_DIR/modifications/add-ubuntu-proxy-repos" >> $EXTENSIONS
+fi
 
 # Set custom repos
 {
@@ -69,6 +125,10 @@ fi
 if [ "$SETUP_TYPE" == "nova-vlan" ]; then
     cat "$THIS_DIR/modifications/use-vlan" >> $EXTENSIONS
 fi
+
+# Configure distribution
+echo "UBUNTU_INST_RELEASE=$UBUNTU_DISTRO" >> $EXTENSIONS
+echo "UBUNTU_INST_TEMPLATE_NAME=devstack_$UBUNTU_DISTRO" >> $EXTENSIONS
 
 # Extend template
 sed \
