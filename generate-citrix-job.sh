@@ -5,7 +5,7 @@ set -eu
 function print_usage_and_die
 {
 cat >&2 << EOF
-usage: $0 BRANCH_REF_NAME [-t SETUP_TYPE] [-u UBUNTU_DISTRO]
+usage: $0 BRANCH_REF_NAME [-t SETUP_TYPE] [-u UBUNTU_DISTRO] [-x]
 
 Generate a test script to the standard output
 
@@ -15,6 +15,10 @@ positional arguments:
                   nova-network.
  UBUNTU_DISTRO    The ubuntu distribution to use [precise, saucy] defaults to
                   precise.
+
+flags:
+ -x               Use external ubuntu repos. If this flag is specified, the
+                  ubuntu repositories won't be overriden.
 
 An example run:
 
@@ -34,6 +38,7 @@ TEMPLATE_NAME="$THIS_DIR/install-devstack-xen.sh"
 # Defaults for options
 SETUP_TYPE="nova-network"
 UBUNTU_DISTRO="precise"
+USE_INTERNAL_REPOS="true"
 
 # Get positiona arguments
 set +u
@@ -46,7 +51,7 @@ REMAINING_OPTIONS="$#"
 
 # Get optional parameters
 set +e
-while getopts ":t:u:" flag; do
+while getopts ":t:u:x" flag; do
     REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
     case "$flag" in
         t)
@@ -62,6 +67,9 @@ while getopts ":t:u:" flag; do
                 print_usage_and_die "ERROR: invalid value for UBUNTU_DISTRO: $UBUNTU_DISTRO"
             fi
             REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
+            ;;
+        x)
+            USE_INTERNAL_REPOS="false"
             ;;
         \?)
             print_usage_and_die "Invalid option -$OPTARG"
@@ -79,7 +87,9 @@ EXTENSION_POINT="^# Additional Localrc parameters here$"
 EXTENSIONS=$(mktemp)
 
 # Set ubuntu install proxy
-cat "$THIS_DIR/modifications/add-ubuntu-proxy-repos" >> $EXTENSIONS
+if [ "true" = "$USE_INTERNAL_REPOS" ]; then
+    cat "$THIS_DIR/modifications/add-ubuntu-proxy-repos" >> $EXTENSIONS
+fi
 
 # Set custom repos
 {
