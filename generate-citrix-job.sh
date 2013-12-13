@@ -118,6 +118,7 @@ fi
 
 # Configure distribution
 echo "UBUNTU_INST_RELEASE=$UBUNTU_DISTRO" >> $EXTENSIONS
+echo "UBUNTU_INST_TEMPLATE_NAME=devstack_$UBUNTU_DISTRO" >> $EXTENSIONS
 
 # Extend template
 sed \
