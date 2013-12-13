@@ -5,7 +5,7 @@ set -eu
 function print_usage_and_die
 {
 cat >&2 << EOF
-usage: $0 BRANCH_REF_NAME [SETUP_TYPE]
+usage: $0 BRANCH_REF_NAME [-t SETUP_TYPE]
 
 Generate a test script to the standard output
 
@@ -16,7 +16,9 @@ positional arguments:
 
 An example run:
 
-$0 build-1373962961 nova-network
+$0 build-1373962961
+
+$@
 EOF
 exit 1
 }
@@ -26,8 +28,42 @@ THIS_DIR=$(cd $(dirname "$0") && pwd)
 . $THIS_DIR/lib/functions
 
 TEMPLATE_NAME="$THIS_DIR/install-devstack-xen.sh"
-BRANCH_REF_NAME="${1-$(print_usage_and_die)}"
-SETUP_TYPE="${2-"nova-network"}"
+
+# Defaults for options
+SETUP_TYPE="nova-network"
+
+# Get positiona arguments
+set +u
+BRANCH_REF_NAME="$1"
+shift || print_usage_and_die "ERROR: Please specify a branch name"
+set -u
+
+# Number of options passed to this script
+REMAINING_OPTIONS="$#"
+
+# Get optional parameters
+set +e
+while getopts ":t:" flag; do
+    REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
+    case "$flag" in
+        t)
+            SETUP_TYPE="$OPTARG"
+            if ! [ "$SETUP_TYPE" = "nova-network" -o "$SETUP_TYPE" = "neutron" ]; then
+                print_usage_and_die "ERROR: invalid value for SETUP_TYPE: $SETUP_TYPE"
+            fi
+            REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
+            ;;
+        \?)
+            print_usage_and_die "Invalid option -$OPTARG"
+            ;;
+    esac
+done
+set -e
+
+# Make sure that all options processed
+if [ "0" != "$REMAINING_OPTIONS" ]; then
+    print_usage_and_die "ERROR: some arguments were not recognised!"
+fi
 
 EXTENSION_POINT="^# Additional Localrc parameters here$"
 EXTENSIONS=$(mktemp)
