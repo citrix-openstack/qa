@@ -4,7 +4,7 @@ set -eu
 function print_usage_and_die
 {
 cat >&2 << EOF
-usage: $0 XENSERVER XENSERVER_PASS PRIVKEY [-t TEST_TYPE] [-d DEVSTACK_URL] [-f] [-l LOG_FILE_DIRECTORY] [-j JEOS_URL] [-e JEOS_FILENAME]
+usage: $0 XENSERVER XENSERVER_PASS PRIVKEY <optional arguments> 
 
 A simple script to use devstack to setup an OpenStack, and optionally
 run tests on it. This script should be executed on an operator machine, and
@@ -19,19 +19,23 @@ positional arguments:
                     used.
 
 optional arguments:
- TEST_TYPE          Type of the tests to run. One of [none, exercise, smoke, full]
-                    defaults to none
- DEVSTACK_TGZ       An URL pointing to a tar.gz snapshot of devstack. This
-                    defaults to the official devstack repository.
- LOG_FILE_DIRECTORY The directory in which to store the devstack logs on failure.
- JEOS_URL           An URL for an xva containing an exported minimal OS template
-                    with the name jeos_template_for_devstack, to be used
-                    as a starting point.
- JEOS_FILENAME      Save a JeOS xva to the given filename and quit. If this
-                    parameter is specified, no private key setup or devstack
-                    installation will be done. The exported file could be
-                    re-used later by putting it to a webserver, and specifying
-                    JEOS_URL
+ -t TEST_TYPE          Type of the tests to run. One of [none, exercise, smoke, full]
+                       defaults to none
+ -d DEVSTACK_URL       An URL pointing to a tar.gz snapshot of devstack. This
+                       defaults to the official devstack repository.
+ -l LOG_FILE_DIRECTORY The directory in which to store the devstack logs on failure.
+ -j JEOS_URL           An URL for an xva containing an exported minimal OS template
+                       with the name jeos_template_for_devstack, to be used
+                       as a starting point.
+ -e JEOS_FILENAME      Save a JeOS xva to the given filename and quit. If this
+                       parameter is specified, no private key setup or devstack
+                       installation will be done. The exported file could be
+                       re-used later by putting it to a webserver, and specifying
+                       JEOS_URL.
+ -s SUPP_PACK_URL      URL to a supplemental pack that will be installed on the host
+                       before running any tests.  The host will not be rebooted after
+                       installing the supplemental pack, so new kernels will not be
+                       picked up.
 
 flags:
  -f                 Force SR replacement. If your XenServer has an LVM type SR,
@@ -61,6 +65,7 @@ FORCE_SR_REPLACEMENT="false"
 LOG_FILE_DIRECTORY=""
 JEOS_URL=""
 JEOS_FILENAME=""
+SUPP_PACK_URL=""
 
 # Get Positional arguments
 set +u
@@ -77,7 +82,7 @@ REMAINING_OPTIONS="$#"
 
 # Get optional parameters
 set +e
-while getopts ":t:d:fl:j:e:" flag; do
+while getopts ":t:d:fl:j:e:s:" flag; do
     REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
     case "$flag" in
         t)
@@ -104,6 +109,10 @@ while getopts ":t:d:fl:j:e:" flag; do
             ;;
         e)
             JEOS_FILENAME="$OPTARG"
+            REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
+            ;;
+        s)
+            SUPP_PACK_URL="$OPTARG"
             REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
             ;;
         \?)
@@ -137,6 +146,7 @@ DEVSTACK_TGZ:   $DEVSTACK_TGZ
 FORCE_SR_REPLACEMENT: $FORCE_SR_REPLACEMENT
 JEOS_URL:             ${JEOS_URL:-template will not be imported}
 JEOS_FILENAME:        ${JEOS_FILENAME:-not exporting JeOS}
+SUPP_PACK_URL:        ${SUPP_PACK_URL:-no supplemental pack}
 EOF
 
 # Helper function
@@ -311,6 +321,15 @@ if [ -z "$XENSERVER_IP" ]; then
     exit 1
 fi
 echo "OK"
+
+if [ -n "$SUPP_PACK_URL" ]; then
+    echo -n "Applying supplemental pack"
+    on_xenserver <<SUPP_PACK
+set -eu
+wget -qO /root/supp_pack_for_devstack.iso $SUPP_PACK_URL
+xe-install-supplemental-pack /root/supp_pack_for_devstack.iso
+SUPP_PACK
+fi
 
 echo -n "Hack ISCSISR.py on XenServer (original saved to /root/ISCSISR.py.orig)..."
 on_xenserver << HACK_ISCSI_SR
