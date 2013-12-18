@@ -14,7 +14,7 @@ function cli
 }
 
 function generate_job() {
-    sed -e "s/TEST_TYPE_DEFAULT/$1/g" -e "s/SETUP_TYPE_DEFAULT/$2/g" -e "s/BRANCH_TYPE/$3/g" "$TEMPLATEJOB"
+    sed -e "s/TEST_TYPE_DEFAULT/$1/g" -e "s/SETUP_TYPE_DEFAULT/$2/g" -e "s/BRANCH_NAME_DEFAULT/$3/g" "$TEMPLATEJOB"
 }
 
 function generate_xenserver_core_test_job() {
@@ -26,7 +26,7 @@ function replace_distro_with() {
 }
 
 function generate_os_test_jobs() {
-    cli get-job "os-TEMPLATE_JOB" > "$TEMPLATEJOB"
+    cli get-job "os-custom" > "$TEMPLATEJOB"
 
     for branch in trunk ctx havana; do
         for test_type in smoke full; do
