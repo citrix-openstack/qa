@@ -3,8 +3,9 @@ set -eu
 
 BRANCHNAME="$1"
 
-if git show-ref | grep -q "$BRANCHNAME"; then
-    git checkout "$BRANCHNAME" -B tmpbranch --no-track
+checkout_name=`git show-ref | grep -m 1 "$BRANCHNAME" | awk '{print $2}'`
+if [ -n "$checkout_name" ]; then
+    git checkout "$checkout_name" -B tmpbranch --no-track
 else
     echo "  WARNING: $BRANCHNAME does not exist [$PWD]"
 fi
