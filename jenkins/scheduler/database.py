@@ -1,3 +1,4 @@
+#!/usr/bin/python
 from selectors import first
 
 def set_database(filename, contents):
@@ -167,7 +168,7 @@ def get_lock_details(filename, hostname=None):
     >>> if os.path.exists('test_db'): os.unlink('test_db')
     >>> set_database('test_db', '[dict(HOST=\"1\")]')
     >>> get_lock_details('test_db')
-    {}
+    {'1': {'date': None, 'lock': u'', 'reason': None}}
     >>> lock_items('test_db', 'lock1', lock_reason='reason')
     [{'HOST': '1'}]
     >>> get_lock_details('test_db') # doctest: +ELLIPSIS
@@ -176,6 +177,9 @@ def get_lock_details(filename, hostname=None):
     {}
     >>> get_lock_details('test_db', '1') # doctest: +ELLIPSIS
     {'1': {'date': ..., 'lock': u'lock1', 'reason': u'reason'}}
+    >>> release_lock('test_db', 'lock1')
+    >>> get_lock_details('test_db') # doctest: +ELLIPSIS
+    {'1': {'date': ..., 'lock': u'', 'reason': u'reason'}}
     """
 
     import sqlite3
@@ -185,8 +189,8 @@ def get_lock_details(filename, hostname=None):
 
     locks = {}
     for lock, data, reason, lock_date, in c.execute(
-        'SELECT lock, data, lock_reason, lock_date FROM stuff WHERE lock <> :empty_lock ORDER by id',
-                                 dict(empty_lock="")).fetchall():
+        'SELECT lock, data, lock_reason, lock_date FROM stuff ORDER by id',
+                                 ).fetchall():
         item = eval(data)
         if hostname is None or item['HOST'] == hostname:
             locks[item['HOST']] = {'lock':lock, 'reason':reason, 'date':lock_date}
@@ -207,7 +211,7 @@ def release_lock(filename, lock):
     >>> get_locks('test_db')
     [u'lock1']
     >>> release_lock('test_db', 'lock1')
-    >>> get_locks('test_db')
+    >>> gets_locks('test_db')
     []
     """
 
@@ -219,3 +223,9 @@ def release_lock(filename, lock):
     c.execute('UPDATE stuff SET lock = :empty_lock WHERE lock = :lock', dict(empty_lock="", lock=lock))
     conn.commit()
     conn.close()
+
+if __name__ == "__main__":
+    import doctest
+    print "Running doctest ..."
+    doctest.testmod()
+    print "... Finished!"
