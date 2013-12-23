@@ -165,8 +165,6 @@ function assert_tool_exists() {
     fi
 }
 
-TMPDIR=$(echo "mktemp -d" | on_xenserver)
-
 if [ -z "$JEOS_FILENAME" ]; then
     echo -n "Setup ssh keys on XenServer..."
     tmp_dir="$(mktemp -d)"
@@ -214,6 +212,7 @@ END_OF_CLEANUP
     exit $RETURN_CODE
 fi
 
+TMPDIR=$(echo "mktemp -d" | on_xenserver)
 
 function copy_logs_on_failure() {
     set +e
