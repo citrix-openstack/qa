@@ -17,8 +17,9 @@ positional arguments:
                   not specifying, so use whatever is defined in localrc/xenrc.
 
 flags:
- -x               Use external ubuntu repos. If this flag is specified, the
-                  ubuntu repositories won't be overriden.
+ -x               Create an externally usable script. If this flag is set, then
+                  ubuntu repositories won't be overriden, and github will be
+                  used.
 
 An example run:
 
@@ -34,11 +35,14 @@ THIS_DIR=$(cd $(dirname "$0") && pwd)
 . $THIS_DIR/lib/functions
 
 TEMPLATE_NAME="$THIS_DIR/install-devstack-xen.sh"
+INTERNAL_REPO_BASE="gold.eng.hq.xensource.com/git/internal/builds"
+EXTERNAL_REPO_BASE="github.com/citrix-openstack-build"
 
 # Defaults for options
 SETUP_TYPE="nova-network"
 UBUNTU_DISTRO=""
-USE_INTERNAL_REPOS="true"
+INTERNAL="true"
+REPO_BASE="$INTERNAL_REPO_BASE"
 
 # Get positiona arguments
 set +u
@@ -69,7 +73,8 @@ while getopts ":t:u:x" flag; do
             REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
             ;;
         x)
-            USE_INTERNAL_REPOS="false"
+            INTERNAL="false"
+            REPO_BASE="$EXTERNAL_REPO_BASE"
             ;;
         \?)
             print_usage_and_die "Invalid option -$OPTARG"
@@ -86,8 +91,8 @@ fi
 EXTENSION_POINT="^# Additional Localrc parameters here$"
 EXTENSIONS=$(mktemp)
 
-# Set ubuntu install proxy
-if [ "true" = "$USE_INTERNAL_REPOS" ]; then
+# Set ubuntu install proxy for intenal script
+if [ "true" = "$INTERNAL" ]; then
     cat "$THIS_DIR/modifications/add-ubuntu-proxy-repos" >> $EXTENSIONS
 fi
 
@@ -98,10 +103,10 @@ fi
         echo "$(branch_name "$repo_record")=$BRANCH_REF_NAME"
     done
     cat << EOF
-NOVA_ZIPBALL_URL="http://gold.eng.hq.xensource.com/git/internal/builds/nova/archive/$BRANCH_REF_NAME.zip"
-NEUTRON_ZIPBALL_URL="http://gold.eng.hq.xensource.com/git/internal/builds/neutron/archive/$BRANCH_REF_NAME.zip"
+NOVA_ZIPBALL_URL="http://$REPO_BASE/nova/archive/$BRANCH_REF_NAME.zip"
+NEUTRON_ZIPBALL_URL="http://$REPO_BASE/neutron/archive/$BRANCH_REF_NAME.zip"
 EOF
-} >> "$EXTENSIONS"
+} | sed -e "s,$INTERNAL_REPO_BASE,$REPO_BASE,g" >> "$EXTENSIONS"
 
 function testing_trunk() {
     echo "$BRANCH_REF_NAME" | grep -q "os-trunk-test"
@@ -135,7 +140,7 @@ fi
 # Extend template
 sed \
     -e "/$EXTENSION_POINT/r  $EXTENSIONS" \
-    -e "s,^\(DEVSTACK_TGZ=\).*,\1http://gold.eng.hq.xensource.com/git/internal/builds/devstack/archive/$BRANCH_REF_NAME.tar.gz,g" \
+    -e "s,^\(DEVSTACK_TGZ=\).*,\1http://$REPO_BASE/devstack/archive/$BRANCH_REF_NAME.tar.gz,g" \
     "$TEMPLATE_NAME"
 
 rm -f "$EXTENSIONS"
