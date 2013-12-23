@@ -165,6 +165,8 @@ function assert_tool_exists() {
     fi
 }
 
+TMPDIR=$(echo "mktemp -d" | on_xenserver)
+
 if [ -z "$JEOS_FILENAME" ]; then
     echo -n "Setup ssh keys on XenServer..."
     tmp_dir="$(mktemp -d)"
@@ -349,8 +351,6 @@ if [ -n "\$iscsi_target_file" ]; then
 fi
 HACK_ISCSI_SR
 echo "OK"
-
-TMPDIR=$(echo "mktemp -d" | on_xenserver)
 
 if [ -n "$JEOS_URL" ]; then
     echo "(re-)importing JeOS template"
