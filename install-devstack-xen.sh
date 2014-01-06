@@ -452,7 +452,8 @@ VNCSERVER_PROXYCLIENT_ADDRESS="$XENSERVER_IP"
 MULTI_HOST=1
 
 # Skip boot from volume exercise
-SKIP_EXERCISES="boot_from_volume"
+# See https://bugs.launchpad.net/openstack-ci/+bug/1263824 for euca and bundle
+SKIP_EXERCISES="boot_from_volume,bundle,euca"
 
 ENABLED_SERVICES=g-api,g-reg,key,n-api,n-crt,n-obj,n-cpu,n-sch,horizon,mysql,rabbit,sysstat,tempest,s-proxy,s-account,s-container,s-object,cinder,c-api,c-vol,c-sch,n-cond,heat,h-api,h-api-cfn,h-api-cw,h-eng,n-net
 
