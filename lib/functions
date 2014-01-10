@@ -59,6 +59,7 @@ NOVNC_REPO kanaka noVNC.git github
 OPENSTACKCLIENT_REPO openstack python-openstackclient.git github
 OSLOCFG_REPO openstack oslo.config.git github
 OSLOMSG_REPO openstack oslo.messaging.git github
+OSLORWRAP_REPO openstack oslo.rootwrap.git github
 PBR_REPO openstack-dev pbr.git github
 PECAN_REPO stackforge pecan.git github
 REQUIREMENTS_REPO openstack requirements.git github
