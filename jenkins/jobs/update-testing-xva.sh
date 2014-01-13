@@ -25,4 +25,5 @@ ssh-add "$PrivateKeyToPublicHttpServer" || { ssh-agent -k; exit 1; }
     cd openstack-xenapi-testing-xva
 
     bin/cloud-xva-create
+    ssh-agent -k
 } || { ssh-agent -k; exit 1; }
