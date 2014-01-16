@@ -2,6 +2,10 @@
 
 set -eux
 
+OPENSTACK_XENAPI_TESTING_XVA_URL="$1"
+OPENSTACK_XENAPI_TESTING_XVA_BRANCH="$2"
+
+
 [ -n "$PublicHttpServerUserAndHost" ]
 [ -n "$PublicHttpServerOpenStackPath" ]
 [ -n "$PrivateKeyToPublicHttpServer" ]
@@ -11,19 +15,17 @@ ssh-add "$PrivateKeyToPublicHttpServer" || { ssh-agent -k; exit 1; }
 
 {
     for dependency in worker-vms remote-bash; do
-        [ -e $dependency ] \
-        && ( cd $dependency; git pull ) \
-        || git clone https://github.com/citrix-openstack/$dependency
+        rm -rf $dependency
+        git clone https://github.com/citrix-openstack/$dependency
 
         export PATH=$PATH:$(pwd)/$dependency/bin
     done
 
-    [ -e "openstack-xenapi-testing-xva" ] \
-        && ( cd openstack-xenapi-testing-xva; git pull ) \
-        || git clone https://github.com/citrix-openstack/openstack-xenapi-testing-xva
+    rm -rf "openstack-xenapi-testing-xva"
+    git clone "$OPENSTACK_XENAPI_TESTING_XVA_URL" -b "$OPENSTACK_XENAPI_TESTING_XVA_BRANCH"
 
     cd openstack-xenapi-testing-xva
 
-    bin/cloud-xva-create
+    bin/cloud-xva-create "OPENSTACK_XENAPI_TESTING_XVA_BRANCH"
     ssh-agent -k
 } || { ssh-agent -k; exit 1; }
