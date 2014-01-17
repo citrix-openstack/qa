@@ -9,6 +9,8 @@ ssh guard@silicon lock-get-single-server --reason $BUILD_URL > "${BUILD_NUMBER}.
 
 echo "Removing old builds"
 set -f
+set +e
 ssh $INTERNAL_HTTP_USER_HOST rm $(internal_novaplugins_path '*')
 ssh $INTERNAL_HTTP_USER_HOST rm $(internal_xva_path '*')
+set -e
 set +f
