@@ -169,7 +169,7 @@ function run_smoke() {
 
     on_devstack $devstack_ip << EOF
 cd /opt/stack/tempest
-nosetests -sv --nologcapture --attr=type=smoke tempest </dev/null # >/opt/stack/smoke.result 2>&1
+tox -esmoke
 EOF
 }
 
