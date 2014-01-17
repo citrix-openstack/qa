@@ -7,8 +7,10 @@ THISDIR="$(cd "$(dirname $0)" && pwd)"
 . "$(pwd)/${BUILD_NUMBER}.properties"
 
 echo "Removing old builds"
-ssh $INTERNAL_HTTP_USER_HOST rm $(internal_novaplugins_path "\*")
-ssh $INTERNAL_HTTP_USER_HOST rm $(internal_xva_path "\*")
+set -f
+ssh $INTERNAL_HTTP_USER_HOST rm $(internal_novaplugins_path *)
+ssh $INTERNAL_HTTP_USER_HOST rm $(internal_xva_path *)
+set +f
 
 jenkins/jobs/xva-build.sh "$HOST" "$XenServerPassword" "$SETUPSCRIPT_URL" "$NOVA_REPO" "$NOVA_BRANCH" "$JEOS_URL"
 
