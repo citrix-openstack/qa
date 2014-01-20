@@ -169,7 +169,7 @@ function run_smoke() {
 
     on_devstack $devstack_ip << EOF
 cd /opt/stack/tempest
-pip install tox
+sudo pip install tox
 tox -esmoke
 EOF
 }
