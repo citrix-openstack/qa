@@ -3,7 +3,7 @@
 set -eux
 
 OPENSTACK_XENAPI_TESTING_XVA_URL="$1"
-OPENSTACK_XENAPI_TESTING_XVA_BRANCH="$2"
+REVISION="$2"
 
 
 [ -n "$PublicHttpServerUserAndHost" ]
@@ -21,11 +21,11 @@ ssh-add "$PrivateKeyToPublicHttpServer" || { ssh-agent -k; exit 1; }
         export PATH=$PATH:$(pwd)/$dependency/bin
     done
 
-    rm -rf "openstack-xenapi-testing-xva"
-    git clone "$OPENSTACK_XENAPI_TESTING_XVA_URL" -b "$OPENSTACK_XENAPI_TESTING_XVA_BRANCH"
+    rm -rf "openstack-xenapi-testing-xva*"
+    wget -qO - "$OPENSTACK_XENAPI_TESTING_XVA_URL/archive/${REVISION}.tar.gz" | tar -xzf -
 
-    cd openstack-xenapi-testing-xva
+    cd openstack-xenapi-testing-xva*
 
-    bin/cloud-xva-create "$OPENSTACK_XENAPI_TESTING_XVA_BRANCH"
+    bin/cloud-xva-create "$REVISION"
     ssh-agent -k
 } || { ssh-agent -k; exit 1; }
