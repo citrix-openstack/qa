@@ -21,7 +21,7 @@ ssh-add "$PrivateKeyToPublicHttpServer" || { ssh-agent -k; exit 1; }
         export PATH=$PATH:$(pwd)/$dependency/bin
     done
 
-    rm -rf "openstack-xenapi-testing-xva*"
+    rm -rf openstack-xenapi-testing-xva*
     wget -qO - "$OPENSTACK_XENAPI_TESTING_XVA_URL/archive/${REVISION}.tar.gz" | tar -xzf -
 
     cd openstack-xenapi-testing-xva*
