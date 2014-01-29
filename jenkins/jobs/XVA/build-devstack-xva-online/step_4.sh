@@ -12,11 +12,11 @@ fi
 echo "Mirroring build result from copper to public http server"
 ssh -i $PrivateKeyToPublicHttpServer $PublicHttpServerUserAndHost \
     wget "http://10.219.13.54/builds/$(novaplugins_name $XVA_INTERNAL_NAME)" \
-    -O "$PublicHttpServerOpenStackPath/$(novaplugins_name $XVA_NAME)"
+    -O "$PublicHttpServerOpenStackPath/$(novaplugins_name $XVA_NAME)" -q
 
 ssh -i $PrivateKeyToPublicHttpServer $PublicHttpServerUserAndHost \
     wget "http://10.219.13.54/builds/$(xva_name $XVA_INTERNAL_NAME)" \
-    -O "$PublicHttpServerOpenStackPath/$(xva_name $XVA_NAME)"
+    -O "$PublicHttpServerOpenStackPath/$(xva_name $XVA_NAME)" -q
 
 echo "Remove internal builds"
 ssh $INTERNAL_HTTP_USER_HOST rm -f \
