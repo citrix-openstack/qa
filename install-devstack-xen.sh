@@ -498,7 +498,7 @@ if [ "$TEST_TYPE" == "exercise" ]; then
 fi
 
 # Pin to 1.6.1 due to https://bugs.launchpad.net/openstack-ci/+bug/1274135
-sudo pip install tox=1.6.1
+sudo pip install tox==1.6.1
 
 cd /opt/stack/tempest
 if [ "$TEST_TYPE" == "smoke" ]; then
