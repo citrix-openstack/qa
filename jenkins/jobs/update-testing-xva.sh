@@ -4,6 +4,7 @@ set -eux
 
 OPENSTACK_XENAPI_TESTING_XVA_URL="$1"
 REVISION="$2"
+REVISION_TYPE="${3:-RELEASE}"
 
 
 [ -n "$PublicHttpServerUserAndHost" ]
@@ -22,7 +23,12 @@ ssh-add "$PrivateKeyToPublicHttpServer" || { ssh-agent -k; exit 1; }
     done
 
     rm -rf openstack-xenapi-testing-xva*
-    wget -qO - "$OPENSTACK_XENAPI_TESTING_XVA_URL/archive/${REVISION}.tar.gz" | tar -xzf -
+    if [ "$REVISION_TYPE" == "RELEASE" ]; then
+	wget -qO - "$OPENSTACK_XENAPI_TESTING_XVA_URL/archive/${REVISION}.tar.gz" | tar -xzf -
+    else
+	git clone $OPENSTACK_XENAPI_TESTING_XVA_URL openstack-xenapi-testing-xva-$REVISION
+	git checkout $REVISION
+    fi
 
     cd openstack-xenapi-testing-xva*
 
