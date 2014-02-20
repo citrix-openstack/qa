@@ -41,6 +41,7 @@ CEILOMETERCLIENT_REPO openstack python-ceilometerclient.git github
 CEILOMETER_REPO openstack ceilometer.git github
 CINDERCLIENT_REPO openstack python-cinderclient.git github
 CINDER_REPO openstack cinder.git github
+CLIFF_REPO openstack cliff.git github
 DEVSTACK_REPO openstack-dev devstack.git github
 GLANCECLIENT_REPO openstack python-glanceclient.git github
 GLANCE_REPO openstack glance.git github
@@ -62,12 +63,15 @@ OSLOMSG_REPO openstack oslo.messaging.git github
 OSLORWRAP_REPO openstack oslo.rootwrap.git github
 PBR_REPO openstack-dev pbr.git github
 PECAN_REPO stackforge pecan.git github
+PYCADF_REPO openstack pycadf.git github
 REQUIREMENTS_REPO openstack requirements.git github
 RYU_REPO osrg ryu.git github
 SPICE_REPO spice spice-html5.git anongit
+STEVEDORE_REPO openstack stevedore.git github
 SWIFT3_REPO fujita swift3.git github
 SWIFTCLIENT_REPO openstack python-swiftclient.git github
 SWIFT_REPO openstack swift.git github
+TASKFLOW_REPO openstack taskflow.git github
 TEMPEST_REPO openstack tempest.git github
 TROVECLIENT_REPO openstack python-troveclient.git github
 TROVE_REPO openstack trove.git github
