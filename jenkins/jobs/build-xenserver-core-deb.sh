@@ -9,7 +9,7 @@ TESTLIB=$(cd $(dirname $(readlink -f "$0")) && cd tests && pwd)
 function print_usage_and_die
 {
 cat >&2 << EOF
-usage: $0 HOSTNAME SLAVE_PARAM_FILE COMMIT REPO_URL
+usage: $0 HOSTNAME COMMIT REPO_URL
 
 Build xenserver-core packages
 
@@ -19,7 +19,6 @@ positional arguments:
  REPO_URL     xenserver-core repository location
 
 optional arguments:
- -s                   Specifies we want to use a slave VM on HOSTNAMEs XenServer
  -f SLAVE_PARAM_FILE  Slave parameters will be placed to this file
 EOF
 exit 1
@@ -34,16 +33,11 @@ shift
 
 # Number of options passed to this script
 REMAINING_OPTIONS="$#"
-USE_SLAVE="false"
 # Get optional parameters
 set +e
-while getopts "sf:u:" flag; do
+while getopts "f:" flag; do
     REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
     case "$flag" in
-        s)
-            USE_SLAVE="true"
-            REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
-            ;;
         f)
             SLAVE_PARAM_FILE="$OPTARG"
             REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
@@ -57,15 +51,11 @@ if [ "0" != "$REMAINING_OPTIONS" ]; then
     print_usage_and_die "ERROR: some arguments were not recognised!"
 fi
 
-if [ "$USE_SLAVE" == "true" ]; then
-    WORKER=$(cat $XSLIB/get-worker.sh | "$REMOTELIB/bash.sh" "root@$HOSTNAME" none raring raring)
+WORKER="root@$HOSTNAME"
 
-    if [ -n "$SLAVE_PARAM_FILE" ]; then
-	echo "$WORKER" > $SLAVE_PARAM_FILE
-    fi
-else
-    WORKER="ubuntu@$HOSTNAME"
-fi
+args="DIST=wheezy"
+args="$args MIRROR=http://ftp.us.debian.org/debian/"
+args="$args APT_REPOS='|deb @MIRROR@ @DIST@ contrib |deb @MIRROR@ @DIST@-backports main '"
 
 "$REMOTELIB/bash.sh" $WORKER << END_OF_XSCORE_BUILD_SCRIPT
 set -eux
@@ -77,19 +67,29 @@ APT_ASSUME_YES
 
 sudo apt-get update
 sudo apt-get dist-upgrade
-sudo apt-get install git ocaml-nox
+sudo apt-get install git ocaml-nox lsb-release
 
-git clone $REPO_URL xenserver-core
+[ -e xenserver-core ] || git clone $REPO_URL xenserver-core
 cd xenserver-core
+git remote update
+git reset --hard HEAD
+git clean -f
 git checkout $COMMIT
 git log -1 --pretty=format:%H
 
-sed -ie 's,http://gb.archive.ubuntu.com/ubuntu/,http://mirror.anl.gov/pub/ubuntu/,g' scripts/deb/pbuilderrc.in
+#cat >> scripts/deb/templates/pbuilderrc << EOF
+#export http_proxy=http://gold.eng.hq.xensource.com:8000
+#DEBOOTSTRAPOPTS=--no-check-gpg
+#EOF
 
-cat >> pbuilderrc.in << EOF
-export http_proxy=http://gold.eng.hq.xensource.com:8000
+cat >> scripts/deb/templates/D04backports << EOF
+tee /etc/apt/preferences.d/50backports << APT_PIN_BACKPORTS
+Package: *
+Pin: release a=wheezy-backports
+Pin-Priority: 500
+APT_PIN_BACKPORTS
 EOF
 
-sudo ./configure.sh
+sudo $args ./configure.sh
 sudo make
 END_OF_XSCORE_BUILD_SCRIPT

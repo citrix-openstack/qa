@@ -19,7 +19,7 @@ exit 1
 SERVER="${1-$(print_usage_and_die)}"
 shift
 
-ssh -q \
+ssh \
     -o Batchmode=yes \
     -o StrictHostKeyChecking=no \
     -o UserKnownHostsFile=/dev/null \
