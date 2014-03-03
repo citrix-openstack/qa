@@ -61,6 +61,7 @@ OPENSTACKCLIENT_REPO openstack python-openstackclient.git github
 OSLOCFG_REPO openstack oslo.config.git github
 OSLOMSG_REPO openstack oslo.messaging.git github
 OSLORWRAP_REPO openstack oslo.rootwrap.git github
+OSLOVMWARE_REPO openstack oslo.vmware.git github
 PBR_REPO openstack-dev pbr.git github
 PECAN_REPO stackforge pecan.git github
 PYCADF_REPO openstack pycadf.git github
