@@ -36,7 +36,6 @@ diff -u \
     <(generate_repos) \
     - \
     << EOF
-BM_POSEUR_REPO tripleo bm_poseur.git github
 CEILOMETERCLIENT_REPO openstack python-ceilometerclient.git github
 CEILOMETER_REPO openstack ceilometer.git github
 CINDERCLIENT_REPO openstack python-cinderclient.git github
