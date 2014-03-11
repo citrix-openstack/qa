@@ -52,8 +52,8 @@ if [ "0" != "$REMAINING_OPTIONS" ]; then
 fi
 
 WORKER="root@$HOSTNAME"
-
-args="DIST=wheezy"
+DIST="jessie"
+args="DIST=$DIST"
 args="$args MIRROR=http://ftp.us.debian.org/debian/"
 args="$args APT_REPOS='|deb @MIRROR@ @DIST@ contrib |deb @MIRROR@ @DIST@-backports main '"
 
@@ -77,18 +77,25 @@ git clean -f
 git checkout $COMMIT
 git log -1 --pretty=format:%H
 
-#cat >> scripts/deb/templates/pbuilderrc << EOF
+cat >> scripts/deb/templates/pbuilderrc << EOF
 #export http_proxy=http://gold.eng.hq.xensource.com:8000
-#DEBOOTSTRAPOPTS=--no-check-gpg
-#EOF
+DEBOOTSTRAPOPTS=--no-check-gpg
+EOF
 
 cat >> scripts/deb/templates/D04backports << EOF
+echo "I: Pinning repositories"
 tee /etc/apt/preferences.d/50backports << APT_PIN_BACKPORTS
 Package: *
-Pin: release a=wheezy-backports
-Pin-Priority: 500
+Pin: release a=$DIST-backports
+Pin-Priority: 600
 APT_PIN_BACKPORTS
+tee /etc/apt/preferences.d/60local << APT_PIN_LOCAL
+Package: *
+Pin: origin ""
+Pin-Priority: 600
+APT_PIN_LOCAL
 EOF
+cp scripts/deb/templates/D04backports scripts/deb/templates/F04backports
 
 sudo $args ./configure.sh
 sudo make
