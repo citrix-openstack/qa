@@ -65,6 +65,11 @@ APT::Get::Assume-Yes "true";
 APT::Get::force-yes "true";
 APT_ASSUME_YES
 
+# If we're running on wheezy, upgrade to jessie automatically
+if \`grep -q wheezy /etc/apt/sources.list\`; then
+    sudo sed -ie 's/wheezy/jessie/g' /etc/apt/sources.list
+fi
+
 sudo apt-get update
 sudo apt-get dist-upgrade
 sudo apt-get install git ocaml-nox lsb-release
