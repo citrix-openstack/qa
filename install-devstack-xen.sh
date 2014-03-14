@@ -460,8 +460,8 @@ ENABLED_SERVICES=g-api,g-reg,key,n-api,n-crt,n-obj,n-cpu,n-sch,horizon,mysql,rab
 # XEN_FIREWALL_DRIVER=nova.virt.xenapi.firewall.Dom0IptablesFirewallDriver
 XEN_FIREWALL_DRIVER=nova.virt.firewall.NoopFirewallDriver
 
-# 16 Gigabyte for object store - minimum for XFS
-SWIFT_LOOPBACK_DISK_SIZE=16777216
+# 9 Gigabyte for object store
+SWIFT_LOOPBACK_DISK_SIZE=9663676416
 
 # Additional Localrc parameters here
 INSTALL_TESTONLY_PACKAGES=True
