@@ -1,11 +1,12 @@
 #!/bin/bash
 
-[ -e /tmp/xenserver-core-deb ] &&  rm -rf /tmp/xenserver-core-deb/*
-mkdir -p /tmp/xenserver-core-deb
-cd /tmp/xenserver-core-deb
+if [ -z ${BUILD_NUMBER+BUILD_NUMBER_unset} ]; then
+    # Assume we're not running in jenkins - move to a scratch location
+    [ -e /tmp/xenserver-core-deb ] &&  rm -rf /tmp/xenserver-core-deb/*
+    mkdir -p /tmp/xenserver-core-deb
+    cd /tmp/xenserver-core-deb
+fi
 
-################
-#!/bin/bash
 set -ex
 
 # Set up virtual environment
