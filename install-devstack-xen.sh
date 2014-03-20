@@ -329,7 +329,10 @@ if [ -n "$SUPP_PACK_URL" ]; then
 set -eu
 wget -qO /root/supp_pack_for_devstack.iso $SUPP_PACK_URL
 xe-install-supplemental-pack /root/supp_pack_for_devstack.iso
+reboot
 SUPP_PACK
+    echo -n "Rebooted host; waiting 10 minutes"
+    sleep 10m
 fi
 
 echo -n "Hack ISCSISR.py on XenServer (original saved to /root/ISCSISR.py.orig)..."

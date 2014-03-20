@@ -12,6 +12,7 @@ set -ex
 # Set up virtual environment
 [ -e .env ] || virtualenv .env
 . .env/bin/activate
+pip install --upgrade pip
 
 # Verify required parameters
 [ -z ${GLOB_NODEPOOL_PASS+GLOB_NODEPOOL_PASS_unset} ] && (echo "GLOB_NODEPOOL_PASS must be set"; exit 1)
