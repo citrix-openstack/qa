@@ -44,11 +44,14 @@ export PATH=$PATH:$(pwd)/remote-bash/bin
 # Set up nova access
 pip install python-novaclient
 
+# Don't trace the openrc as it includes a password!
+set +x
 source $openrc
+set -x
 
 # Set up the keys
-key_name=jenkins
 jenkins_key=$HOME/.ssh/id_rsa
+key_name=`ssh-keygen -lf $jenkins_key.pub | cut -d ' ' -f 2 | tr -d ':'`
 nova keypair-show $key_name || nova keypair-add --pub-key $jenkins_key.pub $key_name
 
 # Verify that the jessie image exists
@@ -82,7 +85,6 @@ if [ $REBUILD_VM -gt 0 ]; then
     fi
     set -e
 
-    nova keypair-show $key_name || nova keypair-add --pub-key $jenkins_key.pub $key_name
     nova boot --poll --flavor performance1-1 --image $JESSIE_IMAGE_NAME --key-name $key_name $BUILD_VM
 fi
 BUILD_IP=`nova show $BUILD_VM | grep accessIPv4 | sed -e 's/IPv4//g' -e 's/[a-z |]*//g'`
