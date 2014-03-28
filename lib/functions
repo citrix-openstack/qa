@@ -69,7 +69,7 @@ REQUIREMENTS_REPO openstack requirements.git github
 RYU_REPO osrg ryu.git github
 SPICE_REPO spice spice-html5.git anongit
 STEVEDORE_REPO openstack stevedore.git github
-SWIFT3_REPO fujita swift3.git github
+SWIFT3_REPO stackforge swift3.git github
 SWIFTCLIENT_REPO openstack python-swiftclient.git github
 SWIFT_REPO openstack swift.git github
 TASKFLOW_REPO openstack taskflow.git github
