@@ -50,11 +50,15 @@ cd xenserver-core
 git checkout $COMMIT
 git log -1 --pretty=format:%H
 
-sed -ie 's,http://gb.archive.ubuntu.com/ubuntu/,http://mirror.anl.gov/pub/ubuntu/,g' scripts/deb/pbuilderrc.in
+if [ -e scripts/deb/pbuilderrc.in ]; then
+  sed -ie 's,http://gb.archive.ubuntu.com/ubuntu/,http://mirror.anl.gov/pub/ubuntu/,g' scripts/deb/pbuilderrc.in
 
-cat >> pbuilderrc.in << EOF
+  cat >> scripts/deb/pbuilderrc.in << EOF
 export http_proxy=http://gold.eng.hq.xensource.com:8000
 EOF
+else
+  export MIRROR=http://mirror.anl.gov/pub/ubuntu/
+fi
 
 sudo ./configure.sh
 sudo make
