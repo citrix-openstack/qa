@@ -38,7 +38,8 @@ FNAME="\$PREFIX-$UBUNTU_DISTRO.xva"
   -m "$UBUNTU_INST_HTTP_HOSTNAME" \
   \$EXTRA_OPT > installer.sh
 
-bash installer.sh $HOST $XENSERVER_PASSWORD devstack_key.priv
+# Ignore devstack failures, as we are only using it to create JeOS
+bash installer.sh $HOST $XENSERVER_PASSWORD devstack_key.priv || true
 
 bash installer.sh $HOST $XENSERVER_PASSWORD devstack_key.priv -e \$FNAME
 
