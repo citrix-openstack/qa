@@ -5,7 +5,7 @@ set -eu
 function print_usage_and_die
 {
 cat >&2 << EOF
-usage: $0 BRANCH_REF_NAME [-t SETUP_TYPE] [-u UBUNTU_DISTRO] [-x]
+usage: $0 BRANCH_REF_NAME [-t SETUP_TYPE] [-u UBUNTU_DISTRO] [-m UBUNTU_INST_HTTP_HOSTNAME] [-x]
 
 Generate a test script to the standard output
 
@@ -15,10 +15,13 @@ positional arguments:
                   nova-network.
  UBUNTU_DISTRO    The ubuntu distribution to use [precise, saucy] defaults to
                   not specifying, so use whatever is defined in localrc/xenrc.
+ UBUNTU_INST_HTTP_HOSTNAME    
+                  Specify an ubuntu mirror to be used. Using the one specified
+                  by .xenrc if not specified.
 
 flags:
  -x               Create an externally usable script. If this flag is set, then
-                  ubuntu repositories won't be overriden, and github will be
+                  ubuntu repositories will not be overriden, and github will be
                   used.
 
 An example run:
@@ -43,6 +46,7 @@ SETUP_TYPE="nova-network"
 UBUNTU_DISTRO=""
 INTERNAL="true"
 REPO_BASE="$INTERNAL_REPO_BASE"
+UBUNTU_INST_HTTP_HOSTNAME=""
 
 # Get positiona arguments
 set +u
@@ -55,7 +59,7 @@ REMAINING_OPTIONS="$#"
 
 # Get optional parameters
 set +e
-while getopts ":t:u:x" flag; do
+while getopts ":t:u:m:x" flag; do
     REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
     case "$flag" in
         t)
@@ -72,6 +76,10 @@ while getopts ":t:u:x" flag; do
             fi
             REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
             ;;
+        m)
+            UBUNTU_INST_HTTP_HOSTNAME="$OPTARG"
+            REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
+            ;;            
         x)
             INTERNAL="false"
             REPO_BASE="$EXTERNAL_REPO_BASE"
@@ -135,6 +143,11 @@ fi
 if [ -n "$UBUNTU_DISTRO" ]; then
     echo "UBUNTU_INST_RELEASE=$UBUNTU_DISTRO" >> $EXTENSIONS
     echo "UBUNTU_INST_TEMPLATE_NAME=devstack_$UBUNTU_DISTRO" >> $EXTENSIONS
+fi
+
+# Configure mirror
+if [ -n "$UBUNTU_INST_HTTP_HOSTNAME" ]; then
+   echo "UBUNTU_INST_HTTP_HOSTNAME=$UBUNTU_INST_HTTP_HOSTNAME" >> $EXTENSIONS 
 fi
 
 # Extend template
