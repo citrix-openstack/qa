@@ -9,7 +9,7 @@ TESTLIB=$(cd $(dirname $(readlink -f "$0")) && cd tests && pwd)
 function print_usage_and_die
 {
 cat >&2 << EOF
-usage: $0 HOSTNAME COMMIT
+usage: $0 HOSTNAME COMMIT REPO_URL
 
 Build xenserver-core packages
 
@@ -53,6 +53,8 @@ cat >> /home/mock/build.sh << EOF_BUILD_SCRIPT
 cd ~
 git clone $REPO_URL xenserver-core
 cd xenserver-core
+git fetch origin '+refs/pull/*:refs/remotes/origin/pr/*'
+
 git checkout $COMMIT
 git log -1 --pretty=format:%H
 
