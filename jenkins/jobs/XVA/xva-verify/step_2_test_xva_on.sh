@@ -1,7 +1,9 @@
 #!/bin/bash
 set -eux
 
-eval `cat "${BUILD_NUMBER}.properties"`
+PARAMS="$1"
+
+eval `cat "${PARAMS}"`
 
 # Setup passwordless authentication
 sshpass -p $XenServerPassword ssh-copy-id -i $HOME/.ssh/id_rsa root@$HOST

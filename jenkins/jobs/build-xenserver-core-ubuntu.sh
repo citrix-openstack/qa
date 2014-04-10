@@ -9,7 +9,7 @@ TESTLIB=$(cd $(dirname $(readlink -f "$0")) && cd tests && pwd)
 function print_usage_and_die
 {
 cat >&2 << EOF
-usage: $0 XENSERVERNAME SLAVE_PARAM_FILE COMMIT
+usage: $0 XENSERVERNAME SLAVE_PARAM_FILE COMMIT REPO_URL
 
 Build xenserver-core packages
 
@@ -47,6 +47,8 @@ sudo apt-get install git ocaml-nox
 
 git clone $REPO_URL xenserver-core
 cd xenserver-core
+git fetch origin '+refs/pull/*:refs/remotes/origin/pr/*'
+
 git checkout $COMMIT
 git log -1 --pretty=format:%H
 

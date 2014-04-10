@@ -38,6 +38,8 @@ cat >> /mnt/devstackroot/opt/stack/devstack/localrc << LOCALRC
 XENAPI_PASSWORD=$XENSERVER_PASSWORD
 LOCALRC
 
+sudo cat /mnt/devstackroot/home/domzero/.ssh/id_rsa.pub > domzero_pubkey.pub
+
 # sudo dd if=/dev/zero of=/mnt/devstackroot/zeroes bs=100M
 # sudo rm /mnt/devstackroot/zeroes
 
@@ -50,6 +52,10 @@ done
 exit 0
 EOF
 
+echo "cat domzero_pubkey.pub" | remote_bash $WORKER > domzero_pubkey
+
+DOMZERO_KEY="$(cat domzero_pubkey)"
+
 remote_bash "root@$XENSERVER" << EOF
 set -eux
 DEVSTACK=\$(xe vm-list name-label=$DEVSTACK_NAME --minimal)
@@ -61,4 +67,6 @@ SLAVE_VBD=\$(xe vbd-list vm-uuid=\$SLAVE userdevice=1 --minimal)
 xe vbd-unplug uuid=\$SLAVE_VBD
 
 xe vbd-destroy uuid=\$SLAVE_VBD
+
+echo "$DOMZERO_KEY" >> .ssh/authorized_keys
 EOF
