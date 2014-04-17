@@ -111,6 +111,9 @@ APT::Get::Assume-Yes "true";
 APT::Get::force-yes "true";
 APT_ASSUME_YES
 
+# Rackspace's debian mirror is not very stable
+sudo sed -ie 's/mirror.rackspace.com/ftp.us.debian.org/g' /etc/apt/sources.list
+
 # If we're running on wheezy, upgrade to jessie automatically
 if \`grep -q wheezy /etc/apt/sources.list\`; then
     sudo sed -ie 's/wheezy/jessie/g' /etc/apt/sources.list
@@ -150,8 +153,7 @@ cp scripts/deb/templates/D04backports scripts/deb/templates/F04backports
 REMOTE_BASH_EOF
 
 scp prepare_build_xsc.sh root@$BUILD_IP:
-ssh root@$BUILD_IP bash prepare_build_xsc.sh
-ssh root@$BUILD_IP "(cd xenserver-core; $args ./configure.sh) | tee configure.log"
-ssh root@$BUILD_IP "(cd xenserver-core; sudo make) | tee make.log"
-
-
+set -o pipefail
+ssh root@$BUILD_IP "bash prepare_build_xsc.sh" | tee configure.log
+ssh root@$BUILD_IP "(cd xenserver-core; $args ./configure.sh 2>&1)" | tee -a configure.log
+ssh root@$BUILD_IP "(cd xenserver-core; $args make 2>&1)" | tee make.log
