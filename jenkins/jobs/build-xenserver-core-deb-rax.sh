@@ -117,8 +117,8 @@ sudo sed -ie 's/mirror.rackspace.com/ftp.us.debian.org/g' /etc/apt/sources.list
 # If we're running on wheezy, upgrade to jessie automatically
 if \`grep -q wheezy /etc/apt/sources.list\`; then
     sudo sed -ie 's/wheezy/jessie/g' /etc/apt/sources.list
-    sudo sed -ie '/jessie\/updates/d' /etc/apt/sources.list
 fi
+sudo sed -ie '/jessie\/updates/d' /etc/apt/sources.list
 
 sudo apt-get update
 sudo apt-get -y dist-upgrade
