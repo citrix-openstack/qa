@@ -155,6 +155,9 @@ REMOTE_BASH_EOF
 
 scp prepare_build_xsc.sh root@$BUILD_IP:
 set -o pipefail
-ssh root@$BUILD_IP "bash prepare_build_xsc.sh" | tee configure.log
-ssh root@$BUILD_IP "(cd xenserver-core; $args ./configure.sh 2>&1)" | tee -a configure.log
-ssh root@$BUILD_IP "(cd xenserver-core; $args make 2>&1)" | tee make.log
+ssh root@$BUILD_IP "bash prepare_build_xsc.sh"
+ssh root@$BUILD_IP "(cd xenserver-core; $args ./configure.sh 2>&1)"
+ssh root@$BUILD_IP "(cd xenserver-core; $args make 2>&1)"
+ssh root@$BUILD_IP "(cd xenserver-core; $args make install 2>&1)"
+
+ssh-agent -k
