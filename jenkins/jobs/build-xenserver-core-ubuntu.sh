@@ -33,7 +33,7 @@ WORKER=$(cat $XSLIB/get-worker.sh | "$REMOTELIB/bash.sh" "root@$XENSERVERNAME" n
 
 echo "$WORKER" > $SLAVE_PARAM_FILE
 
-args="MIRROR=http://ftp.us.debian.org/debian/"
+args="MIRROR=http://mirror.pnl.gov/pub/ubuntu"
 
 "$REMOTELIB/bash.sh" $WORKER << END_OF_XSCORE_BUILD_SCRIPT
 set -eux
@@ -53,10 +53,6 @@ git fetch origin '+refs/pull/*:refs/remotes/origin/pr/*'
 
 git checkout $COMMIT
 git log -1 --pretty=format:%H
-
-cat >> scripts/deb/templates/pbuilderrc << EOF
-export http_proxy=http://gold.eng.hq.xensource.com:8000
-EOF
 
 sudo $args ./configure.sh
 sudo $args make
