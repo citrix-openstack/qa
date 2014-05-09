@@ -33,7 +33,7 @@ WORKER=$(cat $XSLIB/get-worker.sh | "$REMOTELIB/bash.sh" "root@$XENSERVERNAME" n
 
 echo "$WORKER" > $SLAVE_PARAM_FILE
 
-args="MIRROR=http://mirror.pnl.gov/pub/ubuntu"
+args="MIRROR=http://mirror.pnl.gov/ubuntu"
 
 "$REMOTELIB/bash.sh" $WORKER << END_OF_XSCORE_BUILD_SCRIPT
 set -eux
