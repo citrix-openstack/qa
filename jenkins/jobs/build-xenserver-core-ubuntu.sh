@@ -52,6 +52,7 @@ git fetch origin '+refs/pull/*:refs/remotes/origin/pr/*'
 git checkout $COMMIT
 git log -1 --pretty=format:%H
 
+args=''
 if [ -e scripts/deb/pbuilderrc.in ]; then
   sed -ie 's,http://gb.archive.ubuntu.com/ubuntu/,http://mirror.anl.gov/pub/ubuntu/,g' scripts/deb/pbuilderrc.in
 
@@ -59,9 +60,10 @@ if [ -e scripts/deb/pbuilderrc.in ]; then
 export http_proxy=http://gold.eng.hq.xensource.com:8000
 EOF
 else
-  export MIRROR=http://mirror.anl.gov/pub/ubuntu/
+  args="DIST=raring"
+  args="$args MIRROR=http://mirror.anl.gov/pub/ubuntu/"
 fi
 
-sudo ./configure.sh
-sudo make
+sudo $args ./configure.sh
+sudo $args make
 END_OF_XSCORE_BUILD_SCRIPT
