@@ -59,7 +59,12 @@ git checkout $COMMIT
 git log -1 --pretty=format:%H
 
 ./configure.sh
-make || tail -n 250 RPMS/*/build.log
+make
+RET=\\\$?
+if [ \\\$RET -ne 0 ]; then
+  tail -n 250 RPMS/*/build.log
+  exit \\\$RET
+fi
 EOF_BUILD_SCRIPT
 su - mock -c "bash /home/mock/build.sh"
 
