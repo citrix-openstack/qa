@@ -26,6 +26,12 @@ VMIP=$(xecommand vm-param-get uuid=$VMUUID param-name=networks | sed -ne 's,^.*0
 sshpass -p citrix ssh -o 'StrictHostKeyChecking no' root@$VMIP << "EOF"
 set -eux
 
+# Get rid of domzero's keys
+rm -f /home/domzero/.ssh/authorized_keys /home/domzero/.ssh/id_rsa /home/domzero/.ssh/id_rsa.pub
+
+# Generate a new key for domzero
+su -c "ssh-keygen -f /home/domzero/.ssh/id_rsa -C domzero@appliance -N '' -q" domzero
+
 #stop Devstack
 #su stack /opt/stack/devstack/unstack.sh || true
 
@@ -66,11 +72,13 @@ apt-get clean
 rm ~/xs-tools.deb || true
 EOF
 
+# Save domzero's public key to local filesystem
+sshpass -p citrix scp -o 'StrictHostKeyChecking no' root@$VMIP:/home/domzero/.ssh/id_rsa.pub ~/domzero_public_key
 
 #Shutdown the VM
 xecommand vm-shutdown vm=$VMUUID
 
-# Repackage the vhd inorder to minimize its size
+# Repackage the vhd in order to minimize its size
 SLAVEUUID=$(xecommand vm-list name-label=slave --minimal)
 RVBDUUID=$(xecommand vbd-list vm-uuid=$VMUUID device=xvda --minimal)
 RVDIUUID=$(xecommand vbd-param-get uuid=$RVBDUUID param-name=vdi-uuid)
@@ -119,7 +127,7 @@ if [ -n "$CINDER_VBD" ]; then
     xecommand vbd-create vm-uuid=$VMUUID vdi-uuid=$vdi device=1
 fi
 
-# Export the XVA 
+# Export the XVA
 xecommand vm-export filename=devstack_original.xva compress=true vm="DevStackOSDomU" include-snapshots=false
 
 # Rename bridges (takes a long time)

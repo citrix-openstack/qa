@@ -38,6 +38,7 @@ cd ..
 cp -r xenserver-nova-suppack-builder/plugins/* nova/plugins/
 
 cd nova/plugins/xenserver/xenapi/contrib
+./inject-key.sh ~/domzero_public_key
 ./build-rpm.sh
 cd
 
