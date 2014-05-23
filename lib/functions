@@ -59,6 +59,7 @@ NOVA_REPO openstack nova.git github
 NOVNC_REPO kanaka noVNC.git github
 OPENSTACKCLIENT_REPO openstack python-openstackclient.git github
 OSLOCFG_REPO openstack oslo.config.git github
+OSLODB_REPO openstack oslo.db.git github
 OSLOMSG_REPO openstack oslo.messaging.git github
 OSLORWRAP_REPO openstack oslo.rootwrap.git github
 OSLOVMWARE_REPO openstack oslo.vmware.git github
