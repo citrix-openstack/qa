@@ -77,7 +77,7 @@ function create_vm() {
     fi
 
     set +e
-    nova show $BUILD_VM || nova boot --poll --flavor performance1-1 \
+    nova show $BUILD_VM || nova boot --poll --flavor performance1-8 \
 	    --image $IMAGE_NAME \
 	    --key-name $KEY_NAME $BUILD_VM
     set -$restore_flags
