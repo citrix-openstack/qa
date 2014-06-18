@@ -22,7 +22,7 @@ nova keypair-show $key_name > /dev/null || nova keypair-add --pub-key $jenkins_k
 #################################
 # Create a VM for us to use
 BUILD_VM=xs-c_deb_builder
-REBUILD_VM=1
+REBUILD_VM=${REBUILD_VM:-1}
 create_vm $REBUILD_VM $BUILD_VM $JESSIE_IMAGE_NAME $key_name
 BUILD_IP=`nova show $BUILD_VM | grep accessIPv4 | sed -e 's/IPv4//g' -e 's/[a-z |]*//g'`
 
