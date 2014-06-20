@@ -493,18 +493,13 @@ ssh -q \
     "stack@\$GUEST_IP" bash -s -- << END_OF_DEVSTACK_COMMANDS
 set -exu
 
-cd /opt/stack/devstack/
-./exercise.sh
-
-if [ "$TEST_TYPE" == "exercise" ]; then
-    exit 0
-fi
-
 # Pin to 1.6.1 due to https://bugs.launchpad.net/openstack-ci/+bug/1274135
 sudo pip install tox==1.6.1
 
 cd /opt/stack/tempest
-if [ "$TEST_TYPE" == "smoke" ]; then
+if [ "$TEST_TYPE" == "exercise" ]; then
+    tox -eall tempest.scenario.test_minimum_basic
+elif [ "$TEST_TYPE" == "smoke" ]; then
     #./run_tests.sh -s -N
     tox -esmoke
 elif [ "$TEST_TYPE" == "full" ]; then
