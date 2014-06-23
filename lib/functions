@@ -47,6 +47,7 @@ GLANCECLIENT_REPO openstack python-glanceclient.git github
 GLANCE_REPO openstack glance.git github
 HEATCLIENT_REPO openstack python-heatclient.git github
 HEAT_REPO openstack heat.git github
+HORIZONAUTH_REPO openstack django_openstack_auth.git github
 HORIZON_REPO openstack horizon.git github
 IRONICCLIENT_REPO openstack python-ironicclient.git github
 IRONIC_REPO openstack ironic.git github
