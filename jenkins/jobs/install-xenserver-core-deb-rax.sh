@@ -85,6 +85,7 @@ scp -3 -r -o BatchMode=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/de
   root@$BUILD_IP:/root/xenserver-core/SRPMS
 
 ssh root@$BUILD_IP "bash prepare_build_xsc.sh"
-ssh root@$BUILD_IP "(cd xenserver-core; scripts/deb/install.sh)"
+ssh root@$BUILD_IP "(cd xenserver-core; bash scripts/deb/install.sh)"
+ssh root@$BUILD_IP "xenserver-install-wizard --yes-to-all"
 
 ssh-agent -k

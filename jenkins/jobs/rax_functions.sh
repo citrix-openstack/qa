@@ -58,14 +58,14 @@ function create_vm() {
 	verify_image_exists $IMAGE_NAME
 
 	restore_flags=$-
-	set +e # Tolerate failures in nova show
+	set +ex # Tolerate failures in nova show, don't trace this loop
 	nova show $BUILD_VM
 	if [ $? -eq 0 ]; then
 	    nova delete $BUILD_VM
 	    COUNTER=0
 	    while `nova show $BUILD_VM > /dev/null 2>&1`; do
 		echo "Waiting for $BUILD_VM to be destroyed..."
-		sleep 10
+		sleep 30
 		let COUNTER=COUNTER+1
 		if [ $COUNTER -gt 20 ]; then
 		    echo "Timed out waiting for VM $BUILD_VM to be destroyed"
