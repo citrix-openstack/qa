@@ -1,12 +1,6 @@
 #!/bin/bash
 
-# git can sometimes get itself infinitely stuck with transient network
-# errors or other issues with the remote end.  This wraps git in a
-# timeout/retry loop and is intended to watch over non-local git
-# processes that might hang.  GIT_TIMEOUT, if set, is passed directly
-# to timeout(1); otherwise the default value of 0 maintains the status
-# quo of waiting forever.
-# usage: git_timed <git-command>
+GIT_TIMEOUT=${GIT_TIMEOUT:-0}
 function git_retry {
     local count=0
     local timeout=0
