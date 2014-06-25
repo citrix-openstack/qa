@@ -10,11 +10,12 @@ function git_retry {
     fi
 
     until timeout -s SIGINT ${timeout} git "$@"; do
-        # 124 is timeout(1)'s special return code when it reached the
-        # timeout; otherwise assume fatal failure
-        if [[ $? -ne 124 ]]; then
-            die $LINENO "git call failed: [git $@]"
-        fi
+# We want git to retry a couple of times in case there is an error with github
+#        # 124 is timeout(1)'s special return code when it reached the
+#        # timeout; otherwise assume fatal failure
+#        if [[ $? -ne 124 ]]; then
+#            die $LINENO "git call failed: [git $@]"
+#        fi
 
         count=$(($count + 1))
         warn "timeout ${count} for git call: [git $@]"
