@@ -1,5 +1,36 @@
 #!/bin/bash
 
+# git can sometimes get itself infinitely stuck with transient network
+# errors or other issues with the remote end.  This wraps git in a
+# timeout/retry loop and is intended to watch over non-local git
+# processes that might hang.  GIT_TIMEOUT, if set, is passed directly
+# to timeout(1); otherwise the default value of 0 maintains the status
+# quo of waiting forever.
+# usage: git_timed <git-command>
+function git_retry {
+    local count=0
+    local timeout=0
+
+    if [[ -n "${GIT_TIMEOUT}" ]]; then
+        timeout=${GIT_TIMEOUT}
+    fi
+
+    until timeout -s SIGINT ${timeout} git "$@"; do
+        # 124 is timeout(1)'s special return code when it reached the
+        # timeout; otherwise assume fatal failure
+        if [[ $? -ne 124 ]]; then
+            die $LINENO "git call failed: [git $@]"
+        fi
+
+        count=$(($count + 1))
+        warn "timeout ${count} for git call: [git $@]"
+        if [ $count -eq 3 ]; then
+            die $LINENO "Maximum of 3 git retries reached"
+        fi
+        sleep 5
+    done
+}
+
 function repo_lines() {
 wget -qO - https://raw.github.com/openstack-dev/devstack/master/stackrc |
     grep "_REPO=" 
@@ -257,13 +288,13 @@ function create_local_build_branch() {
 
     generate_repos | while read repo; do
         varname=$(var_name "$repo")
-        [ -d "$varname" ] || git clone $(source_repo "$repo") "$varname"
+        [ -d "$varname" ] || git_retry clone $(source_repo "$repo") "$varname"
         (
             set -e
             cd "$varname"
 
-            git fetch -q origin || true # Ignore fetch errors
-            git checkout --quiet origin/master -B "$branch"
+            git_retry fetch -q origin || true # Ignore fetch errors
+            git_retry checkout --quiet origin/master -B "$branch"
             if ! git remote -v | grep -q "^build"; then
                 git remote add build $(dst_repo "$repo")
             fi
@@ -302,7 +333,7 @@ function clone_status_repo() {
 
 
 if ! [ -d "$ldir" ]; then
-    git clone "$srcrepo" "$ldir"
+    git_retry clone "$srcrepo" "$ldir"
 fi
 }
 
@@ -313,7 +344,7 @@ function pull_status_repo() {
 
     (
         cd "$ldir"
-        git pull
+        git_retry pull
     )
 }
 
@@ -341,6 +372,6 @@ function push_status_repo() {
     (
         cd "$ldir"
         git commit -am "Automatic update"
-        git push
+        git_retry push
     )
 }
