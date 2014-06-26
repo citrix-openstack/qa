@@ -149,18 +149,6 @@ fi
 EOF
 }
 
-function run_exercises() {
-    local devstack_ip
-
-    devstack_ip="$1"
-    shift
-
-    on_devstack $devstack_ip << EOF
-cd /opt/stack/devstack
-./exercise.sh </dev/null # >/opt/stack/exercises.result 2>&1
-EOF
-}
-
 function run_smoke() {
     local devstack_ip
 
@@ -223,13 +211,6 @@ EOF
     echo "   devstack finished" | log_info
     echo " - Checking devstack scripts result"
     if devstack_succeeded $devstack_ip; then
-        echo "   success" | log_info
-    else
-        echo "   fail" | log_error
-        exit 1
-    fi
-    echo " - Running exercises"
-    if run_exercises $devstack_ip; then
         echo "   success" | log_info
     else
         echo "   fail" | log_error
