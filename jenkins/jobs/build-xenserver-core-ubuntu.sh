@@ -18,6 +18,7 @@ positional arguments:
  SLAVE_PARAM_FILE  The slave VM's parameters will be placed to this file
  COMMIT            The commit sha1 to be tested
  REPO_URL          xenserver-core repository location
+ UBUNTU_VERSION    raring / trusty
 EOF
 exit 1
 }
@@ -26,10 +27,11 @@ XENSERVERNAME="${1-$(print_usage_and_die)}"
 SLAVE_PARAM_FILE="${2-$(print_usage_and_die)}"
 COMMIT="${3-$(print_usage_and_die)}"
 REPO_URL="${4-$(print_usage_and_die)}"
+UBUNTU_VERSION="${5-$(print_usage_and_die)}"
 
 set -x
 
-WORKER=$(cat $XSLIB/get-worker.sh | "$REMOTELIB/bash.sh" "root@$XENSERVERNAME" none raring raring)
+WORKER=$(cat $XSLIB/get-worker.sh | "$REMOTELIB/bash.sh" "root@$XENSERVERNAME" none $UBUNTU_VERSION $UBUNTU_VERSION)
 
 echo "$WORKER" > $SLAVE_PARAM_FILE
 
