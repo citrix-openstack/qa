@@ -48,6 +48,9 @@ cat >> /etc/sudoers << EOF_SUDOERS
 mock    ALL=(ALL)       NOPASSWD:ALL
 EOF_SUDOERS
 
+# Ensure we can sudo without a TTY
+sed -i -e 's/Defaults    requiretty/#Defaults    requiretty/' /etc/sudoers
+
 # The rest of the script needs to run as the mock user
 cat >> /home/mock/build.sh << EOF_BUILD_SCRIPT
 cd ~
