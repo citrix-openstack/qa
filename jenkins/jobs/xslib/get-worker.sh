@@ -73,8 +73,8 @@ function set_cpus() {
     vm="$1"
 
     max_vcpus=$(xe host-cpu-list | grep -c uuid)
-    xe vm-param-set uuid=$vm VCPUs-max=$mac_vcpus
-    xe vm-param-set uuid=$vm VCPUs-at-startup=$mac_vcpus
+    xe vm-param-set uuid=$vm VCPUs-max=$max_vcpus
+    xe vm-param-set uuid=$vm VCPUs-at-startup=$max_vcpus
 }
 
 if [ -z "$(xe snapshot-list name-label="$FRESHSLAVE" --minimal)" ]
