@@ -57,5 +57,5 @@ git checkout $COMMIT
 git log -1 --pretty=format:%H
 
 sudo $args ./configure.sh
-sudo $args make
+sudo $args make  -j `grep -c '^processor' /proc/cpuinfo`
 END_OF_XSCORE_BUILD_SCRIPT

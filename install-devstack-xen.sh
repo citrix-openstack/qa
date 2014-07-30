@@ -232,7 +232,7 @@ set -xu
 cd $TMPDIR
 cd devstack*
 
-mkdir /root/artifacts
+mkdir -p /root/artifacts
 
 GUEST_IP=\$(. "tools/xen/functions" && find_ip_by_name DevStackOSDomU 0)
 if [ -n \$GUEST_IP ]; then

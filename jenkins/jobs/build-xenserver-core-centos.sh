@@ -62,7 +62,7 @@ git checkout $COMMIT
 git log -1 --pretty=format:%H
 
 ./configure.sh
-make
+make -j `grep -c '^processor' /proc/cpuinfo`
 RET=\\\$?
 if [ \\\$RET -ne 0 ]; then
   tail -n 250 RPMS/*/build.log
