@@ -57,5 +57,6 @@ git checkout $COMMIT
 git log -1 --pretty=format:%H
 
 sudo $args ./configure.sh
-sudo $args make  -j `grep -c '^processor' /proc/cpuinfo`
+NUM_CORES=\$(grep -c '^processor' /proc/cpuinfo)
+sudo $args make  -j \$NUM_CORES
 END_OF_XSCORE_BUILD_SCRIPT

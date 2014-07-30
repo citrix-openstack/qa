@@ -51,6 +51,8 @@ EOF_SUDOERS
 # Ensure we can sudo without a TTY
 sed -i -e 's/Defaults    requiretty/#Defaults    requiretty/' /etc/sudoers
 
+NUM_CORES=\$(grep -c '^processor' /proc/cpuinfo)
+
 # The rest of the script needs to run as the mock user
 cat >> /home/mock/build.sh << EOF_BUILD_SCRIPT
 cd ~
@@ -62,7 +64,7 @@ git checkout $COMMIT
 git log -1 --pretty=format:%H
 
 ./configure.sh
-make -j `grep -c '^processor' /proc/cpuinfo`
+make -j \$NUM_CORES
 RET=\\\$?
 if [ \\\$RET -ne 0 ]; then
   tail -n 250 RPMS/*/build.log
