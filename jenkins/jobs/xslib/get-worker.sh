@@ -66,6 +66,17 @@ function setup_networking() {
     unset IFS
 }
 
+function set_cpus() {
+    local max_vcpus
+    local vm
+
+    vm="$1"
+
+    max_vcpus=$(xe host-cpu-list | grep -c uuid)
+    xe vm-param-set uuid=$vm VCPUs-max=$mac_vcpus
+    xe vm-param-set uuid=$vm VCPUs-at-startup=$mac_vcpus
+}
+
 if [ -z "$(xe snapshot-list name-label="$FRESHSLAVE" --minimal)" ]
 then
     xe vm-uninstall vm="$SLAVENAME" force=true || true
@@ -87,6 +98,7 @@ VM=$(xe vm-list name-label="$SLAVENAME" --minimal)
 
 wipe_networking $VM
 setup_networking $VM "$NETWORKING"
+set_cpus $VM
 
 xe vm-start uuid=$VM
 
