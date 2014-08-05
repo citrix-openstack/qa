@@ -13,8 +13,9 @@ positional arguments:
  BRANCH_REF_NAME  Name of the ref/branch to be used.
  SETUP_TYPE       Type of setup, one of [nova-network, neutron] defaults to
                   nova-network.
- UBUNTU_DISTRO    The ubuntu distribution to use [precise, saucy] defaults to
-                  not specifying, so use whatever is defined in localrc/xenrc.
+ UBUNTU_DISTRO    The ubuntu distribution to use [precise, saucy, trusty]
+                  defaults to not specifying, so use whatever is defined in
+                  localrc/xenrc.
  UBUNTU_INST_HTTP_HOSTNAME    
                   Specify an ubuntu mirror to be used. Using the one specified
                   by .xenrc if not specified.
@@ -71,7 +72,7 @@ while getopts ":t:u:m:x" flag; do
             ;;
         u)
             UBUNTU_DISTRO="$OPTARG"
-            if ! [ "$UBUNTU_DISTRO" = "precise" -o "$UBUNTU_DISTRO" = "saucy" ]; then
+            if ! [ "$UBUNTU_DISTRO" = "precise" -o "$UBUNTU_DISTRO" = "saucy" -o "$UBUNTU_DISTRO" = "trusty" ]; then
                 print_usage_and_die "ERROR: invalid value for UBUNTU_DISTRO: $UBUNTU_DISTRO"
             fi
             REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
