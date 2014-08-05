@@ -16,7 +16,7 @@ positional arguments:
  UBUNTU_DISTRO    The ubuntu distribution to use [precise, saucy, trusty]
                   defaults to not specifying, so use whatever is defined in
                   localrc/xenrc.
- UBUNTU_INST_HTTP_HOSTNAME    
+ UBUNTU_INST_HTTP_HOSTNAME
                   Specify an ubuntu mirror to be used. Using the one specified
                   by .xenrc if not specified.
 
@@ -80,7 +80,7 @@ while getopts ":t:u:m:x" flag; do
         m)
             UBUNTU_INST_HTTP_HOSTNAME="$OPTARG"
             REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
-            ;;            
+            ;;
         x)
             INTERNAL="false"
             REPO_BASE="$EXTERNAL_REPO_BASE"
@@ -148,7 +148,7 @@ fi
 
 # Configure mirror
 if [ -n "$UBUNTU_INST_HTTP_HOSTNAME" ]; then
-   echo "UBUNTU_INST_HTTP_HOSTNAME=$UBUNTU_INST_HTTP_HOSTNAME" >> $EXTENSIONS 
+   echo "UBUNTU_INST_HTTP_HOSTNAME=$UBUNTU_INST_HTTP_HOSTNAME" >> $EXTENSIONS
 fi
 
 # Extend template
