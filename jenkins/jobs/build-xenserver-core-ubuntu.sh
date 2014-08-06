@@ -19,15 +19,38 @@ positional arguments:
  COMMIT            The commit sha1 to be tested
  REPO_URL          xenserver-core repository location
  UBUNTU_VERSION    raring / trusty
+
+optional arguments:
+ -p           Use parallel make
 EOF
 exit 1
 }
 
 XENSERVERNAME="${1-$(print_usage_and_die)}"
-SLAVE_PARAM_FILE="${2-$(print_usage_and_die)}"
-COMMIT="${3-$(print_usage_and_die)}"
-REPO_URL="${4-$(print_usage_and_die)}"
-UBUNTU_VERSION="${5-$(print_usage_and_die)}"
+shift
+SLAVE_PARAM_FILE="${1-$(print_usage_and_die)}"
+shift
+COMMIT="${1-$(print_usage_and_die)}"
+shift
+REPO_URL="${1-$(print_usage_and_die)}"
+shift
+UBUNTU_VERSION="${1-$(print_usage_and_die)}"
+shift
+
+# Number of options passed to this script
+REMAINING_OPTIONS="$#"
+PARALLEL_MAKE=0
+# Get optional parameters
+set +e
+while getopts "p" flag; do
+    REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
+    case "$flag" in
+        p)
+	    PARALLEL_MAKE=1
+            ;;
+    esac
+done
+set -e
 
 set -x
 
@@ -57,6 +80,10 @@ git checkout $COMMIT
 git log -1 --pretty=format:%H
 
 sudo $args ./configure.sh
-NUM_CORES=\$(grep -c '^processor' /proc/cpuinfo)
+if [ $PARALLEL_MAKE -eq 1 ]; then
+  NUM_CORES=\$(grep -c '^processor' /proc/cpuinfo)
+else
+  NUM_CORES=1
+fi
 sudo $args make  -j \$NUM_CORES
 END_OF_XSCORE_BUILD_SCRIPT

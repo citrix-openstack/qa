@@ -17,13 +17,35 @@ positional arguments:
  HOSTNAME     The name of the CentOS host on which we are going to compile
  COMMIT       The commit to use
  REPO_URL     xenserver-core repository location
+
+optional arguments:
+ -p           Use parallel make
 EOF
 exit 1
 }
 
 HOSTNAME="${1-$(print_usage_and_die)}"
-COMMIT="${2-$(print_usage_and_die)}"
-REPO_URL="${3-$(print_usage_and_die)}"
+shift
+COMMIT="${1-$(print_usage_and_die)}"
+shift
+REPO_URL="${1-$(print_usage_and_die)}"
+shift
+
+# Number of options passed to this script
+REMAINING_OPTIONS="$#"
+PARALLEL_MAKE=0
+# Get optional parameters
+set +e
+while getopts "p" flag; do
+    REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
+    case "$flag" in
+        p)
+	    PARALLEL_MAKE=1
+            ;;
+    esac
+done
+set -e
+
 
 "$REMOTELIB/bash.sh" "root@$HOSTNAME" << END_OF_XSCORE_BUILD_SCRIPT
 set -eux
@@ -51,7 +73,11 @@ EOF_SUDOERS
 # Ensure we can sudo without a TTY
 sed -i -e 's/Defaults    requiretty/#Defaults    requiretty/' /etc/sudoers
 
-NUM_CORES=\$(grep -c '^processor' /proc/cpuinfo)
+if [ $PARALLEL_MAKE -eq 1 ]; then
+  NUM_CORES=\$(grep -c '^processor' /proc/cpuinfo)
+else
+  NUM_CORES=1
+fi
 
 # The rest of the script needs to run as the mock user
 cat >> /home/mock/build.sh << EOF_BUILD_SCRIPT
