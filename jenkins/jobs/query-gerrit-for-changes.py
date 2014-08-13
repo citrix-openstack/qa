@@ -62,6 +62,9 @@ def main(args):
 
 
     for change_record in sorted(change_records):
+        change_id = change_record[-1].split('/')[-1]
+        if change_id in args.ignore:
+            continue
         sys.stdout.write("%s %s %s\n" % change_record[1:])
 
     client.close()
@@ -80,5 +83,7 @@ if __name__ == "__main__":
         help='Specify a port. default: 29418')
     parser.add_argument('--change', action='append',
         help='Extra change ids to pick')
+    parser.add_argument('--ignore', action='append',
+        help='Change IDs to ignore')
     args = parser.parse_args()
     main(args)
