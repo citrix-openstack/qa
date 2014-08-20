@@ -423,11 +423,9 @@ EXTRA_OPTS=("xenapi_disable_agent=True")
 API_RATE_LIMIT=False
 VIRT_DRIVER=xenserver
 
-# Use a XenServer Image and the standard one
-# The XenServer image is faster, however tempest requires the uec files
+# Use a XenServer Image
 IMAGE_URLS="\
-https://github.com/downloads/citrix-openstack/warehouse/cirros-0.3.0-x86_64-disk.vhd.tgz,\
-http://download.cirros-cloud.net/0.3.2/cirros-0.3.2-x86_64-uec.tar.gz"
+https://github.com/downloads/citrix-openstack/warehouse/cirros-0.3.0-x86_64-disk.vhd.tgz"
 
 DEFAULT_IMAGE_NAME="cirros-0.3.0-x86_64-disk"
 
