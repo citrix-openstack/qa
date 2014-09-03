@@ -60,6 +60,12 @@ echo "$WORKER" > $SLAVE_PARAM_FILE
 
 args="MIRROR=http://mirror.pnl.gov/ubuntu"
 
+# Wait for SSH
+while [ "`ssh -A -o BatchMode=yes $WORKER echo 1 `" != "1" ]; do
+    echo "Waiting for SSH to come up..."
+    sleep 30
+done
+
 "$REMOTELIB/bash.sh" $WORKER << END_OF_XSCORE_BUILD_SCRIPT
 set -eux
 
