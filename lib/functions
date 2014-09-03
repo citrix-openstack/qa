@@ -65,8 +65,10 @@ DEVSTACK_REPO openstack-dev devstack.git github
 DIB_REPO openstack diskimage-builder.git github
 GLANCECLIENT_REPO openstack python-glanceclient.git github
 GLANCE_REPO openstack glance.git github
+HEAT_CFNTOOLS_REPO openstack heat-cfntools.git github
 HEATCLIENT_REPO openstack python-heatclient.git github
 HEAT_REPO openstack heat.git github
+HEAT_TEMPLATES_REPO openstack heat-templates.git github
 HORIZONAUTH_REPO openstack django_openstack_auth.git github
 HORIZON_REPO openstack horizon.git github
 IRONICCLIENT_REPO openstack python-ironicclient.git github
@@ -79,7 +81,10 @@ NEUTRON_REPO openstack neutron.git github
 NOVACLIENT_REPO openstack python-novaclient.git github
 NOVA_REPO openstack nova.git github
 NOVNC_REPO kanaka noVNC.git github
+OAC_REPO openstack os-apply-config.git github
+OCC_REPO openstack os-collect-config.git github
 OPENSTACKCLIENT_REPO openstack python-openstackclient.git github
+ORC_REPO openstack os-refresh-config.git github
 OSLOCFG_REPO openstack oslo.config.git github
 OSLODB_REPO openstack oslo.db.git github
 OSLOI18N_REPO openstack oslo.i18n.git github
@@ -92,12 +97,14 @@ PYCADF_REPO openstack pycadf.git github
 REQUIREMENTS_REPO openstack requirements.git github
 RYU_REPO osrg ryu.git github
 SPICE_REPO spice spice-html5.git anongit
+SQLALCHEMY_MIGRATE_REPO stackforge sqlalchemy-migrate.git github
 STEVEDORE_REPO openstack stevedore.git github
 SWIFT3_REPO stackforge swift3.git github
 SWIFTCLIENT_REPO openstack python-swiftclient.git github
 SWIFT_REPO openstack swift.git github
 TASKFLOW_REPO openstack taskflow.git github
 TEMPEST_REPO openstack tempest.git github
+TIE_REPO openstack tripleo-image-elements.git github
 TROVECLIENT_REPO openstack python-troveclient.git github
 TROVE_REPO openstack trove.git github
 WSME_REPO stackforge wsme.git github
