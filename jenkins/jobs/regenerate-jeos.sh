@@ -7,6 +7,7 @@ REFERENCE="$3"
 UBUNTU_DISTRO="$4"
 USE_EXTERNAL_UBUNTU_REPO="$5"
 UBUNTU_INST_HTTP_HOSTNAME="$6"
+UBUNTU_INST_HTTP_DIRECTORY="$7"
 
 WORKER=$(cat jenkins/jobs/xslib/get-worker.sh | jenkins/jobs/remote/bash.sh $HOST)
 
@@ -36,6 +37,7 @@ FNAME="\$PREFIX-$UBUNTU_DISTRO.xva"
 ./generate-citrix-job.sh "$REFERENCE" \
   -u "$UBUNTU_DISTRO" \
   -m "$UBUNTU_INST_HTTP_HOSTNAME" \
+  -n "$UBUNTU_INST_HTTP_DIRECTORY" \
   \$EXTRA_OPT > installer.sh
 
 # Ignore devstack failures, as we are only using it to create JeOS

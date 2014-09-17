@@ -5,7 +5,7 @@ set -eu
 function print_usage_and_die
 {
 cat >&2 << EOF
-usage: $0 BRANCH_REF_NAME [-t SETUP_TYPE] [-u UBUNTU_DISTRO] [-m UBUNTU_INST_HTTP_HOSTNAME] [-x]
+usage: $0 BRANCH_REF_NAME [-t SETUP_TYPE] [-u UBUNTU_DISTRO] [-m UBUNTU_INST_HTTP_HOSTNAME] [-n UBUNTU_INST_HTTP_DIRECTORY] [-x]
 
 Generate a test script to the standard output
 
@@ -19,6 +19,8 @@ positional arguments:
  UBUNTU_INST_HTTP_HOSTNAME
                   Specify an ubuntu mirror to be used. Using the one specified
                   by .xenrc if not specified.
+ UBUNTU_INST_HTTP_DIRECTORY
+		  Specify directory within ubuntu mirror to be used.
 
 flags:
  -x               Create an externally usable script. If this flag is set, then
@@ -48,6 +50,7 @@ UBUNTU_DISTRO=""
 INTERNAL="true"
 REPO_BASE="$INTERNAL_REPO_BASE"
 UBUNTU_INST_HTTP_HOSTNAME=""
+UBUNTU_INST_HTTP_DIRECTORY=""
 
 # Get positiona arguments
 set +u
@@ -79,6 +82,10 @@ while getopts ":t:u:m:x" flag; do
             ;;
         m)
             UBUNTU_INST_HTTP_HOSTNAME="$OPTARG"
+            REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
+            ;;
+        n)
+            UBUNTU_INST_HTTP_DIRECTORY="$OPTARG"
             REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
             ;;
         x)
@@ -150,6 +157,10 @@ fi
 if [ -n "$UBUNTU_INST_HTTP_HOSTNAME" ]; then
    echo "UBUNTU_INST_HTTP_HOSTNAME=$UBUNTU_INST_HTTP_HOSTNAME" >> $EXTENSIONS
 fi
+if [ -n "$UBUNTU_INST_HTTP_DIRECTORY" ]; then
+   echo "UBUNTU_INST_HTTP_DIRECTORY=$UBUNTU_INST_HTTP_DIRECTORY" >> $EXTENSIONS
+fi
+
 
 # Extend template
 sed \
