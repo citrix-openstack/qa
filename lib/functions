@@ -65,6 +65,7 @@ DEVSTACK_REPO openstack-dev devstack.git github
 DIB_REPO openstack diskimage-builder.git github
 GLANCECLIENT_REPO openstack python-glanceclient.git github
 GLANCE_REPO openstack glance.git github
+GLANCE_STORE_REPO openstack glance_store.git github
 HEAT_CFNTOOLS_REPO openstack heat-cfntools.git github
 HEATCLIENT_REPO openstack python-heatclient.git github
 HEAT_REPO openstack heat.git github
@@ -72,6 +73,7 @@ HEAT_TEMPLATES_REPO openstack heat-templates.git github
 HORIZONAUTH_REPO openstack django_openstack_auth.git github
 HORIZON_REPO openstack horizon.git github
 IRONICCLIENT_REPO openstack python-ironicclient.git github
+IRONIC_PYTHON_AGENT_REPO openstack ironic-python-agent.git github
 IRONIC_REPO openstack ironic.git github
 KEYSTONECLIENT_REPO openstack python-keystoneclient.git github
 KEYSTONEMIDDLEWARE_REPO openstack keystonemiddleware.git github
@@ -86,10 +88,15 @@ OCC_REPO openstack os-collect-config.git github
 OPENSTACKCLIENT_REPO openstack python-openstackclient.git github
 ORC_REPO openstack os-refresh-config.git github
 OSLOCFG_REPO openstack oslo.config.git github
+OSLOCON_REPO openstack oslo.concurrency.git github
 OSLODB_REPO openstack oslo.db.git github
 OSLOI18N_REPO openstack oslo.i18n.git github
+OSLOLOG_REPO openstack oslo.log.git github
+OSLOMID_REPO openstack oslo.middleware.git github
 OSLOMSG_REPO openstack oslo.messaging.git github
 OSLORWRAP_REPO openstack oslo.rootwrap.git github
+OSLOSERIALIZATION_REPO openstack oslo.serialization.git github
+OSLOUTILS_REPO openstack oslo.utils.git github
 OSLOVMWARE_REPO openstack oslo.vmware.git github
 PBR_REPO openstack-dev pbr.git github
 PECAN_REPO stackforge pecan.git github
