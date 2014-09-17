@@ -2,15 +2,20 @@
 set -eux
 
 BUILD_VERSION="$1"
+REPO_URL="$2"
+COMMIT="$3"
 
 apt-get -qy update
 apt-get -qy upgrade
 
 apt-get -qy install git
 
-git clone https://github.com/xapi-project/xenserver-core.git -b master xenserver-core
-
+git clone $REPO_URL xenserver-core
 cd xenserver-core
+git fetch origin '+refs/pull/*:refs/remotes/origin/pr/*'
+
+git checkout $COMMIT
+git log -1 --pretty=format:%H
 
 if [ -z "${PKG_REPO_LOCATION:-}" ]; then
     rsync -a xscore_deb_producer@unsteve.eng.hq.xensource.com:/xenserver_core_debs/$BUILD_VERSION/deb/ RPMS
