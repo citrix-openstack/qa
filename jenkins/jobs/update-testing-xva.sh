@@ -5,6 +5,7 @@ set -eux
 OPENSTACK_XENAPI_TESTING_XVA_URL="$1"
 REVISION="$2"
 REVISION_TYPE="${3:-RELEASE}"
+UPLOAD_IMAGE="${UPLOAD_IMAGE:-NO}"
 
 
 [ -n "$PublicHttpServerUserAndHost" ]
@@ -33,6 +34,6 @@ ssh-add "$PrivateKeyToPublicHttpServer" || { ssh-agent -k; exit 1; }
     fi
 
 
-    bin/cloud-xva-create "$REVISION"
+    UPLOAD_IMAGE="$UPLOAD_IMAGE" bin/cloud-xva-create "$REVISION"
     ssh-agent -k
 } || { ssh-agent -k; exit 1; }
