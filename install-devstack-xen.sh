@@ -469,6 +469,18 @@ INSTALL_TESTONLY_PACKAGES=True
 
 LOCALRC_CONTENT_ENDS_HERE
 
+# XenServer doesn't have nproc by default - but it's used by stackrc.
+# Fake it up if one doesn't exist
+set +e
+which nproc > /dev/null 2>&1
+if [ \$? -ne 0 ]; then
+  cat >> /usr/local/bin/nproc << END_OF_NPROC
+#!/bin/bash
+cat /proc/cpuinfo | grep -c processor
+END_OF_NPROC
+  chmod +x /usr/local/bin/nproc
+fi
+
 cd tools/xen
 ./install_os_domU.sh
 END_OF_XENSERVER_COMMANDS
