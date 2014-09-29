@@ -165,7 +165,7 @@ fi
 # Extend template
 sed \
     -e "/$EXTENSION_POINT/r  $EXTENSIONS" \
-    -e "s,^\(DEVSTACK_TGZ=\).*,\1http://$REPO_BASE/devstack/archive/$BRANCH_REF_NAME.tar.gz,g" \
+    -e "s,^\(DEVSTACK_SRC=\).*,\1http://$REPO_BASE/devstack/archive/$BRANCH_REF_NAME.tar.gz,g" \
     "$TEMPLATE_NAME"
 
 rm -f "$EXTENSIONS"
