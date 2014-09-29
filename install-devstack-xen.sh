@@ -21,8 +21,9 @@ positional arguments:
 optional arguments:
  -t TEST_TYPE          Type of the tests to run. One of [none, exercise, smoke, full]
                        defaults to none
- -d DEVSTACK_URL       An URL pointing to a tar.gz snapshot of devstack. This
-                       defaults to the official devstack repository.
+ -d DEVSTACK_SRC       An URL pointing to a tar.gz snapshot of devstack. This
+                       defaults to the official devstack repository.  Can also be a local
+                       file location.
  -l LOG_FILE_DIRECTORY The directory in which to store the devstack logs on failure.
  -j JEOS_URL           An URL for an xva containing an exported minimal OS template
                        with the name jeos_template_for_devstack, to be used
@@ -59,7 +60,7 @@ exit 1
 }
 
 # Defaults for optional arguments
-DEVSTACK_TGZ="https://github.com/openstack-dev/devstack/archive/master.tar.gz"
+DEVSTACK_SRC="https://github.com/openstack-dev/devstack/archive/master.tar.gz"
 TEST_TYPE="none"
 FORCE_SR_REPLACEMENT="false"
 LOG_FILE_DIRECTORY=""
@@ -93,7 +94,7 @@ while getopts ":t:d:fl:j:e:s:" flag; do
             fi
             ;;
         d)
-            DEVSTACK_TGZ="$OPTARG"
+            DEVSTACK_SRC="$OPTARG"
             REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
             ;;
         f)
@@ -141,7 +142,7 @@ XENSERVER:      $XENSERVER
 XENSERVER_PASS: $XENSERVER_PASS
 PRIVKEY:        $PRIVKEY
 TEST_TYPE:      $TEST_TYPE
-DEVSTACK_TGZ:   $DEVSTACK_TGZ
+DEVSTACK_SRC:   $DEVSTACK_SRC
 
 FORCE_SR_REPLACEMENT: $FORCE_SR_REPLACEMENT
 JEOS_URL:             ${JEOS_URL:-template will not be imported}
@@ -382,13 +383,30 @@ END_OF_JEOS_IMPORT
     echo "OK"
 fi
 
+if [ -e $DEVSTACK_SRC ]; then
+copy_logs_on_failure on_xenserver << END_OF_XENSERVER_COMMANDS
+set -exu
+
+mkdir -p $TMPDIR/devstack-local
+END_OF_XENSERVER_COMMANDS
+    scp $_SSH_OPTIONS -r $DEVSTACK_SRC/* "root@$XENSERVER:$TMPDIR/devstack-local"
+else
 copy_logs_on_failure on_xenserver << END_OF_XENSERVER_COMMANDS
 set -exu
 
 cd $TMPDIR
 
-wget -qO - "$DEVSTACK_TGZ" |
+wget -qO - "$DEVSTACK_SRC" |
     tar -xzf -
+cd devstack*
+END_OF_XENSERVER_COMMANDS
+fi
+
+copy_logs_on_failure on_xenserver << END_OF_XENSERVER_COMMANDS
+set -exu
+
+cd $TMPDIR
+
 cd devstack*
 
 cat << LOCALRC_CONTENT_ENDS_HERE > localrc
