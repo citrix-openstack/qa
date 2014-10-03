@@ -62,7 +62,6 @@ CINDERCLIENT_REPO openstack python-cinderclient.git github
 CINDER_REPO openstack cinder.git github
 CLIFF_REPO openstack cliff.git github
 DEVSTACK_REPO openstack-dev devstack.git github
-DIB_REPO openstack diskimage-builder.git github
 GLANCECLIENT_REPO openstack python-glanceclient.git github
 GLANCE_REPO openstack glance.git github
 GLANCE_STORE_REPO openstack glance_store.git github
