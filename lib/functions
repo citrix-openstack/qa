@@ -22,7 +22,7 @@ function git_retry {
 
 function repo_lines() {
 wget -qO - https://raw.github.com/openstack-dev/devstack/master/stackrc |
-    grep "_REPO=" 
+    grep -e '=\${[A-Z0-9_]*_REPO:-'
 }
 
 function non_git_repos() {
@@ -38,7 +38,7 @@ function extract_bash_default() {
 }
 
 function extract_var_user_repo() {
-    sed -e 's,^\(.*\)=.*/\(.*\)/\(.*\)}$,\1 \2 \3,g'
+    sed -e 's,^.*=\${\(.*\):-.*/\(.*\)/\(.*\)}$,\1 \2 \3,g'
 }
 
 function generate_repos() {

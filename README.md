@@ -35,6 +35,10 @@ Scripts that are useful for Jenkins jobs:
 
 ## If a new repo comes
 
+First, check what happened:
+
+    . lib/functions && assert_no_new_repos
+
  - amend `lib/functions`
  - execute `create_repos.sh`
  - amend puppet maifests
