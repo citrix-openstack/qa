@@ -43,6 +43,10 @@ flags:
                     it will be destroyed and replaced with an ext SR.
                     WARNING: This will destroy your actual default SR !
 
+ -n                 No devstack, just create the JEOS template that could be
+                    exported to an xva using the -e option.
+
+
 An example run:
 
   # Create a passwordless ssh key
@@ -63,6 +67,7 @@ exit 1
 DEVSTACK_SRC="https://github.com/openstack-dev/devstack/archive/master.tar.gz"
 TEST_TYPE="none"
 FORCE_SR_REPLACEMENT="false"
+EXIT_AFTER_JEOS_INSTALLATION=""
 LOG_FILE_DIRECTORY=""
 JEOS_URL=""
 JEOS_FILENAME=""
@@ -83,7 +88,7 @@ REMAINING_OPTIONS="$#"
 
 # Get optional parameters
 set +e
-while getopts ":t:d:fl:j:e:s:" flag; do
+while getopts ":t:d:fnl:j:e:s:" flag; do
     REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
     case "$flag" in
         t)
@@ -99,6 +104,9 @@ while getopts ":t:d:fl:j:e:s:" flag; do
             ;;
         f)
             FORCE_SR_REPLACEMENT="true"
+            ;;
+        n)
+            EXIT_AFTER_JEOS_INSTALLATION="true"
             ;;
         l)
             LOG_FILE_DIRECTORY="$OPTARG"
@@ -500,7 +508,7 @@ END_OF_NPROC
 fi
 
 cd tools/xen
-./install_os_domU.sh
+EXIT_AFTER_JEOS_INSTALLATION="$EXIT_AFTER_JEOS_INSTALLATION" ./install_os_domU.sh
 END_OF_XENSERVER_COMMANDS
 
 if [ "$TEST_TYPE" == "none" ]; then
