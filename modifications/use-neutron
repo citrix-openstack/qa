@@ -1,5 +1,5 @@
 # Quantum specific settings
-Q_PLUGIN=openvswitch
+Q_PLUGIN=ml2
 ENABLED_SERVICES+=,tempest,neutron,q-svc,q-agt,q-dhcp,q-l3,q-meta,q-domua,-n-net
 
 # Disable security groups
@@ -7,7 +7,15 @@ Q_USE_SECGROUP=False
 
 # With XenServer single box install, VLANs need to be enabled
 ENABLE_TENANT_VLANS="True"
-OVS_VLAN_RANGES="physnet1:1000:1024"
+
+# Disable tunneling as the OVS shipped with XenServer does notsupport it
+ENABLE_TENANT_TUNNELS="False"
+
+# Use VLANs with ML2
+Q_ML2_TENANT_NETWORK_TYPE="vlan"
+
+# Define the range to be used
+ML2_VLAN_RANGES="physnet1:1000:1024"
 
 Q_USE_DEBUG_COMMAND=True
 
