@@ -51,7 +51,7 @@ set -e
 set -eux
 
 # Need to update nss to install epel now (they disabled SSLv3)
-yum update nss\\*
+yum update -y nss\\*
 
 # Install epel so we can get mock
 wget http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
