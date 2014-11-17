@@ -103,6 +103,8 @@ PECAN_REPO stackforge pecan.git github
 PYCADF_REPO openstack pycadf.git github
 REQUIREMENTS_REPO openstack requirements.git github
 RYU_REPO osrg ryu.git github
+SAHARACLIENT_REPO openstack python-saharaclient.git github
+SAHARA_REPO openstack sahara.git github
 SPICE_REPO spice spice-html5.git anongit
 SQLALCHEMY_MIGRATE_REPO stackforge sqlalchemy-migrate.git github
 STEVEDORE_REPO openstack stevedore.git github
