@@ -89,6 +89,7 @@ OPENSTACKCLIENT_REPO openstack python-openstackclient.git github
 ORC_REPO openstack os-refresh-config.git github
 OSLOCFG_REPO openstack oslo.config.git github
 OSLOCON_REPO openstack oslo.concurrency.git github
+OSLOCTX_REPO openstack oslo.context.git github
 OSLODB_REPO openstack oslo.db.git github
 OSLOI18N_REPO openstack oslo.i18n.git github
 OSLOLOG_REPO openstack oslo.log.git github
