@@ -39,7 +39,7 @@ cat > $PARAMETER_FILE << EOF
 SETUPSCRIPT_URL=http://unsteve.eng.hq.xensource.com/build-results/devstack-scripts/${BUILD_TAG}.sh
 NOVA_REPO=https://github.com/citrix-openstack-build/nova.git
 NOVA_BRANCH=${REF_NAME}
-JEOS_URL=http://copper.eng.hq.xensource.com/jeos/external-saucy.xva
+JEOS_URL=http://copper.eng.hq.xensource.com/jeos/external-trusty.xva
 PUBLISH_RESULTS=true
 XVA_NAME=${XVA_NAME}
 XVA_INTERNAL_NAME=${BUILD_TAG}
