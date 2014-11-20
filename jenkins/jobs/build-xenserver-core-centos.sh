@@ -20,6 +20,7 @@ positional arguments:
 
 optional arguments:
  -p           Use parallel make
+ -s <URL>     Download sources from <URL>
 EOF
 exit 1
 }
@@ -34,14 +35,19 @@ shift
 # Number of options passed to this script
 REMAINING_OPTIONS="$#"
 PARALLEL_MAKE=0
+DOWNLOAD_SOURCES_URL=""
 # Get optional parameters
 set +e
-while getopts "p" flag; do
+while getopts "ps:" flag; do
     REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
     case "$flag" in
         p)
 	    PARALLEL_MAKE=1
             ;;
+	s)
+	    DOWNLOAD_SOURCES_URL="$OPTARG"
+	    REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
+	    ;;
     esac
 done
 set -e
@@ -83,14 +89,20 @@ else
 fi
 
 # The rest of the script needs to run as the mock user
-cat >> /home/mock/build.sh << EOF_BUILD_SCRIPT
+cat > /home/mock/build.sh << EOF_BUILD_SCRIPT
 cd ~
-git clone $REPO_URL xenserver-core
+[ -d xenserver-core ] || git clone $REPO_URL xenserver-core
 cd xenserver-core
 git fetch origin '+refs/pull/*:refs/remotes/origin/pr/*'
 
 git checkout $COMMIT
 git log -1 --pretty=format:%H
+
+if [ -n "$DOWNLOAD_SOURCES_URL" ]; then
+  cd SOURCES
+  wget -A gz -m -p -E -k -K -np -nH -nd -nv $DOWNLOAD_SOURCES_URL
+  cd ..
+fi
 
 ./configure.sh
 make -j \$NUM_CORES
@@ -100,6 +112,6 @@ if [ \\\$RET -ne 0 ]; then
   exit \\\$RET
 fi
 EOF_BUILD_SCRIPT
-su - mock -c "bash /home/mock/build.sh"
+su - mock -c "bash -eux /home/mock/build.sh"
 
 END_OF_XSCORE_BUILD_SCRIPT

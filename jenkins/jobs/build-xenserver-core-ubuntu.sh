@@ -22,6 +22,7 @@ positional arguments:
 
 optional arguments:
  -p           Use parallel make
+ -s <URL>     Download sources from <URL>
 EOF
 exit 1
 }
@@ -40,13 +41,18 @@ shift
 # Number of options passed to this script
 REMAINING_OPTIONS="$#"
 PARALLEL_MAKE=0
+DOWNLOAD_SOURCES_URL=""
 # Get optional parameters
 set +e
-while getopts "p" flag; do
+while getopts "ps:" flag; do
     REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
     case "$flag" in
         p)
 	    PARALLEL_MAKE=1
+            ;;
+        s)
+            DOWNLOAD_SOURCES_URL="$OPTARG"
+            REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
             ;;
     esac
 done
@@ -77,12 +83,19 @@ APT_ASSUME_YES
 sudo apt-get update
 sudo apt-get install git ocaml-nox
 
-git clone $REPO_URL xenserver-core
+[ -d xenserver-core ] || git clone $REPO_URL xenserver-core
 cd xenserver-core
 git fetch origin '+refs/pull/*:refs/remotes/origin/pr/*'
 
 git checkout $COMMIT
 git log -1 --pretty=format:%H
+
+if [ -n "$DOWNLOAD_SOURCES_URL" ]; then
+  cd SOURCES
+  wget -A gz -m -p -E -k -K -np -nH -nd -nv $DOWNLOAD_SOURCES_URL
+  cd ..
+fi
+
 
 sudo $args ./configure.sh
 if [ $PARALLEL_MAKE -eq 1 ]; then
