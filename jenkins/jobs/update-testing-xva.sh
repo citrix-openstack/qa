@@ -13,7 +13,7 @@ UPLOAD_IMAGE="${UPLOAD_IMAGE:-NO}"
 [ -n "$PrivateKeyToPublicHttpServer" ]
 
 eval $(ssh-agent) || { ssh-agent -k; exit 1; }
-ssh-add "$PrivateKeyToPublicHttpServer" || { ssh-agent -k; exit 1; }
+ssh-add || { ssh-agent -k; exit 1; }
 
 {
     for dependency in worker-vms remote-bash; do
