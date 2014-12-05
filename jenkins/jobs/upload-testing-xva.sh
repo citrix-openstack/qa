@@ -33,6 +33,7 @@ sudo -u osci -i /opt/osci/env/bin/osci-upload \\
     -r IAD /tmp/img_upload $FOLDER
 EOF
 
+    print_out_script
     ./scp.sh prod_ci upload_script.sh upload_script.sh
     ./ssh.sh prod_ci bash upload_script.sh
 }
@@ -53,6 +54,12 @@ function check_connection() {
     ./ssh.sh prod_ci echo "Connection OK"
 }
 
+
+function print_out_script() {
+    echo "*** Printing out script ***"
+    cat upload_script.sh
+    echo "*** End of script ***"
+}
 
 function print_out_parameters() {
     cat << EOF
