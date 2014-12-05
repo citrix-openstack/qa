@@ -38,6 +38,7 @@ rm -rf dry_upload
 mkdir dry_upload
 echo "hello" > dry_upload/image.xva
 LOCATION=\$(readlink -f dry_upload)
+chmod -R o+r \$LOCATION
 sudo -u osci -i /opt/osci/env/bin/osci-upload -c $CONTAINER -r IAD \$LOCATION image
 EOF
 
