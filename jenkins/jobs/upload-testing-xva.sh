@@ -37,7 +37,7 @@ set -eux
 rm -rf /tmp/img_upload
 mkdir /tmp/img_upload
 echo "hello" > /tmp/img_upload/image.xva
-sudo -u osci -i /opt/osci/env/bin/osci-upload -c $CONTAINER -r IAD /tmp/upload image
+sudo -u osci -i /opt/osci/env/bin/osci-upload -c $CONTAINER -r IAD /tmp/img_upload image
 EOF
 
     ./scp.sh prod_ci upload_script.sh upload_script.sh
