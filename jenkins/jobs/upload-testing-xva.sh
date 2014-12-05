@@ -42,7 +42,6 @@ EOF
 
     ./scp.sh prod_ci upload_script.sh upload_script.sh
     ./ssh.sh prod_ci bash upload_script.sh
-EOF
     exit 0
 fi
 
