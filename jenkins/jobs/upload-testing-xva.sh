@@ -31,13 +31,18 @@ cd infra/osci
 
 ./ssh.sh prod_ci echo "Connection OK"
 
-
 if [ "$DRY_RUN" = "YES" ]; then
-    ./ssh.sh prod_ci << EOF
+    cat > upload_script.sh << EOF
+set -eux
 rm -rf dry_upload
 mkdir dry_upload
 echo "hello" > dry_upload/image.xva
-sudo -u osci -i /opt/osci/env/bin/osci-upload -c $CONTAINER -r IAD dry_upload image
+LOCATION=\$(readlink -f dry_upload)
+sudo -u osci -i /opt/osci/env/bin/osci-upload -c $CONTAINER -r IAD \$LOCATION image
+EOF
+
+    ./scp.sh prod_ci upload_script.sh upload_script.sh
+    ./ssh.sh prod_ci bash upload_script.sh
 EOF
     exit 0
 fi
