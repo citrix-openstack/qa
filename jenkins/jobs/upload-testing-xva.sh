@@ -34,12 +34,10 @@ cd infra/osci
 if [ "$DRY_RUN" = "YES" ]; then
     cat > upload_script.sh << EOF
 set -eux
-rm -rf dry_upload
-mkdir dry_upload
-echo "hello" > dry_upload/image.xva
-LOCATION=\$(readlink -f dry_upload)
-chmod -R o+r \$LOCATION
-sudo -u osci -i /opt/osci/env/bin/osci-upload -c $CONTAINER -r IAD \$LOCATION image
+rm -rf /tmp/img_upload
+mkdir /tmp/img_upload
+echo "hello" > /tmp/img_upload/image.xva
+sudo -u osci -i /opt/osci/env/bin/osci-upload -c $CONTAINER -r IAD /tmp/upload image
 EOF
 
     ./scp.sh prod_ci upload_script.sh upload_script.sh
