@@ -27,14 +27,14 @@ trap finish EXIT
 EOF
 
     if [ -n "$URI_TO_RESOURCE" ]; then
-        cat > upload_script.sh << EOF
+        cat >> upload_script.sh << EOF
 mkdir /tmp/rax_upload
 pushd /tmp/rax_upload
 wget -q $URI_TO_RESOURCE
 popd
 EOF
     else
-        cat > upload_script.sh << EOF
+        cat >> upload_script.sh << EOF
 mv $PROD_CI_LOCAL_FOLDER /tmp/rax_upload
 EOF
 
