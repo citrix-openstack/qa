@@ -10,12 +10,12 @@ THIS_DIR=$(dirname $THIS_FILE)
 
 
 function main() {
-    READY_NODE=""
+    NODE=""
 
     echo "Waiting for a ready node"
     while true; do
-        READY_NODE=$(osci-nodepool list | get_ready_node)
-        if [ -z "$READY_NODE" ]; then
+        NODE=$(osci-nodepool list | get_ready_node)
+        if [ -z "$NODE" ]; then
             echo "."
             sleep 1
             continue
@@ -24,8 +24,8 @@ function main() {
         break
     done
 
-    NODE_ID=$(echo "$READY_NODE" | get_node_id)
-    NODE_IP=$(echo "$READY_NODE" | get_node_ip)
+    NODE_ID=$(echo "$NODE" | get_node_id)
+    NODE_IP=$(echo "$NODE" | get_node_ip)
 
     cat << EOF
 Node ID: $NODE_ID
