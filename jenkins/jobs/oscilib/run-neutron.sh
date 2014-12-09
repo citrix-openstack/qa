@@ -28,7 +28,7 @@ function main() {
         node=$(osci-nodepool list | get_ready_node)
         if [ -z "$node" ]; then
             echo "."
-            sleep 1
+            sleep 5
             continue
         fi
         echo "Got one!"
