@@ -9,7 +9,7 @@ THIS_DIR=$(dirname $THIS_FILE)
 
 function main() {
     check_out_infra
-    enter_infra
+    enter_infra_osci
     ls -la
 }
 

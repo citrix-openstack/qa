@@ -4,6 +4,6 @@ function check_out_infra() {
 }
 
 
-function enter_infra() {
+function enter_infra_osci() {
     cd infra/osci
 }

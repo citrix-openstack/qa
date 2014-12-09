@@ -18,7 +18,7 @@ function main() {
     validate_parameters
     print_out_parameters
     check_out_infra
-    enter_infra
+    enter_infra_osci
     check_connection
 
     cat > upload_script.sh << EOF
