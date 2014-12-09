@@ -8,6 +8,11 @@
 
 set -eux
 
+THIS_FILE=$(readlink -f $0)
+THIS_DIR=$(dirname $THIS_FILE)
+
+. $THIS_DIR/infralib/functions.sh
+
 
 function main() {
     validate_parameters
@@ -49,17 +54,6 @@ EOF
     print_out_script
     ./scp.sh prod_ci upload_script.sh upload_script.sh
     ./ssh.sh prod_ci bash upload_script.sh
-}
-
-
-function check_out_infra() {
-    rm -rf infra
-    hg clone http://hg.uk.xensource.com/openstack/infrastructure.hg/ infra
-}
-
-
-function enter_infra() {
-    cd infra/osci
 }
 
 
