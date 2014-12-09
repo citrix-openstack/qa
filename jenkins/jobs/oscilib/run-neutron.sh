@@ -12,15 +12,15 @@ THIS_DIR=$(dirname $THIS_FILE)
 function main() {
     READY_NODE=""
 
-    echo -n "Holding a node "
+    echo "Waiting for a ready node"
     while true; do
         READY_NODE=$(get_ready_node)
         if [ -z "$READY_NODE" ]; then
-            echo -n "."
+            echo "."
             sleep 1
             continue
         fi
-        echo "OK"
+        echo "Got one!"
         break
     done
 
