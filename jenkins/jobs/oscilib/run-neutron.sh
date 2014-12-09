@@ -14,7 +14,7 @@ function main() {
 
     echo "Waiting for a ready node"
     while true; do
-        READY_NODE=$(get_ready_node)
+        READY_NODE=$(osci-nodepool list | get_ready_node)
         if [ -z "$READY_NODE" ]; then
             echo "."
             sleep 1
