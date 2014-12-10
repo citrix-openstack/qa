@@ -19,7 +19,7 @@ function main() {
 
     node_id=$(echo "$node" | get_node_id)
 
-    osci-nodepool delete "$NODE_ID"
+    osci-nodepool delete "$node_id"
 
     rm -f ${BUILD_ID}.node
 }
