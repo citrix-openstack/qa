@@ -1,6 +1,8 @@
 #!/bin/bash
 set -eu
 
+BUILD_ID="$BUILD_ID"
+
 
 THIS_FILE=$(readlink -f $0)
 THIS_DIR=$(dirname $THIS_FILE)
@@ -8,20 +10,9 @@ THIS_DIR=$(dirname $THIS_FILE)
 
 . $THIS_DIR/utils.sh
 
-HELD_NODE=""
-
-
-function finish {
-    if [ -n "$HELD_NODE" ]; then
-        echo "Deleting held node"
-        osci-nodepool delete $(echo "$HELD_NODE" | get_node_id)
-    fi
-}
-
 
 function main() {
     local node
-    trap finish EXIT
 
     echo "Waiting for a ready node"
     while true; do
@@ -38,7 +29,7 @@ function main() {
     NODE_ID=$(echo "$node" | get_node_id)
     NODE_IP=$(echo "$node" | get_node_ip)
 
-    osci-nodepool hold "$NODE_ID" && HELD_NODE="$node"
+    osci-nodepool hold "$NODE_ID"
 
     cat << EOF
 Node ID: $NODE_ID
@@ -46,7 +37,7 @@ Node IP: $NODE_IP
 EOF
 
     echo "Running tests..."
-    sudo \
+    nohup sudo \
         -u osci \
         -i \
         /opt/osci/env/bin/osci-run-tests \
@@ -55,7 +46,10 @@ EOF
             $NODE_IP \
             refs/changes/97/139097/2 \
             openstack/ironic \
-            https://github.com/matelakat/xenapi-os-testing
+            https://github.com/matelakat/xenapi-os-testing </dev/null >${BUILD_ID}.out 2>${BUILD_ID}.err &
+
+    echo "$node" > ${BUILD_ID}.node
+    echo "Node file created: ${BUILD_ID}.node"
 }
 
 
