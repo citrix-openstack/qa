@@ -44,6 +44,18 @@ function main() {
 Node ID: $NODE_ID
 Node IP: $NODE_IP
 EOF
+
+    echo "Running tests..."
+    sudo \
+        -u osci \
+        -i \
+        /opt/osci/env/bin/osci-run-tests \
+            exec \
+            jenkins \
+            $NODE_IP \
+            refs/changes/97/139097/2 \
+            openstack/ironic \
+            https://github.com/matelakat/xenapi-os-testing
 }
 
 
