@@ -116,6 +116,7 @@ TASKFLOW_REPO openstack taskflow.git github
 TEMPEST_LIB_REPO openstack tempest-lib.git github
 TEMPEST_REPO openstack tempest.git github
 TIE_REPO openstack tripleo-image-elements.git github
+TOOZ_REPO openstack tooz.git github
 TROVECLIENT_REPO openstack python-troveclient.git github
 TROVE_REPO openstack trove.git github
 WSME_REPO stackforge wsme.git github
