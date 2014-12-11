@@ -79,7 +79,10 @@ KEYSTONECLIENT_REPO openstack python-keystoneclient.git github
 KEYSTONEMIDDLEWARE_REPO openstack keystonemiddleware.git github
 KEYSTONE_REPO openstack keystone.git github
 NEUTRONCLIENT_REPO openstack python-neutronclient.git github
+NEUTRON_FWAAS_REPO openstack neutron-fwaas.git github
+NEUTRON_LBAAS_REPO openstack neutron-lbaas.git github
 NEUTRON_REPO openstack neutron.git github
+NEUTRON_VPNAAS_REPO openstack neutron-vpnaas.git github
 NOVACLIENT_REPO openstack python-novaclient.git github
 NOVA_REPO openstack nova.git github
 NOVNC_REPO kanaka noVNC.git github
