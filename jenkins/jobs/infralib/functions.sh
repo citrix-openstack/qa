@@ -9,3 +9,8 @@ function check_out_infra() {
 function enter_infra_osci() {
     cd infra/osci
 }
+
+
+function enter_infra_installer() {
+    cd infra/installer
+}
