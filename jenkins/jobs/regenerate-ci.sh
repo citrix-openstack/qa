@@ -10,4 +10,4 @@ THIS_DIR=$(dirname $THIS_FILE)
 check_out_infra
 enter_infra_installer
 
-./rebuild-test.sh install_with_gateway
+./rebuild.sh install_with_gateway
