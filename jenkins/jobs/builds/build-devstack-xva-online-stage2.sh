@@ -22,6 +22,13 @@ xecommand vif-plug uuid=$HOSTINTERNALNETWORKVIFUUID
 # Find the IP of the VM
 VMIP=$(xecommand vm-param-get uuid=$VMUUID param-name=networks | sed -ne 's,^.*0/ip: \([0-9.]*\).*$,\1,p')
 
+# Enable root login
+sshpass -p citrix ssh -o 'StrictHostKeyChecking no' stack@$VMIP << "EOF"
+set -eux
+grep -q 'PermitRootLogin yes' /etc/ssh/sshd_config || (echo 'PermitRootLogin yes' | sudo tee -a /etc/ssh/sshd_config)
+sudo restart ssh
+EOF
+
 # SSH into the VM to finish the preparation
 sshpass -p citrix ssh -o 'StrictHostKeyChecking no' root@$VMIP << "EOF"
 set -eux
