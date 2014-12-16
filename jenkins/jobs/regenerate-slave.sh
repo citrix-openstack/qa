@@ -11,7 +11,7 @@ THIS_DIR=$(dirname $THIS_FILE)
 function main() {
     check_out_infra
     enter_infra_installer
-    ls -la
+    ./regenerate-slave.sh
 }
 
 
