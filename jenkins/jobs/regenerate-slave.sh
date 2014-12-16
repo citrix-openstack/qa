@@ -1,7 +1,7 @@
 #!/bin/bash
 set -eux
 
-THIS_FILE=$(readlink -f)
+THIS_FILE=$(readlink -f $0)
 THIS_DIR=$(dirname $THIS_FILE)
 
 
