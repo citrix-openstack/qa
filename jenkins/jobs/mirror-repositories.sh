@@ -2,7 +2,7 @@
 set -eux
 
 
-sshpass -pubuntu ubuntu@copper.eng.hq.xensource.com << EOF
+sshpass -pubuntu ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ubuntu@copper.eng.hq.xensource.com << EOF
 set -eux
 cd /usr/share/nginx/www
 /usr/bin/wget -m -np -nH -q "http://coltrane.eng.hq.xensource.com/release/XenServer-6.x/XS-6.1/RTM/xe-phase-1/"
