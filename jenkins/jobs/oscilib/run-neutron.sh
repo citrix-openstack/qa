@@ -35,6 +35,8 @@ function main() {
 Node ID: $NODE_ID
 Node IP: $NODE_IP
 EOF
+    echo "$node" > ${BUILD_ID}.node
+    echo "Node file created: ${BUILD_ID}.node"
 
     echo "Running tests..."
     nohup sudo \
@@ -46,10 +48,7 @@ EOF
             $NODE_IP \
             refs/changes/97/139097/2 \
             openstack/ironic \
-            https://github.com/matelakat/xenapi-os-testing </dev/null >${BUILD_ID}.out 2>${BUILD_ID}.err &
-
-    echo "$node" > ${BUILD_ID}.node
-    echo "Node file created: ${BUILD_ID}.node"
+            https://github.com/matelakat/xenapi-os-testing </dev/null
 }
 
 
