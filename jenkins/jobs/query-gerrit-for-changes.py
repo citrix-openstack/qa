@@ -35,8 +35,8 @@ def main(args):
     client.set_missing_host_key_policy(paramiko.WarningPolicy())
     client.connect(hostname, port=port, username=username, key_filename=keyfile)
     stdin, stdout, stderr = client.exec_command(
-        "gerrit query --patch-sets --format=JSON status:open AND %s %s" %
-            (create_query_expression(owners), query_for_extra_changes(args.change)))
+        "gerrit query --patch-sets --format=JSON status:open AND branch:%s AND %s %s" %
+            (args.branch, create_query_expression(owners), query_for_extra_changes(args.change)))
 
 
     def to_change_record(change):
@@ -85,5 +85,7 @@ if __name__ == "__main__":
         help='Extra change ids to pick')
     parser.add_argument('--ignore', action='append',
         help='Change IDs to ignore')
+    parser.add_argument('--branch', default='master',
+        help='Branch to use (e.g. stable/icehouse)')
     args = parser.parse_args()
     main(args)
