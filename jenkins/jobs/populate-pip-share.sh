@@ -23,8 +23,9 @@ function scp_to_unsteve() {
 }
 
 SSHPASS="sshpass -p$InfraPass"
-SSHOPTS="-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -l ${InfraUser}"
+SSHOPTS="-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
+REMOTE="${InfraUser}@unsteve.eng.hq.xensource.com"
 
-$SSHPASS ssh $SSHOPTS unsteve.eng.hq.xensource.com rm -f '/pip-dir/*'
-$SSHPASS scp $SSHOPTS dl/* unsteve.eng.hq.xensource.com:/pip-dir/
+$SSHPASS ssh $SSHOPTS $REMOTE rm -f '/pip-dir/*'
+$SSHPASS scp $SSHOPTS dl/* "$REMOTE:/pip-dir/"
 
