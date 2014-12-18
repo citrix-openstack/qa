@@ -2,6 +2,7 @@
 set -eu
 
 BUILD_ID="$BUILD_ID"
+XENAPI_OS_TESTING_REPO="$XENAPI_OS_TESTING_REPO"
 
 
 THIS_FILE=$(readlink -f $0)
@@ -48,7 +49,7 @@ EOF
             $NODE_IP \
             refs/changes/97/139097/2 \
             openstack/ironic \
-            https://github.com/matelakat/xenapi-os-testing </dev/null
+            "$XENAPI_OS_TESTING_REPO" </dev/null
 }
 
 
