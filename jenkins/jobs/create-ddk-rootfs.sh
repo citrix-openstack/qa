@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eu
+set -eux
 
 XSLIB=$(cd $(dirname $(readlink -f "$0")) && cd xslib && pwd)
 BUILDLIB=$(cd $(dirname $(readlink -f "$0")) && cd builds && pwd)
@@ -26,6 +26,6 @@ SERVERNAME="${1-$(print_usage_and_die)}"
 XENSERVER_DDK_URL="${2-$(print_usage_and_die)}"
 
 echo "Spinning up virtual machine"
-WORKER=$(cat $XSLIB/get_worker.sh | remote_bash "root@$SERVERNAME")
+WORKER=$(cat $XSLIB/get-worker.sh | remote_bash "root@$SERVERNAME")
 echo "Starting job on $WORKER"
 run_bash_script_on $WORKER "$BUILDLIB/create-ddk-rootfs.sh" "$XENSERVER_DDK_URL" "ddk.tgz"
