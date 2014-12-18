@@ -534,7 +534,7 @@ sudo pip install tox==1.6.1
 
 cd /opt/stack/tempest
 if [ "$TEST_TYPE" == "exercise" ]; then
-    tox -eall tempest.scenario.test_minimum_basic
+    tox -eall tempest.scenario.test_server_basic_ops
 elif [ "$TEST_TYPE" == "smoke" ]; then
     #./run_tests.sh -s -N
     tox -esmoke
