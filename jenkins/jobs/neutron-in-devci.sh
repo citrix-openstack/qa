@@ -23,7 +23,8 @@ function main() {
         sleep 5
     done
 
-    ./ssh-as-jenkins.sh dev_ci $node_ip tail -f /opt/stack/new/devstacklog.txt
+    echo "*** Devstack LOG ***"
+    ./ssh-as-jenkins.sh dev_ci $node_ip cat /opt/stack/new/devstacklog.txt
 }
 
 
