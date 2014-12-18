@@ -7,7 +7,7 @@ THIS_DIR=$(dirname $THIS_FILE)
 . $THIS_DIR/infralib/functions.sh
 . $THIS_DIR/oscilib/utils.sh
 
-XENAPI_OS_TESTING_REPO="https://github.com/matelakat/xenapi-os-testing"
+XENAPI_OS_TESTING_REPO="https://github.com/citrix-openstack/neutron-xenapi-os-testing"
 
 function main() {
     check_out_infra
