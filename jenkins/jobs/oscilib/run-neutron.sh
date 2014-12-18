@@ -1,5 +1,5 @@
 #!/bin/bash
-set -eu
+set -eux
 
 BUILD_ID="$BUILD_ID"
 XENAPI_OS_TESTING_REPO="$XENAPI_OS_TESTING_REPO"
