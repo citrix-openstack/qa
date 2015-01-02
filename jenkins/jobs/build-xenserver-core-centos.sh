@@ -100,7 +100,9 @@ git log -1 --pretty=format:%H
 
 if [ -n "$DOWNLOAD_SOURCES_URL" ]; then
   cd SOURCES
+  set +e
   wget -A gz -m -p -E -k -K -np -nH -nd -nv $DOWNLOAD_SOURCES_URL
+  set -e
   cd ..
 fi
 
