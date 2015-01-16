@@ -72,6 +72,7 @@ LOG_FILE_DIRECTORY=""
 JEOS_URL=""
 JEOS_FILENAME=""
 SUPP_PACK_URL=""
+SCREEN_LOGDIR="/opt/stack/devstack_logs"
 
 # Get Positional arguments
 set +u
@@ -249,7 +250,7 @@ ssh -q \
     -o Batchmode=yes \
     -o StrictHostKeyChecking=no \
     -o UserKnownHostsFile=/dev/null \
-    stack@\$GUEST_IP "tar --ignore-failed-read -czf - /tmp/devstack/log/* /opt/stack/tempest/*.xml" > \
+    stack@\$GUEST_IP "tar --ignore-failed-read -czf - ${SCREEN_LOGDIR}/* /opt/stack/tempest/*.xml" > \
     /root/artifacts/domU.tgz < /dev/null || true
 fi
 tar --ignore-failed-read -czf /root/artifacts/dom0.tgz /var/log/messages* /var/log/xensource* /var/log/SM* || true
@@ -466,8 +467,8 @@ TERMINATE_TIMEOUT=500
 BOOT_TIMEOUT=500
 
 # DevStack settings
-LOGFILE=/tmp/devstack/log/stack.log
-SCREEN_LOGDIR=/tmp/devstack/log/
+LOGFILE=${SCREEN_LOGDIR}/stack.log
+SCREEN_LOGDIR=${SCREEN_LOGDIR}
 
 # Turn on verbosity (password input does not work otherwise)
 VERBOSE=True
