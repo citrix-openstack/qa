@@ -142,7 +142,7 @@ function devstack_succeeded() {
 set -eu
 
 if service devstack status > /dev/null ; then
-    test -e /var/run/devstack.succeeded
+    test -e /var/run/devstack.succeeded || test -e /opt/stack/runsh.succeeded
 else
     grep -q 'stack.sh completed in' run.sh.log
 fi
