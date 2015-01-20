@@ -13,7 +13,7 @@ def set_database(filename, contents):
     >>> os.path.exists('test_db')
     True
     >>> from selectors import first
-    >>> lock_items('test_db', 'lock1', first(lambda x: x['HOST'] == 'a'))
+    >>> lock_items('test_db', 'lock1', first(lambda x: x['HOST'] == 'a'), 'reason')
     [{'HOST': 'a'}]
     >>> set_database('test_db', '[dict(HOST=\"c\"), dict(HOST=\"b\"), dict(HOST=\"a\")]')
     >>> os.path.exists('test_db')
@@ -22,6 +22,8 @@ def set_database(filename, contents):
     [{'HOST': 'c'}, {'HOST': 'b'}, {'HOST': 'a'}]
     >>> get_locks('test_db')
     [u'lock1']
+    >>> get_lock_details('test_db') # doctest: +ELLIPSIS
+    {'a': {'date': ..., 'lock': u'lock1', 'reason': u'reason'}, 'c': ..., 'b': ...}
     """
 
     import sqlite3
@@ -32,8 +34,8 @@ def set_database(filename, contents):
     cur_locks = {}
     for table_name, in c.execute('SELECT name FROM sqlite_master WHERE type=\'table\' AND name=\'stuff\''):
         if table_name == "stuff":
-            for lock, lock_date, data in c.execute('SELECT lock, lock_date, data FROM stuff'):
-                cur_locks[eval(data)['HOST']] = (lock, lock_date)
+            for lock, lock_date, reason, data in c.execute('SELECT lock, lock_date, lock_reason, data FROM stuff'):
+                cur_locks[eval(data)['HOST']] = (lock, lock_date, reason)
 
     c.execute('DROP TABLE IF EXISTS stuff')
     c.execute('CREATE TABLE stuff (id INTEGER PRIMARY KEY, data TEXT, lock TEXT, lock_reason TEXT, lock_date DATETIME)')
@@ -42,8 +44,8 @@ def set_database(filename, contents):
     for record in eval(contents):
         new_lock = cur_locks.get(record['HOST'], None)
         if new_lock:
-            c.execute('INSERT INTO stuff (id, data, lock, lock_date) VALUES(:id, :data, :lock, :lock_date)',
-                      dict(id=id, data=repr(record), lock=new_lock[0], lock_date=new_lock[1]))
+            c.execute('INSERT INTO stuff (id, data, lock, lock_date, lock_reason) VALUES(:id, :data, :lock, :lock_date, :lock_reason)',
+                      dict(id=id, data=repr(record), lock=new_lock[0], lock_date=new_lock[1], lock_reason=new_lock[2]))
         else:
             c.execute('INSERT INTO stuff (id, data, lock) VALUES(:id, :data, :lock)',
                       dict(id=id, data=repr(record), lock=""))
@@ -211,7 +213,7 @@ def release_lock(filename, lock):
     >>> get_locks('test_db')
     [u'lock1']
     >>> release_lock('test_db', 'lock1')
-    >>> gets_locks('test_db')
+    >>> get_locks('test_db')
     []
     """
 
