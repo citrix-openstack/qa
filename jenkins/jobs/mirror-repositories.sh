@@ -9,6 +9,8 @@ cd /usr/share/nginx/www
 echo "\$?"
 /usr/bin/wget -m -np -nH "http://coltrane.eng.hq.xensource.com/release/XenServer-6.x/XS-6.2/RTM-70446/xe-phase-1/"
 echo "\$?"
+/usr/bin/wget -m -np -nH "http://coltrane.eng.hq.xensource.com/release/XenServer-6.x/XS-6.5/RTM-90233/xe-phase-1/"
+echo "\$?"
 /usr/bin/wget -m -np -nH "http://coltrane.eng.hq.xensource.com/usr/groups/build/clearwater-lcm/xe-phase-3-latest/xe-phase-1/"
 echo "\$?"
 /usr/bin/wget -m -np -nH "http://www.uk.xensource.com/linux/distros/CentOS/6.4/os/x86_64/"
