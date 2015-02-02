@@ -118,8 +118,8 @@ MULTI_HOST=False
 CLEAN_TEMPLATES=true
 
 # Citrix specific settings to speed up Ubuntu install (Remove them)
-UBUNTU_INST_HTTP_HOSTNAME="mirror.anl.gov"
-UBUNTU_INST_HTTP_DIRECTORY="/pub/ubuntu"
+UBUNTU_INST_HTTP_HOSTNAME="mirror.cc.columbia.edu"
+UBUNTU_INST_HTTP_DIRECTORY="/pub/linux/ubuntu/archive"
 UBUNTU_INST_HTTP_PROXY="http://gold.eng.hq.xensource.com:8000"
 
 # Citrix settings (Remove them)
