@@ -60,16 +60,7 @@ set -eux
 yum update -y nss\\*
 
 # Install epel so we can get mock
-wget http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
-wget http://rpms.famillecollet.com/enterprise/remi-release-6.rpm
-set +e
-rpm -Uvh remi-release-6*.rpm epel-release-6*.rpm
-RET=\$?
-if [ \$RET -ne 0 -a \$RET -ne 2 ]; then
-  exit \$RET
-fi
-set -e
-
+yum install -y epel-release
 yum install -y mock redhat-lsb-core
 
 getent passwd mock || useradd -g mock -d /home/mock -s /bin/bash -p \$(echo mock | openssl passwd -1 -stdin) mock
