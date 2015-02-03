@@ -494,6 +494,9 @@ SWIFT_LOOPBACK_DISK_SIZE=9663676416
 # Additional Localrc parameters here
 INSTALL_TESTONLY_PACKAGES=True
 
+UBUNTU_INST_HTTP_HOSTNAME=mirror.cc.columbia.edu
+UBUNTU_INST_HTTP_DIRECTORY=/pub/linux/ubuntu/archive
+
 LOCALRC_CONTENT_ENDS_HERE
 
 # XenServer doesn't have nproc by default - but it's used by stackrc.
