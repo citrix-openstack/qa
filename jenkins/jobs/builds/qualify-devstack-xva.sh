@@ -9,7 +9,11 @@ DEVSTACKPASSWORD=$4
 NOVAPLUGINSISO=$5
 
 # Prepare slave requirements
-sudo DEBIAN_FRONTEND=noninteractive apt-get -y install xcp-xe stunnel sshpass
+sudo DEBIAN_FRONTEND=noninteractive apt-get -y install stunnel sshpass
+
+function xecommand() {
+    sshpass -p $XENSERVERPASSWORD ssh -o 'StrictHostKeyChecking no' root@$XENSERVERHOST "xe $@"
+}
 
 # Install the supplemental pack
 sshpass -p $XENSERVERPASSWORD scp -o StrictHostKeyChecking=no $NOVAPLUGINSISO root@"$XENSERVERHOST":~/novaplugins.iso
@@ -18,12 +22,12 @@ sshpass -p $XENSERVERPASSWORD ssh -o StrictHostKeyChecking=no root@"$XENSERVERHO
 
 # Install the Devstack VM
 OLDDEVSTACKVM=$(xe -s $XENSERVERHOST -u root -pw $XENSERVERPASSWORD vm-list name-label="DevStackOSDomU" --minimal) || true
-xe -s $XENSERVERHOST -u root -pw $XENSERVERPASSWORD vm-shutdown uuid=$OLDDEVSTACKVM || true
-xe -s $XENSERVERHOST -u root -pw $XENSERVERPASSWORD vm-destroy uuid=$OLDDEVSTACKVM || true
+xecommand vm-shutdown uuid=$OLDDEVSTACKVM || true
+xecommand vm-destroy uuid=$OLDDEVSTACKVM || true
 sshpass -p $XENSERVERPASSWORD scp -o StrictHostKeyChecking=no $DEVSTACKXVA root@$XENSERVERHOST:/root/devstack.xva
 VM=$(sshpass -p $XENSERVERPASSWORD ssh -o StrictHostKeyChecking=no root@$XENSERVERHOST xe vm-import filename=/root/devstack.xva)
 sshpass -p $XENSERVERPASSWORD ssh -o StrictHostKeyChecking=no root@$XENSERVERHOST rm -f /root/devstack.xva
-xe -s $XENSERVERHOST -u root -pw $XENSERVERPASSWORD vm-start uuid=$VM
+xecommand vm-start uuid=$VM
 DEVSTACKVMIP=""
 IPTRY=0
 while [ -z $DEVSTACKVMIP ];
@@ -33,7 +37,7 @@ do
         echo "Failed to get DEVSTACKVMIP within 1 minute."
         exit 1
     fi
-    DEVSTACKVMIP=$(xe -s $XENSERVERHOST -u root -pw $XENSERVERPASSWORD vm-param-get uuid=$VM param-name=networks | sed -ne 's,^.*0/ip: \([0-9.]*\).*$,\1,p')
+    DEVSTACKVMIP=$(xecommand  vm-param-get uuid=$VM param-name=networks | sed -ne 's,^.*0/ip: \([0-9.]*\).*$,\1,p')
     sleep 1
 done
 
@@ -53,8 +57,8 @@ done
 EXERCISEOUTPUT=`sshpass -p $DEVSTACKPASSWORD ssh -o StrictHostKeyChecking=no root@"$DEVSTACKVMIP" "su stack /opt/stack/devstack/exercise.sh"` || true
 
 # Tidy and act based on the exercise result
-xe -s $XENSERVERHOST -u root -pw $XENSERVERPASSWORD vm-shutdown uuid=$VM
-xe -s $XENSERVERHOST -u root -pw $XENSERVERPASSWORD vm-destroy uuid=$VM
+xecommand vm-shutdown uuid=$VM
+xecommand vm-destroy uuid=$VM
 
 # Return value based on Exercise result
 if [ "`echo -e "$EXERCISEOUTPUT" | grep -o "FAILED " | wc -l`" != "0" ]; then

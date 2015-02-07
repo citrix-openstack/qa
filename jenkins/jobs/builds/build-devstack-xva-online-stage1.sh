@@ -11,7 +11,7 @@ shift 3
 TEMPKEYFILE=$(mktemp)
 
 # Prepare slave requirements
-sudo DEBIAN_FRONTEND=noninteractive apt-get -y install xcp-xe stunnel sshpass
+sudo DEBIAN_FRONTEND=noninteractive apt-get -y install stunnel sshpass
 
 rm -f install-devstack-xen.sh || true
 wget -qO install-devstack-xen.sh "$SETUPSCRIPT_URL"

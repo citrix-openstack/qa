@@ -6,7 +6,7 @@ XENSERVERHOST=$1
 XENSERVERPASSWORD=$2
 
 function xecommand() {
-    xe -s $XENSERVERHOST -u root -pw $XENSERVERPASSWORD "$@"
+    sshpass -p $XENSERVERPASSWORD ssh -o 'StrictHostKeyChecking no' root@$XENSERVERHOST "xe $@"
 }
 
 # Find out the UUID of the VM
