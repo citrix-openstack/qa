@@ -394,7 +394,7 @@ fi
 
 if [ -e $DEVSTACK_SRC ]; then
 copy_logs_on_failure on_xenserver << END_OF_XENSERVER_COMMANDS
-set -exu
+set -eu
 
 mkdir -p $TMPDIR/devstack-local
 END_OF_XENSERVER_COMMANDS

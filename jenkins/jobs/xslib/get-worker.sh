@@ -5,7 +5,7 @@ NETWORKING="0=xenbr0,${1:-}"
 
 SLAVENAME="${2:-slave}"
 FRESHSLAVE="${SLAVENAME}-fresh"
-IMAGENAME="${3:-slave}"
+IMAGENAME="${3:-trusty}"
 
 function resolve_to_network() {
     local name_or_bridge
@@ -88,6 +88,11 @@ then
 
     xe vm-param-set uuid="$VM" name-label="$SLAVENAME"
 
+    # If it's a template, create an instance
+    IS_TEMPLATE=$(xe vm-param-get uuid="$VM" param-name="is-a-template")
+    if [ "$IS_TEMPLATE" = "true" ]; then
+	xe vm-install template=${VM} new-name-label="$SLAVENAME"
+    fi
     xe vm-snapshot vm="$SLAVENAME" new-name-label="$FRESHSLAVE" > /dev/null
 fi
 
@@ -110,6 +115,6 @@ done
 while true
 do
     SLAVE_IP=$(xe vm-param-get uuid=$VM param-name=networks | sed -ne 's,^.*0/ip: \([0-9.]*\).*$,\1,p')
-    [ -z "$SLAVE_IP" ] || { echo "ubuntu@$SLAVE_IP"; exit 0; }
+    [ -z "$SLAVE_IP" ] || { echo "root@$SLAVE_IP"; exit 0; }
     sleep 1
 done
