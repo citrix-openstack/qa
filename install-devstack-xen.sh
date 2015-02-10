@@ -206,7 +206,7 @@ END_OF_EXPORT_COMMANDS
     echo "OK"
 
     echo -n "Copy exported template to local file..."
-    if scp $_SSH_OPTIONS "root@$XENSERVER:/root/jeos-for-devstack.xva" "$JEOS_FILENAME"; then
+    if scp -3 $_SSH_OPTIONS "root@$XENSERVER:/root/jeos-for-devstack.xva" "$JEOS_FILENAME"; then
         echo "OK"
         RETURN_CODE=0
     else
