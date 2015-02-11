@@ -32,10 +32,10 @@ FNAME="/usr/share/nginx/www/jeos/$PREFIX-$UBUNTU_DISTRO.xva"
 # Ignore devstack failures, as we are only using it to create JeOS
 bash $TMP/installer.sh $HOST $XENSERVER_PASSWORD $TMP/devstack_key.priv -n || true
 
+# Requires passwordless SSH to copper
 bash $TMP/installer.sh $HOST $XENSERVER_PASSWORD $TMP/devstack_key.priv -e ubuntu@copper.eng.hq.xensource.com:$FNAME
 
-sshpass -p ubuntu \
-  ssh \
-    -o StrictHostKeyChecking=no \
+
+ssh -o StrictHostKeyChecking=no \
     -o UserKnownHostsFile=/dev/null \
     ubuntu@copper.eng.hq.xensource.com chmod o+r $FNAME
