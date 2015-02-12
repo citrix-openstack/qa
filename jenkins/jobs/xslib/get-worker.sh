@@ -91,7 +91,7 @@ then
     # If it's a template, create an instance
     IS_TEMPLATE=$(xe vm-param-get uuid="$VM" param-name="is-a-template")
     if [ "$IS_TEMPLATE" = "true" ]; then
-	xe vm-install template=${VM} new-name-label="$SLAVENAME"
+	xe vm-install template=${VM} new-name-label="$SLAVENAME" > /dev/null
     fi
     xe vm-snapshot vm="$SLAVENAME" new-name-label="$FRESHSLAVE" > /dev/null
 fi
