@@ -3,9 +3,9 @@ set -eux
 
 NETWORKING="0=xenbr0,${1:-}"
 
-SLAVENAME="${2:-slave}"
+SLAVENAME="${2:-trusty}"
 FRESHSLAVE="${SLAVENAME}-fresh"
-IMAGENAME="${3:-trusty}"
+IMAGENAME="${3:-external-trusty}"
 
 function resolve_to_network() {
     local name_or_bridge
@@ -82,8 +82,8 @@ then
     xe vm-uninstall vm="$SLAVENAME" force=true || true
     mkdir -p /mnt/exported-vms
 
-    mount -t nfs copper.eng.hq.xensource.com:/exported-vms /mnt/exported-vms
-    VM=$(xe vm-import filename=/mnt/exported-vms/${IMAGENAME}.xva)
+    mount -t nfs copper.eng.hq.xensource.com:/usr/share/nginx/www /mnt/exported-vms
+    VM=$(xe vm-import filename=/mnt/exported-vms/jeos/${IMAGENAME}.xva)
     umount /mnt/exported-vms
 
     xe vm-param-set uuid="$VM" name-label="$SLAVENAME"
