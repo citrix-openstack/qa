@@ -57,6 +57,7 @@ diff -u \
     - \
     << EOF
 CEILOMETERCLIENT_REPO openstack python-ceilometerclient.git github
+CEILOMETERMIDDLEWARE_REPO openstack ceilometermiddleware.git github
 CEILOMETER_REPO openstack ceilometer.git github
 CINDERCLIENT_REPO openstack python-cinderclient.git github
 CINDER_REPO openstack cinder.git github
@@ -105,7 +106,6 @@ OSLOVMWARE_REPO openstack oslo.vmware.git github
 PBR_REPO openstack-dev pbr.git github
 PYCADF_REPO openstack pycadf.git github
 REQUIREMENTS_REPO openstack requirements.git github
-RYU_REPO osrg ryu.git github
 SAHARACLIENT_REPO openstack python-saharaclient.git github
 SAHARA_REPO openstack sahara.git github
 SPICE_REPO spice spice-html5.git anongit
