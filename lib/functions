@@ -99,6 +99,7 @@ OSLOI18N_REPO openstack oslo.i18n.git github
 OSLOLOG_REPO openstack oslo.log.git github
 OSLOMID_REPO openstack oslo.middleware.git github
 OSLOMSG_REPO openstack oslo.messaging.git github
+OSLOPOLICY_REPO openstack oslo.policy.git github
 OSLORWRAP_REPO openstack oslo.rootwrap.git github
 OSLOSERIALIZATION_REPO openstack oslo.serialization.git github
 OSLOUTILS_REPO openstack oslo.utils.git github
