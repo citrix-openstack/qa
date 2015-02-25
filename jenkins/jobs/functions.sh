@@ -28,7 +28,6 @@ function remote_bash() {
         "$server" bash -s -- "$@"
 }
 
-
 function run_bash_script_on() {
     local server
     local script

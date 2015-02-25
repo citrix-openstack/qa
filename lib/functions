@@ -62,6 +62,7 @@ CEILOMETER_REPO openstack ceilometer.git github
 CINDERCLIENT_REPO openstack python-cinderclient.git github
 CINDER_REPO openstack cinder.git github
 CLIFF_REPO openstack cliff.git github
+DEBTCOLLECTOR_REPO openstack debtcollector.git github
 DEVSTACK_REPO openstack-dev devstack.git github
 DIB_REPO openstack diskimage-builder.git github
 GLANCECLIENT_REPO openstack python-glanceclient.git github
