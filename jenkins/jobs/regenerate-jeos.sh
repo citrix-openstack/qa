@@ -33,9 +33,13 @@ FNAME="/usr/share/nginx/www/jeos/$PREFIX-$UBUNTU_DISTRO.xva"
 bash $TMP/installer.sh $HOST $XENSERVER_PASSWORD $TMP/devstack_key.priv -n || true
 
 # Requires passwordless SSH to copper
-bash $TMP/installer.sh $HOST $XENSERVER_PASSWORD $TMP/devstack_key.priv -e ubuntu@copper.eng.hq.xensource.com:$FNAME
+bash $TMP/installer.sh $HOST $XENSERVER_PASSWORD $TMP/devstack_key.priv -e ubuntu@copper.eng.hq.xensource.com:${FNAME}_new
 
 
 ssh -o StrictHostKeyChecking=no \
     -o UserKnownHostsFile=/dev/null \
-    ubuntu@copper.eng.hq.xensource.com chmod o+r $FNAME
+    ubuntu@copper.eng.hq.xensource.com chmod o+r ${FNAME}_new
+
+ssh -o StrictHostKeyChecking=no \
+    -o UserKnownHostsFile=/dev/null \
+    ubuntu@copper.eng.hq.xensource.com mv -f ${FNAME}_new ${FNAME}_new
