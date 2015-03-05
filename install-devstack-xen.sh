@@ -16,7 +16,7 @@ positional arguments:
  PRIVKEY            A passwordless private key to be used for installation.
                     This key will be copied over to the xenserver host, and will
                     be used for migration/resize tasks if multiple XenServers
-                    used.
+                    used.  If '-' is passed, assume the key is provided by an agent
 
 optional arguments:
  -t TEST_TYPE          Type of the tests to run. One of [none, exercise, smoke, full]
@@ -142,8 +142,11 @@ _SSH_OPTIONS="\
     -q \
     -o BatchMode=yes \
     -o StrictHostKeyChecking=no \
-    -o UserKnownHostsFile=/dev/null \
-    -i $PRIVKEY"
+    -o UserKnownHostsFile=/dev/null"
+
+if [ "$PRIVKEY" != "-" ]; then
+  _SSH_OPTIONS="$_SSH_OPTIONS -i $PRIVKEY"
+fi
 
 # Print out summary
 cat << EOF
@@ -178,15 +181,21 @@ function assert_tool_exists() {
 if [ -z "$JEOS_FILENAME" ]; then
     echo -n "Setup ssh keys on XenServer..."
     tmp_dir="$(mktemp -d)"
-    cp $PRIVKEY "$tmp_dir/devstack"
-    ssh-keygen -y -f $PRIVKEY > "$tmp_dir/devstack.pub"
+    COPY_KEY=""
+    if [ "$PRIVKEY" != "-" ]; then
+      cp $PRIVKEY "$tmp_dir/devstack"
+      ssh-keygen -y -f $PRIVKEY > "$tmp_dir/devstack.pub"
+      COPY_KEY="$tmp_dir/devstack.pub"
+    fi
     assert_tool_exists sshpass
     sshpass -p "$XENSERVER_PASS" \
         ssh-copy-id \
-            -i "$tmp_dir/devstack.pub" \
+            -i $COPY_KEY \
             root@$XENSERVER > /dev/null 2>&1
-    scp $_SSH_OPTIONS $PRIVKEY "root@$XENSERVER:.ssh/id_rsa"
-    scp $_SSH_OPTIONS $tmp_dir/devstack.pub "root@$XENSERVER:.ssh/id_rsa.pub"
+    if [ "$PRIVKEY" != "-" ]; then
+      scp $_SSH_OPTIONS $PRIVKEY "root@$XENSERVER:.ssh/id_rsa"
+      scp $_SSH_OPTIONS $tmp_dir/devstack.pub "root@$XENSERVER:.ssh/id_rsa.pub"
+    fi
     rm -rf "$tmp_dir"
     unset tmp_dir
     echo "OK"

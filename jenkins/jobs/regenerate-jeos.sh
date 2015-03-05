@@ -33,7 +33,12 @@ FNAME="/usr/share/nginx/www/jeos/$PREFIX-$UBUNTU_DISTRO.xva"
 bash $TMP/installer.sh $HOST $XENSERVER_PASSWORD $TMP/devstack_key.priv -n || true
 
 # Requires passwordless SSH to copper
-bash $TMP/installer.sh $HOST $XENSERVER_PASSWORD $TMP/devstack_key.priv -e ubuntu@copper.eng.hq.xensource.com:${FNAME}_new
+# -e specifically does not copy any keys to the server - so we can rely on just having access to the host
+eval `ssh-agent`
+ssh-add ~/.ssh/id_rsa
+ssh-add $TMP/devstack_key.priv
+bash -x $TMP/installer.sh $HOST $XENSERVER_PASSWORD - -e ubuntu@copper.eng.hq.xensource.com:${FNAME}_new
+ssh-agent -k
 
 
 ssh -o StrictHostKeyChecking=no \
