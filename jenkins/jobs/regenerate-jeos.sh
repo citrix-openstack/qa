@@ -47,4 +47,4 @@ ssh -o StrictHostKeyChecking=no \
 
 ssh -o StrictHostKeyChecking=no \
     -o UserKnownHostsFile=/dev/null \
-    ubuntu@copper.eng.hq.xensource.com mv -f ${FNAME}_new ${FNAME}_new
+    ubuntu@copper.eng.hq.xensource.com mv -f ${FNAME}_new ${FNAME}
