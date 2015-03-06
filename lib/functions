@@ -64,7 +64,6 @@ CINDER_REPO openstack cinder.git github
 CLIFF_REPO openstack cliff.git github
 DEBTCOLLECTOR_REPO openstack debtcollector.git github
 DEVSTACK_REPO openstack-dev devstack.git github
-DIB_REPO openstack diskimage-builder.git github
 GLANCECLIENT_REPO openstack python-glanceclient.git github
 GLANCE_REPO openstack glance.git github
 GLANCE_STORE_REPO openstack glance_store.git github
@@ -104,6 +103,7 @@ OSLOPOLICY_REPO openstack oslo.policy.git github
 OSLORWRAP_REPO openstack oslo.rootwrap.git github
 OSLOSERIALIZATION_REPO openstack oslo.serialization.git github
 OSLOUTILS_REPO openstack oslo.utils.git github
+OSLOVERSIONEDOBJECTS_REPO openstack oslo.versionedobjects.git github
 OSLOVMWARE_REPO openstack oslo.vmware.git github
 PBR_REPO openstack-dev pbr.git github
 PYCADF_REPO openstack pycadf.git github
@@ -118,7 +118,6 @@ SWIFT_REPO openstack swift.git github
 TASKFLOW_REPO openstack taskflow.git github
 TEMPEST_LIB_REPO openstack tempest-lib.git github
 TEMPEST_REPO openstack tempest.git github
-TIE_REPO openstack tripleo-image-elements.git github
 TOOZ_REPO openstack tooz.git github
 TROVECLIENT_REPO openstack python-troveclient.git github
 TROVE_REPO openstack trove.git github
