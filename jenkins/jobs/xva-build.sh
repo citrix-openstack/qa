@@ -6,7 +6,7 @@ THISDIR=$(cd $(dirname $(readlink -f "$0")) && pwd)
 
 function print_usage_and_die() {
     log_error << EOF
-usage: $0 xenserver xenserver_password setupscript_url nova_repo nova_branch jeos_url worker_jeos_password
+usage: $0 xenserver xenserver_password setupscript_url nova_repo nova_branch jeos_url
 
 Build a DevStack XVA
 
@@ -29,8 +29,6 @@ function parse_parameters() {
     shift || print_usage_and_die "No nova branch specified"
     JEOS_URL="$1"
     shift || print_usage_and_die "No jeos url specified"
-    WORKER_JEOS_PASSWORD="$1"
-    shift || print_usage_and_die "No jeos password specified"
     set -u
 }
 
@@ -38,7 +36,6 @@ parse_parameters $@
 
 
 WORKER=$(run_bash_script_on "root@$HOST" "$THISDIR/xslib/get-worker.sh")
-sshpass -p $WORKER_JEOS_PASSWORD ssh-copy-id $WORKER
 
 echo "Worker: $WORKER"
 
