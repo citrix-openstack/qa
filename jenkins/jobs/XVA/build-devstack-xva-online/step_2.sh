@@ -6,7 +6,7 @@ THISDIR="$(cd "$(dirname $0)" && pwd)"
 
 . "$(pwd)/${BUILD_NUMBER}.properties"
 
-jenkins/jobs/xva-build.sh "$HOST" "$XenServerPassword" "$SETUPSCRIPT_URL" "$NOVA_REPO" "$NOVA_BRANCH" "$JEOS_URL"
+jenkins/jobs/xva-build.sh "$HOST" "$XenServerPassword" "$SETUPSCRIPT_URL" "$NOVA_REPO" "$NOVA_BRANCH" "$JEOS_URL" "$JEOS_ROOT_PASSWORD"
 
 SLAVE_IP="$(cat jenkins/jobs/xslib/get-slave-ip.sh | jenkins/jobs/remote/bash.sh $HOST)"
 
