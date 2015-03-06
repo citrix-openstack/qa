@@ -13,7 +13,7 @@ function xecommand() {
 VMUUID=$(xecommand vm-list name-label=DevStackOSDomU params=uuid --minimal)
 
 # Add the host internal network
-HOSTINTERNALNETWORKUUID=$(xecommand network-list name-label=Host\ internal\ management\ network params=uuid --minimal)
+HOSTINTERNALNETWORKUUID=$(xecommand network-list bridge=xenapi params=uuid --minimal)
 [ -n "$HOSTINTERNALNETWORKUUID" ]
 HOSTINTERNALNETWORKVIFUUID=$(xecommand vif-create device=3 network-uuid=$HOSTINTERNALNETWORKUUID vm-uuid=$VMUUID)
 [ -n "$HOSTINTERNALNETWORKVIFUUID" ]
