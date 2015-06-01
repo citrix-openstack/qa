@@ -52,7 +52,7 @@ if ! [ -e "$JEOS_CACHE" ]; then
          --include=openssh-server,language-pack-en,linux-image-virtual,grub-pc,sshpass,wget \
          precise \
          /ubuntu_chroot \
-         http://mirror.cc.columbia.edu/pub/linux/ubuntu/archive/
+         http://us.archive.ubuntu.com/ubuntu/
     echo "Saving cache..."
     sudo tar -czf "$JEOS_CACHE" -C /ubuntu_chroot ./
 fi
