@@ -56,6 +56,7 @@ diff -u \
     <(generate_repos) \
     - \
     << EOF
+AUTOMATON_REPO openstack automaton.git github
 CEILOMETERCLIENT_REPO openstack python-ceilometerclient.git github
 CEILOMETERMIDDLEWARE_REPO openstack ceilometermiddleware.git github
 CEILOMETER_REPO openstack ceilometer.git github
@@ -65,6 +66,7 @@ CLIFF_REPO openstack cliff.git github
 DEBTCOLLECTOR_REPO openstack debtcollector.git github
 DEVSTACK_REPO openstack-dev devstack.git github
 DIB_UTILS_REPO openstack dib-utils.git github
+FUTURIST_REPO openstack futurist.git github
 GLANCECLIENT_REPO openstack python-glanceclient.git github
 GLANCE_REPO openstack glance.git github
 GLANCE_STORE_REPO openstack glance_store.git github
