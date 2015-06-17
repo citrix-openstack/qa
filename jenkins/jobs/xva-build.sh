@@ -37,6 +37,7 @@ function parse_parameters() {
 parse_parameters $@
 
 
+sshpass -p $XenServerPassword ssh-copy-id root@$HOST
 WORKER=$(run_bash_script_on "root@$HOST" "$THISDIR/xslib/get-worker.sh")
 sshpass -p $WORKER_JEOS_PASSWORD ssh-copy-id $WORKER
 
@@ -45,8 +46,17 @@ echo "Worker: $WORKER"
 echo "Building Devstack XVA" | log_info
 run_bash_script_on "$WORKER" \
     "$THISDIR/builds/build-devstack-xva-online-stage1.sh" "$HOST" "$XenServerPassword" "$SETUPSCRIPT_URL" -j "$JEOS_URL"
-run_bash_script_on "$WORKER" \
-    "$THISDIR/builds/build-devstack-xva-online-stage2.sh" "$HOST" "$XenServerPassword"
+
+# Copy ID to devstack domu
+DEVSTACK_IP=$(ssh -o Batchmode=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$HOST xe vm-list name-label=DevStackOSDomU params=networks | sed -ne 's,^.*0/ip: \([0-9.]*\).*$,\1,p')
+sshpass -p citrix ssh-copy-id stack@$DEVSTACK_IP
+sshpass -p citrix ssh-copy-id root@$DEVSTACK_IP
+
+# Finally let dom0 log into the worker (dom0 is already set up to be able to log in to itself)
+ssh root@$HOST cat /root/.ssh/authorized_keys | ssh $WORKER tee -a /root/.ssh/authorized_keys
+
+run_bash_script_on "root@$HOST" \
+    "$THISDIR/builds/build-devstack-xva-online-stage2.sh" "$WORKER"
 
 echo "Building Nova suppack" | log_info
 run_bash_script_on "$WORKER" \
