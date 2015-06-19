@@ -106,6 +106,7 @@ OSLOMSG_REPO openstack oslo.messaging.git github
 OSLOPOLICY_REPO openstack oslo.policy.git github
 OSLORWRAP_REPO openstack oslo.rootwrap.git github
 OSLOSERIALIZATION_REPO openstack oslo.serialization.git github
+OSLOSERVICE_REPO openstack oslo.service.git github
 OSLOUTILS_REPO openstack oslo.utils.git github
 OSLOVERSIONEDOBJECTS_REPO openstack oslo.versionedobjects.git github
 OSLOVMWARE_REPO openstack oslo.vmware.git github
