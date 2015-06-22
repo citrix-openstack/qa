@@ -461,9 +461,9 @@ VIRT_DRIVER=xenserver
 
 # Use a XenServer Image
 IMAGE_URLS="\
-https://github.com/downloads/citrix-openstack/warehouse/cirros-0.3.0-x86_64-disk.vhd.tgz"
+http://ca.downloads.xensource.com/OpenStack/cirros-0.3.3-x86_64-disk.vhd"
 
-DEFAULT_IMAGE_NAME="cirros-0.3.0-x86_64-disk"
+DEFAULT_IMAGE_NAME="cirros-0.3.3-x86_64-disk"
 
 # OpenStack VM settings
 OSDOMU_VDI_GB=40
@@ -541,9 +541,6 @@ ssh -q \
     -o UserKnownHostsFile=/dev/null \
     "stack@\$GUEST_IP" bash -s -- << END_OF_DEVSTACK_COMMANDS
 set -exu
-
-# Pin to 1.6.1 due to https://bugs.launchpad.net/openstack-ci/+bug/1274135
-sudo pip install tox==1.6.1
 
 cd /opt/stack/tempest
 if [ "$TEST_TYPE" == "exercise" ]; then
