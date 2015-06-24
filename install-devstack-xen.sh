@@ -463,7 +463,7 @@ VIRT_DRIVER=xenserver
 IMAGE_URLS="\
 http://ca.downloads.xensource.com/OpenStack/cirros-0.3.4-x86_64-disk.vhd.tgz"
 
-DEFAULT_IMAGE_NAME="cirros-0.3.3-x86_64-disk"
+DEFAULT_IMAGE_NAME="cirros-0.3.4-x86_64-disk"
 
 # OpenStack VM settings
 OSDOMU_VDI_GB=40
