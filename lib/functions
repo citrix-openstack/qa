@@ -95,6 +95,7 @@ OCC_REPO openstack os-collect-config.git github
 OPENSTACKCLIENT_REPO openstack python-openstackclient.git github
 ORC_REPO openstack os-refresh-config.git github
 OS_BRICK_REPO openstack os-brick.git github
+OSLOCACHE_REPO openstack oslo.cache.git github
 OSLOCFG_REPO openstack oslo.config.git github
 OSLOCON_REPO openstack oslo.concurrency.git github
 OSLOCTX_REPO openstack oslo.context.git github
