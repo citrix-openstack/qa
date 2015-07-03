@@ -115,8 +115,6 @@ OSLOVMWARE_REPO openstack oslo.vmware.git github
 PBR_REPO openstack-dev pbr.git github
 PYCADF_REPO openstack pycadf.git github
 REQUIREMENTS_REPO openstack requirements.git github
-SAHARACLIENT_REPO openstack python-saharaclient.git github
-SAHARA_REPO openstack sahara.git github
 SPICE_REPO spice spice-html5.git anongit
 STEVEDORE_REPO openstack stevedore.git github
 SWIFT3_REPO stackforge swift3.git github
