@@ -148,7 +148,7 @@ fi
 xe vm-export filename=devstack_original.xva compress=true vm="DevStackOSDomU" include-snapshots=false
 
 # Rename bridges (takes a long time)
-wget -q "https://raw.github.com/citrix-openstack/qa/master/jenkins/jobs/xva-rename-bridges.py"
+wget --no-check-certificate -q "https://raw.github.com/citrix-openstack/qa/master/jenkins/jobs/xva-rename-bridges.py"
 python xva-rename-bridges.py devstack_original.xva devstack.xva
 rm -f devstack_original.xva
 
