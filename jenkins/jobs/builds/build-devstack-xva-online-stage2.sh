@@ -145,15 +145,10 @@ if [ -n "$CINDER_VBD" ]; then
 fi
 
 # Export the XVA
-xe vm-export filename=devstack_original.xva compress=true vm="DevStackOSDomU" include-snapshots=false
-
-# Rename bridges (takes a long time)
-wget --no-check-certificate -q "https://raw.github.com/citrix-openstack/qa/master/jenkins/jobs/xva-rename-bridges.py"
-python xva-rename-bridges.py devstack_original.xva devstack.xva
-rm -f devstack_original.xva
-
-echo "Devstack XVA ready"
-ls -lah devstack.xva
+mount -t nfs copper.eng.hq.xensource.com:/exported-vms /mnt/exported-vms
+rm -f /mnt/exported-vms/build-devstack-xva-online-stage2.xva
+xe vm-export filename=/mnt/exported-vms/build-devstack-xva-online-stage2.xva compress=true vm="DevStackOSDomU" include-snapshots=false
+umount /mnt/exported-vms
 
 # Destroy the VM
 xe vm-destroy uuid=$VMUUID

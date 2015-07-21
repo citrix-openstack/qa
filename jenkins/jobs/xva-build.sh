@@ -57,6 +57,8 @@ ssh root@$HOST cat /root/.ssh/authorized_keys | ssh $WORKER tee -a /root/.ssh/au
 
 run_bash_script_on "root@$HOST" \
     "$THISDIR/builds/build-devstack-xva-online-stage2.sh" "$WORKER"
+run_bash_script_on "$WORKER" \
+    "$THISDIR/builds/build-devstack-xva-online-stage3.sh"
 
 echo "Building Nova suppack" | log_info
 run_bash_script_on "$WORKER" \
