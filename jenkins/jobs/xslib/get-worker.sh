@@ -115,6 +115,14 @@ done
 while true
 do
     SLAVE_IP=$(xe vm-param-get uuid=$VM param-name=networks | sed -ne 's,^.*0/ip: \([0-9.]*\).*$,\1,p')
-    [ -z "$SLAVE_IP" ] || { echo "root@$SLAVE_IP"; exit 0; }
-    sleep 1
+    # Wait for SSH to come up
+    if [ -n "$SLAVE_IP" ]; then
+	until echo | telnet $SLAVE_IP 22 2>/dev/null | grep -q Connected; do
+	    echo "Waiting for SSH to come up..."
+	    sleep 10
+	done
+	echo root@$SLAVE_IP
+	exit 0
+    fi
+    sleep 10
 done
