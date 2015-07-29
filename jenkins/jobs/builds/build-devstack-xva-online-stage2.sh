@@ -1,5 +1,4 @@
 #/bin/bash
-
 set -eux
 
 WORKER=$1
@@ -79,7 +78,8 @@ rm ~/xs-tools.deb || true
 EOF
 
 # Save domzero's public key to local filesystem
-scp -o 'StrictHostKeyChecking no' root@$VMIP:/home/domzero/.ssh/id_rsa.pub ~/domzero_public_key
+scp -o 'StrictHostKeyChecking no' root@$VMIP:/home/domzero/.ssh/id_rsa.pub /tmp/domzero_public_key
+scp -o 'StrictHostKeyChecking no' /tmp/domzero_public_key $WORKER:/root/domzero_public_key
 
 #Shutdown the VM
 xe vm-shutdown vm=$VMUUID
