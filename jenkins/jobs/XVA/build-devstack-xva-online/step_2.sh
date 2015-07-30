@@ -17,9 +17,10 @@ scp -B -3 -o 'StrictHostKeyChecking no' \
 ssh $INTERNAL_HTTP_USER_HOST chmod 755 $INTERNAL_NOVAPLUGINS_PATH
 
 INTERNAL_XVA_PATH="$(internal_xva_path $XVA_INTERNAL_NAME)"
-scp -B -3 -o 'StrictHostKeyChecking no' \
-    root@$SLAVE_IP:~/devstack.xva \
-    $INTERNAL_HTTP_USER_HOST:$INTERNAL_XVA_PATH
+#scp -B -3 -o 'StrictHostKeyChecking no' \
+#    root@$SLAVE_IP:~/devstack.xva \
+#    $INTERNAL_HTTP_USER_HOST:$INTERNAL_XVA_PATH
+ssh $INTERNAL_HTTP_USER_HOST cp /exported-vms/devstack.xva $INTERNAL_XVA_PATH
 ssh $INTERNAL_HTTP_USER_HOST chmod 755 $INTERNAL_XVA_PATH
 
 # Save internal build's details to a file so it could be verified
