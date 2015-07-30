@@ -63,7 +63,3 @@ run_bash_script_on "$WORKER" \
 echo "Building Nova suppack" | log_info
 run_bash_script_on "$WORKER" \
     "$THISDIR/builds/build-nova-suppack.sh" "$NOVA_REPO" "http://copper.eng.hq.xensource.com/builds/ddk-xs6_2.tgz" "$NOVA_BRANCH"
-
-echo "Qualifying Devstack XVA with Nova suppack" | log_info
-run_bash_script_on "$WORKER" \
-    "$THISDIR/builds/qualify-devstack-xva.sh" "$HOST" "$XenServerPassword" "~/devstack.xva" "citrix" "~/suppack/novaplugins.iso"

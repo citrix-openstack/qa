@@ -3,7 +3,7 @@ set -eux
 
 NETWORKING="0=xenbr0,${1:-}"
 
-SLAVENAME="${2:-slave}"
+SLAVENAME="${2:-trusty}"
 FRESHSLAVE="${SLAVENAME}-fresh"
 
 function resolve_to_network() {
@@ -70,12 +70,17 @@ then
     xe vm-uninstall vm="$SLAVENAME" force=true || true
     mkdir -p /mnt/exported-vms
 
-    mount -t nfs copper.eng.hq.xensource.com:/exported-vms /mnt/exported-vms
-    VM=$(xe vm-import filename=/mnt/exported-vms/slave.xva)
+    mount -t nfs copper.eng.hq.xensource.com:/usr/share/nginx/www /mnt/exported-vms
+    VM=$(xe vm-import filename=/mnt/exported-vms/jeos/${IMAGENAME}.xva)
     umount /mnt/exported-vms
 
     xe vm-param-set uuid="$VM" name-label="$SLAVENAME"
 
+    # If it's a template, create an instance
+    IS_TEMPLATE=$(xe vm-param-get uuid="$VM" param-name="is-a-template")
+    if [ "$IS_TEMPLATE" = "true" ]; then
+	xe vm-install template=${VM} new-name-label="$SLAVENAME" > /dev/null
+    fi
     xe vm-snapshot vm="$SLAVENAME" new-name-label="$FRESHSLAVE" > /dev/null
 fi
 

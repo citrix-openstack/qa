@@ -4,6 +4,7 @@ set -eux
 
 XENSERVER="$1"
 XENSERVER_PASSWORD="$2"
+SLAVENAME=${SLAVENAME:-trusty}
 
 DEVSTACK_NAME="DevStackOSDomU"
 
@@ -22,7 +23,7 @@ fi
 ROOT_VBD=\$(xe vbd-list vm-uuid=\$DEVSTACK userdevice=0 --minimal)
 ROOT_VDI=\$(xe vbd-param-get param-name=vdi-uuid uuid=\$ROOT_VBD)
 
-SLAVE=\$(xe vm-list name-label=slave --minimal)
+SLAVE=\$(xe vm-list name-label=$SLAVENAME --minimal)
 
 SLAVE_VBD=\$(xe vbd-create vm-uuid=\$SLAVE vdi-uuid=\$ROOT_VDI device=1)
 
