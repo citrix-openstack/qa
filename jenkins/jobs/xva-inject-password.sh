@@ -31,6 +31,7 @@ xe vbd-plug uuid=\$SLAVE_VBD
 EOF
 
 remote_bash $WORKER << EOF
+set -eux
 sudo fdisk -l /dev/xvdb
 sudo mkdir -p /mnt/devstackroot
 sudo mount /dev/xvdb1 /mnt/devstackroot
