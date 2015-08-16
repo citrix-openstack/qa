@@ -1,5 +1,5 @@
 source localrc
-
+set -x
 ALL_NODES="$CONTROLLER_NODES,$COMPUTE_NODES,$STORAGE_NODES"
 
 echo "Creating VMs"
@@ -10,7 +10,7 @@ do
 	HOST=${_HOST_NODE[0]}
 	NODE=${_HOST_NODE[1]}
 	
-	sshpass -p $XEN_PASSWORD ssh $XEN_ROOT@$HOST \
+	sshpass -p $XEN_PASSWORD ssh -o StrictHostKeyChecking=no $XEN_ROOT@$HOST \
 'set +x
 guest_name="'$NODE'"
 eth0="'$NODE_ETH0'"
@@ -52,10 +52,10 @@ done
 echo "Booting VMs"
 for HOST_NODE in ${ALL_NODES//,/ }
 do
-	IFS=/ read -a _HOST_NODE <<< $HOST_NODE
+	_HOST_NODE=(${HOST_NODE//// })
 	HOST=${_HOST_NODE[0]}
 	NODE=${_HOST_NODE[1]}
-	sshpass -p $XEN_PASSWORD ssh $XEN_ROOT@$HOST \
+	sshpass -p $XEN_PASSWORD ssh -o StrictHostKeyChecking=no $XEN_ROOT@$HOST \
 '
 guest_name="'$NODE'"
 vm_uuid=$(xe vm-list name-label="$guest_name" power-state="halted" --minimal)
@@ -68,7 +68,7 @@ if false; then
 	sleep 60
 
 	echo "Creating Cluster"
-	sshpass -p $FUELMASTER_PASSWORD ssh $FUELMASTER_ROOT@$FUELMASTER \
+	sshpass -p $FUELMASTER_PASSWORD ssh -o StrictHostKeyChecking=no $FUELMASTER_ROOT@$FUELMASTER \
 '
 guest_name="'$NODE'"
 

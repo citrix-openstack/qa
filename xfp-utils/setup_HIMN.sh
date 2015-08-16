@@ -7,7 +7,7 @@ do
 	_HOST_NODE=(${HOST_NODE//// })
 	HOST=${_HOST_NODE[0]}
 	NODE=${_HOST_NODE[1]}
-	sshpass -p $XEN_PASSWORD ssh $XEN_ROOT@$HOST \
+	sshpass -p $XEN_PASSWORD ssh -o StrictHostKeyChecking=no $XEN_ROOT@$HOST \
 'set +x
 vm_name="'$NODE'"
 vm_uuid=$(xe vm-list name-label="$vm_name" --minimal)
