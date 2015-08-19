@@ -22,7 +22,7 @@ function remote_bash() {
     shift
 
     # Test connection before running the script
-    ssh -q -o Batchmode=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$server" bash -s exit 0
+    ssh -q -o Batchmode=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$server" bash -s exit 0 < /dev/null
 
     ssh -q \
         -o Batchmode=yes \
