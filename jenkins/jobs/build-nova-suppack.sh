@@ -28,9 +28,12 @@ SERVERNAME="${1-$(print_usage_and_die)}"
 GITREPO="${2-$(print_usage_and_die)}"
 DDK_ROOT_URL="${3-$(print_usage_and_die)}"
 GITBRANCH="${4-$(print_usage_and_die)}"
+WORKER_JEOS_PASSWORD=${5:-citrix}
 
 echo "Spinning up virtual machine"
 WORKER=$(cat $XSLIB/get-worker.sh | remote_bash "root@$SERVERNAME")
+sshpass -p $WORKER_JEOS_PASSWORD ssh-copy-id $WORKER
+
 echo "Starting job on $WORKER"
 run_bash_script_on "$WORKER" \
     "$BUILDLIB/build-nova-suppack.sh" "$GITREPO" "$DDK_ROOT_URL" "$GITBRANCH"

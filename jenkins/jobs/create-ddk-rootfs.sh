@@ -24,8 +24,11 @@ exit 1
 
 SERVERNAME="${1-$(print_usage_and_die)}"
 XENSERVER_DDK_URL="${2-$(print_usage_and_die)}"
+WORKER_JEOS_PASSWORD=${3:-citrix}
 
 echo "Spinning up virtual machine"
 WORKER=$(cat $XSLIB/get-worker.sh | remote_bash "root@$SERVERNAME")
+sshpass -p $WORKER_JEOS_PASSWORD ssh-copy-id $WORKER
+
 echo "Starting job on $WORKER"
 run_bash_script_on $WORKER "$BUILDLIB/create-ddk-rootfs.sh" "$XENSERVER_DDK_URL" "ddk.tgz"

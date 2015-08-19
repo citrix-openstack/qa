@@ -5,6 +5,7 @@ set -eux
 XENSERVER="$1"
 XENSERVER_PASSWORD="$2"
 SLAVENAME=${SLAVENAME:-trusty}
+WORKER_JEOS_PASSWORD=${3:-citrix}
 
 DEVSTACK_NAME="DevStackOSDomU"
 
@@ -12,6 +13,7 @@ THISDIR=$(cd $(dirname $(readlink -f "$0")) && pwd)
 . "$THISDIR/functions.sh"
 
 WORKER=$(run_bash_script_on "root@$XENSERVER" "$THISDIR/xslib/get-worker.sh")
+sshpass -p $WORKER_JEOS_PASSWORD ssh-copy-id $WORKER
 
 remote_bash "root@$XENSERVER" << EOF
 set -eux
