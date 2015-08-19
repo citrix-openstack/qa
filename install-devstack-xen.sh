@@ -460,10 +460,9 @@ API_RATE_LIMIT=False
 VIRT_DRIVER=xenserver
 
 # Use a XenServer Image
-IMAGE_URLS="\
-http://ca.downloads.xensource.com/OpenStack/cirros-0.3.4-x86_64-disk.vhd.tgz"
-
-DEFAULT_IMAGE_NAME="cirros-0.3.4-x86_64-disk"
+#DOWNLOAD_DEFAULT_IMAGES=False
+#IMAGE_URLS="http://ca.downloads.xensource.com/OpenStack/cirros-0.3.4-x86_64-disk.vhd.tgz"
+#DEFAULT_IMAGE_NAME="cirros-0.3.4-x86_64-disk"
 
 # OpenStack VM settings
 OSDOMU_VDI_GB=40
