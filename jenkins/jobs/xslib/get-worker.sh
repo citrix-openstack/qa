@@ -82,7 +82,7 @@ then
     xe vm-uninstall vm="$SLAVENAME" force=true || true
     mkdir -p /mnt/exported-vms
 
-    mount -t nfs copper.eng.hq.xensource.com:/usr/share/nginx/www /mnt/exported-vms
+    [ -f /mnt/exported-vms/jeos/${IMAGENAME}.xva ] || mount -t nfs copper.eng.hq.xensource.com:/usr/share/nginx/www /mnt/exported-vms
     VM=$(xe vm-import filename=/mnt/exported-vms/jeos/${IMAGENAME}.xva)
     umount /mnt/exported-vms
 
