@@ -58,7 +58,7 @@ remote_bash "root@$XENSERVER" << EOF
 set -eux
 DEVSTACK=\$(xe vm-list name-label=$DEVSTACK_NAME --minimal)
 
-SLAVE=\$(xe vm-list name-label=slave --minimal)
+SLAVE=\$(xe vm-list name-label=$SLAVENAME --minimal)
 
 SLAVE_VBD=\$(xe vbd-list vm-uuid=\$SLAVE userdevice=1 --minimal)
 
