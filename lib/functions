@@ -77,6 +77,7 @@ HEAT_TEMPLATES_REPO openstack heat-templates.git github
 HORIZONAUTH_REPO openstack django_openstack_auth.git github
 HORIZON_REPO openstack horizon.git github
 IRONICCLIENT_REPO openstack python-ironicclient.git github
+IRONIC_LIB_REPO openstack ironic-lib.git github
 IRONIC_PYTHON_AGENT_REPO openstack ironic-python-agent.git github
 IRONIC_REPO openstack ironic.git github
 KEYSTONEAUTH_REPO openstack keystoneauth.git github
