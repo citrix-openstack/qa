@@ -438,10 +438,6 @@ GUEST_PASSWORD=citrix
 XENAPI_PASSWORD="$XENSERVER_PASS"
 SWIFT_HASH="66a3d6b56c1f479c8b4e70ab5c2000f5"
 
-# Use xvdb for backing cinder volumes
-XEN_XVDB_SIZE_GB=20
-VOLUME_BACKING_DEVICE=/dev/xvdb
-
 # Nice short names, so we could export an XVA
 VM_BRIDGE_OR_NET_NAME="osvmnet"
 PUB_BRIDGE_OR_NET_NAME="ospubnet"
