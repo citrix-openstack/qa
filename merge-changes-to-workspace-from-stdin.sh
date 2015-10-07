@@ -54,9 +54,9 @@ while read change; do
         echo "Failed to get all parameters"
         exit 1
     fi
-    if grep -q "$user $repo" "$tmpfile"; then
+    if grep -q "$user $repo.git" "$tmpfile"; then
         echo "[MERGE-START] $change"
-        repo_record=$(grep "$user $repo" "$tmpfile")
+        repo_record=$(grep "$user $repo.git" "$tmpfile")
         cd $(var_name "$repo_record")
             if git fetch $(source_repo "$repo_record") $changeref && git merge FETCH_HEAD; then
                 echo "[MERGE-OK]"
