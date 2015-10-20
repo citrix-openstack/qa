@@ -117,7 +117,7 @@ PYCADF_REPO openstack pycadf.git github
 REQUIREMENTS_REPO openstack requirements.git github
 SPICE_REPO spice spice-html5.git anongit
 STEVEDORE_REPO openstack stevedore.git github
-SWIFT3_REPO stackforge swift3.git github
+SWIFT3_REPO openstack swift3.git github
 SWIFTCLIENT_REPO openstack python-swiftclient.git github
 SWIFT_REPO openstack swift.git github
 TASKFLOW_REPO openstack taskflow.git github
