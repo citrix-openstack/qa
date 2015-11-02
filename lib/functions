@@ -105,6 +105,7 @@ OSLOLOG_REPO openstack oslo.log.git github
 OSLOMID_REPO openstack oslo.middleware.git github
 OSLOMSG_REPO openstack oslo.messaging.git github
 OSLOPOLICY_REPO openstack oslo.policy.git github
+OSLOPRIVSEP_REPO openstack oslo.privsep.git github
 OSLOREPORTS_REPO openstack oslo.reports.git github
 OSLORWRAP_REPO openstack oslo.rootwrap.git github
 OSLOSERIALIZATION_REPO openstack oslo.serialization.git github
