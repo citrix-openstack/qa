@@ -34,21 +34,28 @@ def main(args):
     client.load_system_host_keys()
     client.set_missing_host_key_policy(paramiko.WarningPolicy())
     client.connect(hostname, port=port, username=username, key_filename=keyfile)
-    stdin, stdout, stderr = client.exec_command(
-        "gerrit query --patch-sets --format=JSON status:open AND branch:%s AND %s %s" %
-            (args.branch, create_query_expression(owners), query_for_extra_changes(args.change)))
+    cmd = "gerrit query --patch-sets --format=JSON --current-patch-set status:open AND branch:%s AND %s %s" % \
+           (args.branch, create_query_expression(owners), query_for_extra_changes(args.change))
+    logger.debug(cmd)
+    stdin, stdout, stderr = client.exec_command(cmd)
 
 
     def to_change_record(change):
         logger.debug("Processing change: %s" % change)
-        if 'patchSets' not in change:
+        if 'currentPatchSet' not in change:
             return
-        patchsets = [(int(ps['number']), ps['ref']) for ps in change['patchSets']]
-        latest_patchset = sorted(patchsets, key=lambda x: x[0], reverse=True)[0]
+        latest_patchset = change['currentPatchSet']
+
+        if latest_patchset['isDraft']:
+            return
+        bad_approvals = [x for x in latest_patchset['approvals'] if x['type'] == 'Workflow' and (
+            x['value'] == '-1' or x['value'] == '-2')]
+        if len(bad_approvals) > 0:
+            return
 
         project = change['project']
 
-        changeref = latest_patchset[1]
+        changeref = latest_patchset['ref']
         change_url = change['url']
         return (change['createdOn'], project, changeref, change_url)
 
