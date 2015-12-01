@@ -43,6 +43,7 @@ THIS_DIR=$(cd $(dirname "$0") && pwd)
 TEMPLATE_NAME="$THIS_DIR/install-devstack-xen.sh"
 INTERNAL_REPO_BASE="gold.eng.hq.xensource.com/git/internal/builds"
 EXTERNAL_REPO_BASE="github.com/citrix-openstack-build"
+BUILD_REFS="https://github.com/citrix-openstack/build-refs"
 
 # Defaults for options
 SETUP_TYPE="nova-network"
@@ -114,10 +115,15 @@ fi
 
 # Set custom repos
 {
-    generate_repos | while read repo_record; do
-        echo "$(var_name "$repo_record")=$(dst_repo "$repo_record")"
-        echo "$(branch_name "$repo_record")=$BRANCH_REF_NAME"
-    done
+    repo_url=${BUILD_REFS}/raw/master/${BRANCH_REF_NAME}
+    if curl -L --fail $repo_url 2>/dev/null; then
+	# The contents will have already been output to stdout from the curl command above
+    else
+        static_repos | while read repo_record; do
+            echo "$(var_name "$repo_record")=$(dst_repo "$repo_record")"
+            echo "$(branch_name "$repo_record")=$BRANCH_REF_NAME"
+        done
+    fi
     cat << EOF
 NOVA_ZIPBALL_URL="http://$REPO_BASE/nova/archive/$BRANCH_REF_NAME.zip"
 NEUTRON_ZIPBALL_URL="http://$REPO_BASE/neutron/archive/$BRANCH_REF_NAME.zip"

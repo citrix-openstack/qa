@@ -21,8 +21,11 @@ function git_retry {
 }
 
 function repo_lines() {
-wget -qO - https://raw.github.com/openstack-dev/devstack/master/stackrc |
-    grep -e '=\${[A-Z0-9_]*_REPO:-'
+CACHE_FILE=/tmp/stackrc_cache
+if [ -z "$(find $CACHE_FILE -mmin -30 2>/dev/null)" ]; then
+wget -q -O $CACHE_FILE https://raw.github.com/openstack-dev/devstack/master/stackrc
+fi
+cat $CACHE_FILE | grep -e '=\${[A-Z0-9_]*_REPO:-'
 }
 
 function non_git_repos() {
@@ -51,11 +54,8 @@ function generate_repos() {
     } | sort | sed -e '/^BM_IMAGE_BUILD_REPO.*$/d'
 }
 
-function assert_no_new_repos() {
-diff -u \
-    <(generate_repos) \
-    - \
-    << EOF
+function static_repos() {
+cat <<EOF
 AUTOMATON_REPO openstack automaton.git github
 CEILOMETERMIDDLEWARE_REPO openstack ceilometermiddleware.git github
 CINDERCLIENT_REPO openstack python-cinderclient.git github
@@ -126,6 +126,12 @@ TEMPEST_LIB_REPO openstack tempest-lib.git github
 TEMPEST_REPO openstack tempest.git github
 TOOZ_REPO openstack tooz.git github
 EOF
+}
+
+function assert_no_new_repos() {
+diff -u \
+    <(generate_repos) \
+    <(static_repos)
 }
 
 function dst_repo() {
@@ -206,11 +212,24 @@ function repo_name() {
     echo "$reponame"
 }
 
+function repo_full_name() {
+    local repo
+
+    repo="$1"
+
+    local reponame
+
+    reponame=$(echo "$repo" | cut -d" " -f 3)
+    repouser=$(echo "$repo" | cut -d" " -f 2)
+
+    echo "$repouser/$reponame"
+}
+
 function init_non_existing_repos() {
     local repo
     local varname
 
-    generate_repos | while read repo; do
+    static_repos | while read repo; do
         varname=$(var_name "$repo")
         [ -d "$varname" ] || git init "$varname"
     done
@@ -220,7 +239,7 @@ function add_build_remote() {
     local repo
     local varname
 
-    generate_repos | while read repo; do
+    static_repos | while read repo; do
         varname=$(var_name "$repo")
         (
             cd "$varname"
@@ -235,7 +254,7 @@ function add_public_remote() {
     local repo
     local varname
 
-    generate_repos | while read repo; do
+    static_repos | while read repo; do
         varname=$(var_name "$repo")
         (
             cd "$varname"
@@ -253,7 +272,7 @@ function add_origin_remote() {
     local repo
     local varname
 
-    generate_repos | while read repo; do
+    static_repos | while read repo; do
         varname=$(var_name "$repo")
         (
             cd "$varname"
@@ -271,7 +290,7 @@ function with_all_repos() {
 
     args="$@"
 
-    generate_repos | while read repo; do
+    static_repos | while read repo; do
         varname=$(var_name "$repo")
         (
             cd "$varname"
@@ -280,12 +299,39 @@ function with_all_repos() {
     done
 }
 
+function with_some_repos() {
+    local args
+    local repo
+    local varname
+
+    local action_repos
+
+    action_repos="$1"
+    shift
+
+    args="$@"
+
+    static_repos | while read repo; do
+	full_name=$(repo_full_name "$repo")
+	echo "$action_repos" | while read repo_test; do
+            if [ "X${repo_test}.gitX" != "X${full_name}X" ]; then
+		continue
+	    fi
+            varname=$(var_name "$repo")
+            (
+                cd "$varname"
+                $@
+            )
+        done
+    done
+}
+
 function reset_repos() {
     local args
     local repo
     local varname
 
-    generate_repos | while read repo; do
+    static_repos | while read repo; do
         varname=$(var_name "$repo")
         (
             cd "$varname"
@@ -301,7 +347,7 @@ function create_local_build_branch() {
 
     branch="$1"
 
-    generate_repos | while read repo; do
+    static_repos | while read repo; do
         varname=$(var_name "$repo")
         [ -d "$varname" ] || git_retry clone $(source_repo "$repo") "$varname"
         (
@@ -327,7 +373,7 @@ function print_updated_repos() {
     local reponame
     local varname
 
-    generate_repos | while read repo; do
+    static_repos | while read repo; do
         varname=$(var_name "$repo")
         reponame=$(repo_name "$repo")
 
