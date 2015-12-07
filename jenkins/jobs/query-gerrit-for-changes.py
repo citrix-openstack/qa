@@ -53,6 +53,14 @@ def main(args):
         if len(bad_approvals) > 0:
             return
 
+        bad_approvals = [x for x in latest_patchset['approvals'] if x['type'] == 'Code-Review' and x['value'] == '-2']
+        if len(bad_approvals) > 0:
+            return
+
+        bad_approvals = [x for x in latest_patchset['approvals'] if x['type'] == 'Code-Review' and x['value'] == '-1' and x['by']['username'] in owners]
+        if len(bad_approvals) > 0:
+            return
+
         project = change['project']
 
         changeref = latest_patchset['ref']
