@@ -61,10 +61,6 @@ while read change; do
             if git fetch $(source_repo "$repo_record") $changeref && git merge FETCH_HEAD; then
                 echo "[MERGE-OK]"
             else
-                if [ -z "$CONFLICT_PATCHES_DIR" ]; then
-                    echo "There are no conflict-resolvers."
-                    exit 1
-                fi
                 echo "[MERGE-CONFLICT] Removing commit ids from conflicting files"
                 git diff --name-only --diff-filter=U | while read conflicting_filename; do
                     sed -ie 's/^\(>\+\) \([^ ]\+\) \(.*\)$/\1 \3/g' \
@@ -72,9 +68,15 @@ while read change; do
                 done
                 echo "[MERGE-CONFLICT] Printing diff to standard output"
                 git --no-pager diff
+		generic_resolution="$CONFLICT_PATCHES_DIR/generic_resolution.sh"
                 resolution_script="$CONFLICT_PATCHES_DIR/$change_number"
                 diff_script="$CONFLICT_PATCHES_DIR/$change_number.diff"
-                echo "[MERGE-CONFLICT] looking for resolution script as $resolution_script"
+		if [ -x $generic_resolution ]; then
+		    echo "[MERGE-CONFLICT] Running generic resolution script generic_resolution.sh"
+		    $generic_resolution
+                    echo "[MERGE-CONFLICT] script done"
+		fi
+                echo "[MERGE-CONFLICT] looking for additional resolution script as $resolution_script"
                 if [ -x  "$resolution_script" ]; then
                     echo "[MERGE-CONFLICT] Applying script $resolution_script"
                     $resolution_script
@@ -91,11 +93,12 @@ while read change; do
 
                         git commit --no-edit --allow-empty
                         echo "[MERGE-CONFLICT] applied diff $diff_script"
-                    else
-                        echo "[MERGE-FAIL] No resolution found"
-                        exit 1
                     fi
                 fi
+		if [ -z "`git status -s`" ]; then
+		    echo "[MERGE-CONFLICT] Conflict was not resolved by any resolution script"
+		    exit 1
+		fi
             fi
         cd ..
     else
