@@ -95,7 +95,7 @@ while read change; do
                         echo "[MERGE-CONFLICT] applied diff $diff_script"
                     fi
                 fi
-		if [ -z "`git status -s`" ]; then
+		if [ -n "`git status -s`" ]; then
 		    echo "[MERGE-CONFLICT] Conflict was not resolved by any resolution script"
 		    exit 1
 		fi
