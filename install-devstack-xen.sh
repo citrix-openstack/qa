@@ -4,7 +4,7 @@ set -eu
 function print_usage_and_die
 {
 cat >&2 << EOF
-usage: $0 XENSERVER XENSERVER_PASS PRIVKEY <optional arguments> 
+usage: $0 XENSERVER XENSERVER_PASS PRIVKEY <optional arguments>
 
 A simple script to use devstack to setup an OpenStack, and optionally
 run tests on it. This script should be executed on an operator machine, and
@@ -73,6 +73,7 @@ JEOS_URL=""
 JEOS_FILENAME=""
 SUPP_PACK_URL=""
 SCREEN_LOGDIR="/opt/stack/devstack_logs"
+NOVA_CONF="/etc/nova/nova.conf"
 
 # Get Positional arguments
 set +u
@@ -502,6 +503,27 @@ UBUNTU_INST_HTTP_HOSTNAME=us.archive.ubuntu.com
 UBUNTU_INST_HTTP_DIRECTORY=/ubuntu
 
 LOCALRC_CONTENT_ENDS_HERE
+
+cat << LOCALCONF_CONTENT_ENDS_HERE > local.conf
+# ``local.conf`` is a user-maintained settings file that is sourced from ``stackrc``.
+# This gives it the ability to override any variables set in ``stackrc``.
+# Also, most of the settings in ``stack.sh`` are written to only be set if no
+# value has already been set; this lets ``local.conf`` effectively override the
+# default values.
+
+# The ``localrc`` section replaces the old ``localrc`` configuration file.
+# Note that if ``localrc`` is present it will be used in favor of this section.
+# --------------------------------
+[[local|localrc]]
+
+# Nova user specific configuration
+# --------------------------------
+
+[[post-config|$NOVA_CONF]]
+[DEFAULT]
+disk_allocation_ratio = 2.0
+
+LOCALCONF_CONTENT_ENDS_HERE
 
 # XenServer doesn't have nproc by default - but it's used by stackrc.
 # Fake it up if one doesn't exist
