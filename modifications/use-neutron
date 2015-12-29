@@ -1,9 +1,9 @@
 # Quantum specific settings
 Q_PLUGIN=ml2
-ENABLED_SERVICES+=,tempest,neutron,q-svc,q-agt,q-dhcp,q-l3,q-meta,q-domua,-n-net
+ENABLED_SERVICES+=,neutron,q-svc,q-agt,q-dhcp,q-l3,q-meta,q-domua,q-metering,-n-net
 
-# Disable security groups
-Q_USE_SECGROUP=False
+# Enable security groups
+Q_USE_SECGROUP=True
 
 # With XenServer single box install, VLANs need to be enabled
 ENABLE_TENANT_VLANS="True"
@@ -21,3 +21,16 @@ Q_USE_DEBUG_COMMAND=True
 
 # Disable multi host
 MULTI_HOST=0
+
+Q_AGENT=openvswitch
+
+# set mechanism driver to only openvswitch, not including linuxbridge
+Q_ML2_PLUGIN_MECHANISM_DRIVERS=openvswitch
+
+# we don't support vxlan now, set type driver to only vlan
+Q_ML2_PLUGIN_TYPE_DRIVERS=vlan
+
+PUBLIC_INTERFACE=eth2
+OVS_PHYSICAL_BRIDGE=br-ex
+PUBLIC_BRIDGE=br-ex
+PUB_IP=172.24.4.1

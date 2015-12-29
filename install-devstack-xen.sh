@@ -537,6 +537,9 @@ END_OF_NPROC
   chmod +x /usr/local/bin/nproc
 fi
 
+# remove the blacklist of linux bridge in Dom0
+rm -f /etc/modprobe.d/blacklist-bridge
+
 cd tools/xen
 EXIT_AFTER_JEOS_INSTALLATION="$EXIT_AFTER_JEOS_INSTALLATION" ./install_os_domU.sh
 END_OF_XENSERVER_COMMANDS
