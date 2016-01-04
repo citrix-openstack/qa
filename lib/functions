@@ -77,7 +77,6 @@ HORIZON_REPO openstack horizon.git github
 IRONICCLIENT_REPO openstack python-ironicclient.git github
 IRONIC_LIB_REPO openstack ironic-lib.git github
 IRONIC_PYTHON_AGENT_REPO openstack ironic-python-agent.git github
-IRONIC_REPO openstack ironic.git github
 KEYSTONEAUTH_REPO openstack keystoneauth.git github
 KEYSTONECLIENT_REPO openstack python-keystoneclient.git github
 KEYSTONEMIDDLEWARE_REPO openstack keystonemiddleware.git github
