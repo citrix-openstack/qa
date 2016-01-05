@@ -20,9 +20,9 @@ exit 1
 
 
 TARGET_REF="${1-$(print_usage_and_die)}"
-SOME_REPOS="${2:-}"
+SOME_REPOS="${2:-ALL}"
 
-if [ -z "$SOME_REPOS" ]; then
+if [ "$SOME_REPOS" == "ALL" ]; then
     echo "[All repos] updating $TARGET_REF to point to HEAD"
     ./with-all-repos-in-workspace.sh git update-ref "$TARGET_REF" HEAD
     echo "[All repos] Pushing HEAD as a reference $TARGET_REF to build remote"

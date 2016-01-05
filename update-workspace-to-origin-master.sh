@@ -1,13 +1,13 @@
 #!/bin/bash
 set -eu
 
-SOME_REPOS="${1:-}"
+SOME_REPOS="${1:-ALL}"
 
 echo "Creating workspace..."
 ./create-workspace.sh
 echo "Resetting workspace..."
 ./reset-workspace.sh
-if [ -z "$SOME_REPOS" ]; then
+if [ "$SOME_REPOS" == "ALL" ]; then
     echo "[All repos] Fetch origin..."
     ./with-all-repos-in-workspace.sh git_retry fetch origin
     echo "[All repos] Check out origin/master as a new branch..."
