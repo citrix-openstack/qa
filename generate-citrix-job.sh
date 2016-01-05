@@ -119,7 +119,7 @@ fi
     repo_url=${BUILD_REFS}/raw/master/${BRANCH_REF_BASENAME}
     if curl -L --fail $repo_url 2>/dev/null; then
 	# The contents will have already been output to stdout from the curl command above
-        echo "curl -L failed with repo " $repo_url
+        :
     else
         static_repos | while read repo_record; do
             echo "$(var_name "$repo_record")=$(dst_repo "$repo_record")"
