@@ -43,7 +43,7 @@ THIS_DIR=$(cd $(dirname "$0") && pwd)
 TEMPLATE_NAME="$THIS_DIR/install-devstack-xen.sh"
 INTERNAL_REPO_BASE="gold.eng.hq.xensource.com/git/internal/builds"
 EXTERNAL_REPO_BASE="github.com/citrix-openstack-build"
-BUILD_REFS="https://github.com/citrix-openstack/build-refs"
+BUILD_REFS="https://github.com/citrix-openstack-build/build-refs"
 
 # Defaults for options
 SETUP_TYPE="nova-network"
@@ -53,11 +53,12 @@ REPO_BASE="$INTERNAL_REPO_BASE"
 UBUNTU_INST_HTTP_HOSTNAME=""
 UBUNTU_INST_HTTP_DIRECTORY=""
 
-# Get positiona arguments
+# Get positional arguments
 set +u
 BRANCH_REF_NAME="$1"
 shift || print_usage_and_die "ERROR: Please specify a branch name"
 set -u
+BRANCH_REF_BASENAME=$(basename $BRANCH_REF_NAME)
 
 # Number of options passed to this script
 REMAINING_OPTIONS="$#"
@@ -115,7 +116,7 @@ fi
 
 # Set custom repos
 {
-    repo_url=${BUILD_REFS}/raw/master/${BRANCH_REF_NAME}
+    repo_url=${BUILD_REFS}/raw/master/${BRANCH_REF_BASENAME}
     if curl -L --fail $repo_url 2>/dev/null; then
 	# The contents will have already been output to stdout from the curl command above
         echo "curl -L failed with repo " $repo_url
