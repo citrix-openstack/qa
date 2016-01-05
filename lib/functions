@@ -21,7 +21,7 @@ function git_retry {
 }
 
 function repo_lines() {
-CACHE_FILE=/tmp/stackrc_cache
+CACHE_FILE=/tmp/stackrc_cache$$
 if [ -z "$(find $CACHE_FILE -mmin -30 2>/dev/null)" ]; then
 wget -q -O $CACHE_FILE https://raw.github.com/openstack-dev/devstack/master/stackrc
 fi

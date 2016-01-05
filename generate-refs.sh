@@ -37,7 +37,7 @@ function get_custom_repo_lines
         if [ "X${repo_test}.gitX" != "X${full_name}X" ]; then
 	    continue
 	fi
-        echo "$(var_name "$repo_record")=$(dst_repo "$repo_record")"
+        echo "$(var_name "$repo_record")=$(public_repo "$repo_record")"
         echo "$(branch_name "$repo_record")=$BRANCH_REF_NAME"
     done
 }
