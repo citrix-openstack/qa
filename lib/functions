@@ -149,12 +149,17 @@ function public_repo() {
     local repo
 
     repo="$1"
+    push="${2:-True}"
 
     local reponame
 
     reponame=$(echo "$repo" | cut -d" " -f 3)
 
-    echo "git@github.com:citrix-openstack-build/$reponame"
+    if [ "$push" == "True" ]; then
+	echo "git@github.com:citrix-openstack-build/$reponame"
+    else
+	echo "https://github.com/citrix-openstack-build/$reponame"
+    fi
 }
 
 function source_repo() {
