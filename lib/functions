@@ -314,6 +314,7 @@ function with_some_repos() {
     shift
 
     args="$@"
+    some_actioned=0
 
     static_repos | while read repo; do
 	full_name=$(repo_full_name "$repo")
@@ -323,7 +324,9 @@ function with_some_repos() {
 	    fi
             varname=$(var_name "$repo")
             (
+		some_actioned=1
                 cd "$varname"
+                echo "$varname: Running $@"
                 $@
             )
         done
