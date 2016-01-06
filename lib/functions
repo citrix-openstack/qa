@@ -317,7 +317,7 @@ function with_some_repos() {
 
     static_repos | while read repo; do
 	full_name=$(repo_full_name "$repo")
-	echo "$action_repos" | while read repo_test; do
+	for repo_test in $action_repos; do
             if [ "X${repo_test}.gitX" != "X${full_name}X" ]; then
 		continue
 	    fi
