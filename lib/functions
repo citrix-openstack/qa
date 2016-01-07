@@ -314,21 +314,24 @@ function with_some_repos() {
     shift
 
     args="$@"
-    some_actioned=0
 
     static_repos | while read repo; do
 	full_name=$(repo_full_name "$repo")
+        repo_actioned=0
 	for repo_test in $action_repos; do
             if [ "X${repo_test}.gitX" != "X${full_name}X" ]; then
 		continue
 	    fi
+            if [ $repo_actioned -eq 1 ]; then
+		continue
+	    fi
             varname=$(var_name "$repo")
             (
-		some_actioned=1
                 cd "$varname"
                 echo "$varname: Running $@"
                 $@
             )
+            repo_actioned=1
         done
     done
 }
