@@ -48,18 +48,20 @@ def main(args):
 
         if latest_patchset['isDraft']:
             return
-        bad_approvals = [x for x in latest_patchset['approvals'] if x['type'] == 'Workflow' and (
-            x['value'] == '-1' or x['value'] == '-2')]
-        if len(bad_approvals) > 0:
-            return
 
-        bad_approvals = [x for x in latest_patchset['approvals'] if x['type'] == 'Code-Review' and x['value'] == '-2']
-        if len(bad_approvals) > 0:
-            return
+        if 'approvals' in latest_patchset:
+            bad_approvals = [x for x in latest_patchset['approvals'] if x['type'] == 'Workflow' and (
+                x['value'] == '-1' or x['value'] == '-2')]
+            if len(bad_approvals) > 0:
+                return
 
-        bad_approvals = [x for x in latest_patchset['approvals'] if x['type'] == 'Code-Review' and x['value'] == '-1' and x['by']['username'] in owners]
-        if len(bad_approvals) > 0:
-            return
+            bad_approvals = [x for x in latest_patchset['approvals'] if x['type'] == 'Code-Review' and x['value'] == '-2']
+            if len(bad_approvals) > 0:
+                return
+
+            bad_approvals = [x for x in latest_patchset['approvals'] if x['type'] == 'Code-Review' and x['value'] == '-1' and x['by']['username'] in owners]
+            if len(bad_approvals) > 0:
+                return
 
         project = change['project']
 
