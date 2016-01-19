@@ -45,6 +45,10 @@ while read change; do
         echo "Skipping empty line"
         continue
     fi
+    if [[ "$change" = \#* ]]; then
+	echo "Skipping comment $change"
+	continue
+    fi
     user=$(echo "$change" | cut -d"/" -f 1)
     repo=$(echo "$change" | cut -d" " -f 1 | cut -d"/" -f 2)
     change_number=$(echo "$change" | cut -d" " -f 2 | cut -d"/" -f 4)
