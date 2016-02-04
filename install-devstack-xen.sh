@@ -490,6 +490,9 @@ SKIP_EXERCISES="boot_from_volume,bundle,euca"
 
 ENABLED_SERVICES=g-api,g-reg,key,n-api,n-crt,n-cpu,n-sch,horizon,mysql,rabbit,sysstat,tempest,s-proxy,s-account,s-container,s-object,cinder,c-api,c-vol,c-sch,n-cond,heat,h-api,h-api-cfn,h-api-cw,h-eng,n-net,n-novnc,n-cauth
 
+# Set instance build timeout to 300s in tempest.conf
+BUILD_TIMEOUT=300
+
 # XEN_FIREWALL_DRIVER=nova.virt.xenapi.firewall.Dom0IptablesFirewallDriver
 XEN_FIREWALL_DRIVER=nova.virt.firewall.NoopFirewallDriver
 
