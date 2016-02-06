@@ -1,0 +1,19 @@
+networking_parameters:
+  fixed_networks_vlan_start: null
+  floating_ranges:
+  - - 172.16.0.21
+    - 172.16.0.30
+  net_manager: FlatDHCPManager
+networks:
+- cidr: 172.16.0.0/24
+  gateway: 172.16.0.1
+  ip_ranges:
+  - - 172.16.0.11
+    - 172.16.0.20
+  name: public
+- cidr: 192.168.10.0/24
+  name: management
+  vlan_start: 19
+- cidr: 192.168.11.0/24
+  name: storage
+  vlan_start: 20
