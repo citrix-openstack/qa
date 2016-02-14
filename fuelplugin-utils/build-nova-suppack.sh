@@ -1,6 +1,6 @@
 set -eux
 
-cd ..
+cd ../..
 
 PWD=`pwd`
 
@@ -8,7 +8,7 @@ mkdir -p nova-suppack && cd nova-suppack
 
 GITREPO=${1:-"https://git.openstack.org/openstack/nova"}
 DDK_ROOT_URL=${2:-"http://copper.eng.hq.xensource.com/builds/ddk-xs6_2.tgz"}
-GITBRANCH=${3:-"2014.1.1"}
+GITBRANCH=${3:-"stable/kilo"}
 
 
 # Update system and install dependencies
@@ -46,9 +46,9 @@ cp -r xenserver-nova-suppack-builder/plugins/* nova/plugins/
 cd nova/plugins/xenserver/xenapi/contrib
 #./inject-key.sh ~/domzero_public_key
 ./build-rpm.sh
-cd 
+cd ~/workspace
 
-RPMFILE=$(find -name "*.noarch.rpm" -print)
+RPMFILE=$(find -name "openstack-xen-plugins*.noarch.rpm" -print -quit)
 
 # Create Supplemental pack
 rm -rf suppack
@@ -93,5 +93,3 @@ sudo chroot $DDKROOT python buildscript.py \
 sudo umount $DDKROOT/mnt/host
 sudo rm -rf "$DDKROOT"
 
-cp $PWD/nova-suppack/suppack/novaplugins.iso \
-    $PWD/xenserver-fuel-plugin/xenserver-fuel-plugin/deployment_scripts/

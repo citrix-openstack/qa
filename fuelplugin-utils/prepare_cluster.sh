@@ -39,6 +39,6 @@ eth1_uuid=$(xe vif-create network-uuid=$(xe network-list name-label="'"$NODE_ETH
 eth0_mac=$(xe vif-param-get uuid=$eth0_uuid param-name=MAC)
 xe vm-param-set uuid=$vm_uuid HVM-boot-params:order=ndc
 #xe vm-start uuid=$vm_uuid
-echo "'$HOST'	'$NODE'	($eth0_mac) created"
+echo "${eth0_mac:12:5}	'$NODE'"
 '
 done
