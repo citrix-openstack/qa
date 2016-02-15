@@ -6,6 +6,49 @@ import itertools
 
 
 def configure_interfaces(ifaces, actions):
+    """
+    In node_X/interfaces.yaml, property assigned_networks of interfaces is
+    used to decide the network cabling and originally might like this:
+
+    - assigned_networks:
+      - {id: 1, name: fuelweb_admin}
+      - {id: 3, name: management}
+      - {id: 4, name: storage}
+      - {id: 5, name: fixed}
+      ...
+    - assigned_networks:
+      - {id: 2, name: public}
+      ...
+    - assigned_networks:
+      ...
+
+    As you see, id is not fixed. So to reassign the networks, we setup a map
+    using node_interfaces.yaml like below to manipulate node_X/interfaces.yaml
+
+    eth0:
+    - fuelweb_admin
+    eth1:
+    - public
+    - management
+    - storage
+    eth2:
+    - fixed
+
+    Finally we are supposed to make node_X/interfaces.yaml like:
+
+    - assigned_networks:
+      - {id: 1, name: fuelweb_admin}
+      ...
+    - assigned_networks:
+      - {id: 2, name: public}
+      - {id: 3, name: management}
+      - {id: 4, name: storage}
+      ...
+    - assigned_networks:
+      - {id: 5, name: fixed}
+      ...
+
+    """
     all_networks = [iface["assigned_networks"] for iface in ifaces]
     all_networks = list(itertools.chain(*all_networks))
     for iface_name in actions:

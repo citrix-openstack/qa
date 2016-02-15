@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -x
+set -eux
 
 function wait_for_fm {
 	# Wait for fuel master booting and return its IP address
@@ -13,7 +13,11 @@ function wait_for_fm {
 	local counter=0
 	while [ $counter -lt $retry_count ]; do
 		fm_ip=$(ssh -qo StrictHostKeyChecking=no root@$xs_host \
-	'eth1_ip=$(xe vm-list name-label="'$fm_name'" params=networks --minimal | egrep -Eo "1/ip: ([0-9]+\.){3}[0-9]+");echo ${eth1_ip: 5}')
+	'
+	fm_networks=$(xe vm-list name-label="'$fm_name'" params=networks --minimal)
+	fm_ip=$(echo $fm_networks | egrep -Eo "1/ip: ([0-9]+\.){3}[0-9]+");
+	echo ${fm_ip: 5}
+	')
 		if [ -n "$fm_ip" ]; then
 			echo $fm_ip
 			return
@@ -29,10 +33,8 @@ function start_node {
 	local vm="$2"
 	ssh -qo StrictHostKeyChecking=no root@$xs_host \
 	'
-	set -x
-
-	vm="'$vm'"
-	xe vm-start vm=$vm
+	set -eux
+	xe vm-start vm="'$vm'"
 	'
 }
 
@@ -43,11 +45,13 @@ function build_plugin {
 	local refspec="$2"
 	ssh -qo StrictHostKeyChecking=no root@$fm_ip \
 	'
-set -x
+set -eux
 pip install virtualenv
 cd /root/
 virtualenv fuel-devops-venv
+set +u
 . fuel-devops-venv/bin/activate
+set -u
 pip install fuel-plugin-builder
 yum install git createrepo dpkg-devel dpkg-dev rpm rpm-build -y
 git clone https://review.openstack.org/openstack/fuel-plugin-xenserver
@@ -89,7 +93,7 @@ function install_plugin {
 
 	ssh -qo StrictHostKeyChecking=no root@$fm_ip \
 	'
-	set -x
+	set -eux
 	export FUELCLIENT_CUSTOM_SETTINGS="/etc/fuel/client/config.yaml"
 	fuel plugins --install /root/fuel-plugin-xenserver/fuel-plugin-xenserver-2.0-2.0.0-1.noarch.rpm &> /dev/null
 	'
@@ -110,7 +114,7 @@ function create_env {
 	scp "yaml_overwrite.py" root@$fm_ip:/tmp/
 	ssh -qo StrictHostKeyChecking=no root@$fm_ip \
 	'
-	set -x
+	set -eux
 	export FUELCLIENT_CUSTOM_SETTINGS="/etc/fuel/client/config.yaml"
 
 	rel_id=$(fuel rel | grep "'$rel_name'" | egrep ^[0-9]+ -o)
@@ -135,12 +139,12 @@ function get_node_mac {
 	local vm="$2"
 	local eth0_mac=$(ssh -qo StrictHostKeyChecking=no root@$xs_host \
 	'
-	set -x
+	set -eux
 
 	vm="'$vm'"
 	vm_uuid=$(xe vm-list name-label="$vm" --minimal)
-	vif0=$(xe vif-list network-uuid=$(xe network-list name-label=pxe --minimal) vm-uuid=$vm_uuid --minimal)
-	eth0_mac=$(xe vif-param-get uuid=$vif0 param-name=MAC)
+	network_uuid=$(xe network-list name-label=pxe --minimal)
+	eth0_mac=$(xe vif-list network-uuid=$network_uuid vm-uuid=$vm_uuid params=MAC --minimal)
 	echo "${eth0_mac:12:5}"
 	')
 	echo $eth0_mac
@@ -158,6 +162,8 @@ function wait_for_node {
 	while [ $counter -lt $retry_count ]; do
 		discovered=$(ssh -qo StrictHostKeyChecking=no root@$fm_ip \
 		'
+		set -eux
+
 		export FUELCLIENT_CUSTOM_SETTINGS="/etc/fuel/client/config.yaml"
 		fuel node | grep "'$node_mac'" -q
 		echo $?
@@ -185,6 +191,8 @@ function add_env_node {
 	scp $interface_yaml root@$fm_ip:/tmp/
 	ssh -qo stricthostkeychecking=no root@$fm_ip \
 	'
+	set -eux
+
 	export fuelclient_custom_settings="/etc/fuel/client/config.yaml"
 	env_id=$(fuel env | grep "'$env_name'" | egrep -o "^[0-9]+")
 	node_id=$(fuel node --node-id "'$node_mac'" | grep "'$node_mac'" | egrep -o "^[0-9]+")
@@ -207,6 +215,8 @@ function verify_network {
 
 	ssh -qo stricthostkeychecking=no root@$fm_ip \
 	'
+	set -eux
+
 	export fuelclient_custom_settings="/etc/fuel/client/config.yaml"
 	env_id=$(fuel env | grep "'$env_name'" | egrep -o "^[0-9]+")
 	fuel network --verify --env $env_id &> /dev/null
@@ -242,6 +252,8 @@ function deploy_env {
 
 	ssh -qo stricthostkeychecking=no root@$fm_ip \
 	'
+	set -eux
+
 	export fuelclient_custom_settings="/etc/fuel/client/config.yaml"
 	env_id=$(fuel env | grep "'$env_name'" | egrep -o "^[0-9]+")
 	fuel deploy-changes --env $env_id

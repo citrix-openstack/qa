@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -x
+set +eux
 
 function health_check {
 	# Run a health check excluding HA tests and default credential tests
@@ -9,6 +9,7 @@ function health_check {
 
 	ssh -qo stricthostkeychecking=no root@$fm_ip \
 	'
+	set -eux
 	export fuelclient_custom_settings="/etc/fuel/client/config.yaml"
 	env_id=$(fuel env | grep "'$env_name'" | egrep -o "^[0-9]+")
 	fuel --env $env_id health --check smoke,sanity,tests_platform,cloudvalidation

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -x
+set +eux
 
 function restore_fm {
 	#Restore snapshot that has test machine's ssh public key
@@ -9,7 +9,7 @@ function restore_fm {
 	local fm_snapshot="$3"
 	ssh -qo StrictHostKeyChecking=no root@$xs_host \
 	'
-	set -x
+	set -eux
 	#echo "FM_NAME : '$fm_name'"
 	#echo "FM_SNAPSHOT : '$fm_snapshot'"
 	vm_uuid=$(xe vm-list name-label="'$fm_name'" --minimal)
@@ -27,20 +27,16 @@ function create_node {
 	local vm="$2"
 	local mem="$3"
 	local disk="$4"
-	local eths=()
-	for ((i=5;i<=$#;i++)); do
-		eths+=("\"${!i}\"")
-	done
+
 	ssh -qo StrictHostKeyChecking=no root@$xs_host \
 	'
-	set -x
+	set -eux
 
 	vm="'$vm'"
 	mem="'$mem'"
 	disk="'$disk'"
 
 	template="Other install media"
-	device=0
 
 	vm_uuid=$(xe vm-install template="$template" new-name-label="$vm")
 
@@ -49,7 +45,7 @@ function create_node {
 		name-label=xvdb \
 		virtual-size="${disk}GiB" \
 		sr-uuid=$localsr type=user)
-	vbd_uuid=$(xe vbd-create vm-uuid=$vm_uuid vdi-uuid=$extra_vdi device=$device)
+	vbd_uuid=$(xe vbd-create vm-uuid=$vm_uuid vdi-uuid=$extra_vdi device=0)
 	xe vm-cd-add vm=$vm_uuid device=1 cd-name="xs-tools.iso"
 
 	xe vm-memory-limits-set \
@@ -59,13 +55,26 @@ function create_node {
 		dynamic-max=${mem}MiB \
 		uuid=$vm_uuid
 
-	for eth in '${eths[@]}'; do
-		device=$(($device + 1))
-		eth=${eth//Network /Pool-wide network associated with eth}
-		vif=$(xe vif-create network-uuid=$(xe network-list name-label="$eth" --minimal) vm-uuid=$vm_uuid device=$device)
-	done
-
 	xe vm-param-set uuid=$vm_uuid HVM-boot-params:order=ndc
+	'
+}
+
+function add_network {
+	local xs_host="$1"
+	local vm="$2"
+	local network="$3"
+	local device="$4"
+	ssh -qo StrictHostKeyChecking=no root@$xs_host \
+	'
+	set -eux
+	vm="'$vm'"
+	network="'$network'"
+	device="'$device'"
+
+	vm_uuid=$(xe vm-list name-label="'$vm'" --minimal)
+	network=${network//Network /Pool-wide network associated with eth}
+	network_uuid=$(xe network-list name-label="$network" --minimal)
+	xe vif-create network-uuid=$network_uuid vm-uuid=$vm_uuid device=$device
 	'
 }
 
@@ -75,7 +84,7 @@ function add_himn {
 	local vm="$2"
 	ssh -qo StrictHostKeyChecking=no root@$xs_host \
 	'
-	set -x
+	set -eux
 	vm="'$vm'"
 	network=$(xe network-list bridge=xenapi minimal=true)
 	vm_uuid=$(xe vm-list name-label="'$vm'" --minimal)
@@ -96,9 +105,16 @@ function add_himn {
 echo "Restoring Fuel Master.."
 restore_fm "$XS_HOST" "$FM_NAME" "$FM_SNAPSHOT"
 
-create_node "$XS_HOST" "Compute" 3072 60 pxe "Network 1" "br100"
+create_node "$XS_HOST" "Compute" 3072 60
+add_network "$XS_HOST" "Compute" pxe 1
+add_network "$XS_HOST" "Compute" "Network 1" 2
+add_network "$XS_HOST" "Compute" br100 3
 echo "Compute Node is created"
 add_himn "$XS_HOST" "Compute"
+
 echo "HIMN is added to Compute Node"
-create_node "$XS_HOST" "Controller" 3072 60 pxe "Network 1" "br100"
+create_node "$XS_HOST" "Controller" 3072 60
+add_network "$XS_HOST" "Controller" pxe 1
+add_network "$XS_HOST" "Controller" "Network 1" 2
+add_network "$XS_HOST" "Controller" br100 3
 echo "Controller Node is created"
