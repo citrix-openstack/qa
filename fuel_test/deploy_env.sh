@@ -42,16 +42,15 @@ function build_plugin {
 	# Build plugin with given refspec
 	# refspec can be empty
 	local fm_ip="$1"
-	local refspec="$2"
+	local refspec="${2:-''}"
 	ssh -qo StrictHostKeyChecking=no root@$fm_ip \
 	'
-set -eux
+set -ex
 pip install virtualenv
 cd /root/
 virtualenv fuel-devops-venv
-set +u
+
 . fuel-devops-venv/bin/activate
-set -u
 pip install fuel-plugin-builder
 yum install git createrepo dpkg-devel dpkg-dev rpm rpm-build -y
 git clone https://review.openstack.org/openstack/fuel-plugin-xenserver
