@@ -1,6 +1,10 @@
 #!/bin/bash
 
-set -eux
+set +eux
+
+. localrc
+
+[ $DEBUG == "on" ] && set -x
 
 function wait_for_fm {
 	# Wait for fuel master booting and return its IP address
@@ -12,12 +16,9 @@ function wait_for_fm {
 	local fm_ip
 	local counter=0
 	while [ $counter -lt $retry_count ]; do
-		fm_ip=$(ssh -qo StrictHostKeyChecking=no root@$xs_host \
-	'
-	fm_networks=$(xe vm-list name-label="'$fm_name'" params=networks --minimal)
-	fm_ip=$(echo $fm_networks | egrep -Eo "1/ip: ([0-9]+\.){3}[0-9]+");
-	echo ${fm_ip: 5}
-	')
+		fm_networks=$(ssh -qo StrictHostKeyChecking=no root@$xs_host \
+		'xe vm-list name-label="'$fm_name'" params=networks --minimal')
+		fm_ip=$(echo $fm_networks | egrep -Eo "1/ip: ([0-9]+\.){3}[0-9]+")
 		if [ -n "$fm_ip" ]; then
 			echo $fm_ip
 			return
@@ -32,10 +33,7 @@ function start_node {
 	local xs_host="$1"
 	local vm="$2"
 	ssh -qo StrictHostKeyChecking=no root@$xs_host \
-	'
-	set -eux
-	xe vm-start vm="'$vm'"
-	'
+	'xe vm-start vm="'$vm'"'
 }
 
 function build_plugin {
@@ -63,7 +61,7 @@ fpb --build .
 }
 
 function wait_for_nailgun {
-	# Wait for nailgun service started before plugin can be installed
+	# Wait for nailgun service started until the fuel plugin can be installed
 	local fm_ip="$1"
 	local retry_count=$2
 	local retry_interval=$3

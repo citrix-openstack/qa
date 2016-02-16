@@ -2,6 +2,10 @@
 
 set +eux
 
+. localrc
+
+[ $DEBUG == "on" ] && set -x
+
 function restore_fm {
 	#Restore snapshot that has test machine's ssh public key
 	local xs_host="$1"
@@ -10,12 +14,8 @@ function restore_fm {
 	ssh -qo StrictHostKeyChecking=no root@$xs_host \
 	'
 	set -eux
-	#echo "FM_NAME : '$fm_name'"
-	#echo "FM_SNAPSHOT : '$fm_snapshot'"
 	vm_uuid=$(xe vm-list name-label="'$fm_name'" --minimal)
-	#echo "VM_UUID : $vm_uuid"
 	snapshot_uuid=$(xe snapshot-list name-label="'$fm_snapshot'" snapshot-of="$vm_uuid" --minimal)
-	#echo "SNAPSHOT_UUID: $snapshot_uuid"
 	xe snapshot-revert snapshot-uuid="$snapshot_uuid"
 	xe vm-start vm="'$fm_name'"
 	'
@@ -59,7 +59,7 @@ function create_node {
 	'
 }
 
-function add_network {
+function add_vif {
 	local xs_host="$1"
 	local vm="$2"
 	local network="$3"
@@ -106,15 +106,15 @@ echo "Restoring Fuel Master.."
 restore_fm "$XS_HOST" "$FM_NAME" "$FM_SNAPSHOT"
 
 create_node "$XS_HOST" "Compute" 3072 60
-add_network "$XS_HOST" "Compute" pxe 1
-add_network "$XS_HOST" "Compute" "Network 1" 2
-add_network "$XS_HOST" "Compute" br100 3
+add_vif "$XS_HOST" "Compute" pxe 1
+add_vif "$XS_HOST" "Compute" "Network 1" 2
+add_vif "$XS_HOST" "Compute" br100 3
 echo "Compute Node is created"
 add_himn "$XS_HOST" "Compute"
 
 echo "HIMN is added to Compute Node"
 create_node "$XS_HOST" "Controller" 3072 60
-add_network "$XS_HOST" "Controller" pxe 1
-add_network "$XS_HOST" "Controller" "Network 1" 2
-add_network "$XS_HOST" "Controller" br100 3
+add_vif "$XS_HOST" "Controller" pxe 1
+add_vif "$XS_HOST" "Controller" "Network 1" 2
+add_vif "$XS_HOST" "Controller" br100 3
 echo "Controller Node is created"
