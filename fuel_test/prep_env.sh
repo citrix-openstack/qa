@@ -94,10 +94,8 @@ function add_himn {
 		vif=$(xe vif-create network-uuid=$network vm-uuid=$vm_uuid device=9 minimal=true)
 	fi
 
-	xe vm-start vm=$vm
 	mac=$(xe vif-list uuid=$vif params=MAC --minimal)
-	dom_id=$(xe vm-list params=dom-id uuid=$vm_uuid --minimal)
-	xenstore-write /local/domain/$dom_id/vm-data/himn_mac $mac
+	xe vm-param-set xenstore-data:vm-data/himn_mac=$mac uuid=$vm_uuid
 	'
 }
 
