@@ -1,39 +1,21 @@
 #!/bin/bash
 
-set +eux
+set -eu
 
 . localrc
 
 [ $DEBUG == "on" ] && set -x
 
-function wait_for_fm {
+function get_fm_ip {
 	# Wait for fuel master booting and return its IP address
 	local xs_host="$1"
 	local fm_name="$2"
-	local retry_count=$3
-	local retry_interval=$4
 
-	local fm_ip
-	local counter=0
-	while [ $counter -lt $retry_count ]; do
-		fm_networks=$(ssh -qo StrictHostKeyChecking=no root@$xs_host \
-		'xe vm-list name-label="'$fm_name'" params=networks --minimal')
-		fm_ip=$(echo $fm_networks | egrep -Eo "1/ip: ([0-9]+\.){3}[0-9]+")
-		if [ -n "$fm_ip" ]; then
-			echo $fm_ip
-			return
-		fi
-		let counter=counter+1
-		sleep $retry_interval
-	done
-}
+	fm_networks=$(ssh -qo StrictHostKeyChecking=no root@$xs_host \
+	'xe vm-list name-label="'$fm_name'" params=networks --minimal')
+	fm_ip=$(echo $fm_networks | egrep -Eo "1/ip: ([0-9]+\.){3}[0-9]+")
 
-function start_node {
-	# Boot up given node
-	local xs_host="$1"
-	local vm="$2"
-	ssh -qo StrictHostKeyChecking=no root@$xs_host \
-	'xe vm-start vm="'$vm'"'
+	echo ${fm_ip: 5}
 }
 
 function build_plugin {
@@ -47,7 +29,7 @@ set -ex
 pip install virtualenv
 cd /root/
 virtualenv fuel-devops-venv
-
+set -u
 . fuel-devops-venv/bin/activate
 pip install fuel-plugin-builder
 yum install git createrepo dpkg-devel dpkg-dev rpm rpm-build -y
@@ -58,31 +40,6 @@ git checkout FETCH_HEAD
 fpb --check .
 fpb --build .
 	'
-}
-
-function wait_for_nailgun {
-	# Wait for nailgun service started until the fuel plugin can be installed
-	local fm_ip="$1"
-	local retry_count=$2
-	local retry_interval=$3
-
-	local counter=0
-	local ready
-	while [ $counter -lt $retry_count ]; do
-		ready=$(ssh -qo StrictHostKeyChecking=no root@$fm_ip \
-		'
-		export FUELCLIENT_CUSTOM_SETTINGS="/etc/fuel/client/config.yaml"
-		fuel plugins &> /dev/null
-		echo $?
-		')
-		if [ $ready -eq 0 ]; then
-			echo 1
-			return
-		fi
-		let counter=counter+1
-		sleep $retry_interval
-	done
-	echo 0
 }
 
 function install_plugin {
@@ -257,40 +214,31 @@ function deploy_env {
 	'
 }
 
-FM_IP=$(wait_for_fm "$XS_HOST" "$FM_NAME" 10 60)
-[ -z $FM_IP ] && echo "Fuel Master IP obtaining timeout" && exit -1
+FM_IP=$(get_fm_ip "$XS_HOST" "$FM_NAME")
 
 build_plugin $FM_IP $FUEL_PLUGIN_REFSPEC
 echo "Fuel plugin with $FUEL_PLUGIN_REFSPEC is built"
-
-NAILGUN_READY=$(wait_for_nailgun "$FM_IP" 10 60)
-[ $NAILGUN_READY -eq 0 ] && echo "Nailgun test connection timeout" && exit -1
 
 install_plugin "$FM_IP"
 echo "Fuel plugin is installed"
 
 create_env "$FM_IP" "$ENV_NAME" "$REL_NAME" "$ATTRIBUTES_YAML" "$NETWORK_YAML"
 
-start_node "$XS_HOST" "Compute"
-echo "Compute Node is started"
-start_node "$XS_HOST" "Controller"
-echo "Controller Node is started"
-
 COMPUTE_MAC=$(get_node_mac "$XS_HOST" "Compute")
 [ -z $COMPUTE_MAC ] && echo "Compute node doesnot exist" && exit -1
-COMPUTE_DISCOVERED=$(wait_for_node "$FM_IP" "$COMPUTE_MAC" 10 60)
+COMPUTE_DISCOVERED=$(wait_for_node "$FM_IP" "$COMPUTE_MAC" 60 10)
 [ -z $COMPUTE_DISCOVERED ] && echo "Compute node discovery timeout" && exit -1
 add_env_node "$FM_IP" "$ENV_NAME" "$COMPUTE_MAC" "compute,cinder" $INTERFACE_YAML
 echo "Compute Node added"
 
 CONTROLLER_MAC=$(get_node_mac "$XS_HOST" "Controller")
 [ -z $CONTROLLER_MAC ] && echo "Controller node doesnot exist" && exit -1
-CONTROLLER_DISCOVERED=$(wait_for_node "$FM_IP" "$CONTROLLER_MAC" 10 60)
+CONTROLLER_DISCOVERED=$(wait_for_node "$FM_IP" "$CONTROLLER_MAC" 60 10)
 [ -z $CONTROLLER_DISCOVERED ] && echo "Controller node discovery timeout" && exit -1
 add_env_node "$FM_IP" "$ENV_NAME" "$CONTROLLER_MAC" "controller" $INTERFACE_YAML
 echo "Controller Node added"
 
-NETWORK_VERIFIED=$(verify_network "$FM_IP" "$ENV_NAME" 10 60)
+NETWORK_VERIFIED=$(verify_network "$FM_IP" "$ENV_NAME" 60 10)
 [ $NETWORK_VERIFIED -eq 0 ] && echo "Network verification failed" && exit -1
 
 deploy_env "$FM_IP" "$ENV_NAME"
