@@ -29,7 +29,6 @@ set -ex
 pip install virtualenv
 cd /root/
 virtualenv fuel-devops-venv
-set -u
 . fuel-devops-venv/bin/activate
 pip install fuel-plugin-builder
 yum install git createrepo dpkg-devel dpkg-dev rpm rpm-build -y

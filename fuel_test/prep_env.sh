@@ -113,7 +113,7 @@ function wait_for_fm {
 		'xe vm-list name-label="'$fm_name'" params=networks --minimal')
 		fm_ip=$(echo $fm_networks | egrep -Eo "1/ip: ([0-9]+\.){3}[0-9]+")
 		if [ -n "$fm_ip" ]; then
-			echo $fm_ip
+			echo ${fm_ip: 5}
 			return
 		fi
 		let counter=counter+1
