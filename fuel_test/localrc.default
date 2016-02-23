@@ -1,0 +1,12 @@
+
+export XS_HOST=""
+export FM_NAME=""
+export FM_SNAPSHOT=""
+export FUEL_PLUGIN_REFSPEC=""
+export ENV_NAME="TestEnv"
+export REL_NAME="Kilo+Citrix XenServer on Ubuntu 14.04"
+export ATTRIBUTES_YAML="env_attributes.yaml"
+export NETWORK_YAML="env_network.yaml"
+export INTERFACE_YAML="node_interfaces.yaml"
+
+export DEBUG=on
