@@ -2,6 +2,19 @@
 
 set -eux
 
+# =============================================
+# Usage of this script:
+# ./build-xenserver-suppack.sh xs-version xs-build git-branch plugin-version
+# or
+# ./build-xenserver-suppack.sh
+#
+# You can provide explict input parameters or you can use the default ones:
+#   XenServer version
+#   XenServer build
+#   OpenStack release branch
+#   XenServer OpenStack plugin version
+
+
 QA_REPO_ROOT=$(cd ../ && pwd)
 cd $QA_REPO_ROOT
 rm -rf xenserver-suppack
@@ -11,56 +24,51 @@ mkdir -p xenserver-suppack && cd xenserver-suppack
 # =============================================
 # Configurable items
 
-# nova and neutron repository info
-GITREPO=${1:-"https://git.openstack.org/openstack/nova"}
-NEUTRON_GITREPO=${1:-"https://git.openstack.org/openstack/neutron"}
-DDK_ROOT_URL=${2:-"http://copper.eng.hq.xensource.com/builds/ddk-xs6_2.tgz"}
+# xenserver version info
+XS_VERSION=${1:-"6.2"}
+XS_BUILD=${2:-"70446c"}
+
+# branch info
 GITBRANCH=${3:-"stable/liberty"}
 
-# xenserver version info
-XS_VERSION=5.6.100
-XS_BUILD=39265p
+# nova and neutron xenserver dom0 plugin version
+XS_PLUGIN_VERSION=${4:-"2012.1"}
 
-# ISO info
-ISO_NAME=xenserverplugins-liberty
+# OpenStack release
+OS_RELEASE=liberty
+
+# repository info
+NOVA_GITREPO="https://git.openstack.org/openstack/nova"
+NEUTRON_GITREPO="https://git.openstack.org/openstack/neutron"
+DDK_ROOT_URL="http://copper.eng.hq.xensource.com/builds/ddk-xs6_2.tgz"
 
 # Update system and install dependencies
 export DEBIAN_FRONTEND=noninteractive
 
 
 # =============================================
-# Check out rpm packaging
-[ -e xenserver-nova-suppack-builder ] || git clone https://github.com/citrix-openstack/xenserver-nova-suppack-builder
+# Check out rpm packaging repo
+if ! [ -e xenserver-nova-suppack-builder ]; then
+    git clone https://github.com/citrix-openstack/xenserver-nova-suppack-builder
+fi
 
 
 # =============================================
 # Create nova rpm file
 
 if ! [ -e nova ]; then
-    git clone "$GITREPO" nova
+    git clone "$NOVA_GITREPO" nova
     cd nova
     git fetch origin "$GITBRANCH"
     git checkout FETCH_HEAD
     cd ..
 fi
 
-cd nova
-NOVA_VER=$(
-{
-    grep -e "^PLUGIN_VERSION" plugins/xenserver/xenapi/etc/xapi.d/plugins/nova_plugin_version;
-    echo "print PLUGIN_VERSION"
-} | python
-)
-cd ..
-
-cp -r xenserver-nova-suppack-builder/plugins/* nova/plugins/
-
+cp -r xenserver-nova-suppack-builder/plugins/xenserver/xenapi/* nova/plugins/xenserver/xenapi/
 cd nova/plugins/xenserver/xenapi/contrib
-#./inject-key.sh ~/domzero_public_key
-./build-rpm.sh
+./build-rpm.sh $XS_PLUGIN_VERSION
 cd $QA_REPO_ROOT/xenserver-suppack/
 RPMFILE=$(find -name "openstack-xen-plugins-*.noarch.rpm" -print)
-
 
 
 # =============================================
@@ -74,10 +82,11 @@ if ! [ -e neutron ]; then
     cd ..
 fi
 
-cp -r xenserver-nova-suppack-builder/neutron/* neutron/neutron/plugins/ml2/drivers/openvswitch/agent/xenapi/
-
+rm -rf neutron/neutron/plugins/ml2/drivers/openvswitch/agent/xenapi/contrib
+cp -r xenserver-nova-suppack-builder/neutron/* \
+      neutron/neutron/plugins/ml2/drivers/openvswitch/agent/xenapi/
 cd neutron/neutron/plugins/ml2/drivers/openvswitch/agent/xenapi/contrib
-./build-rpm.sh
+./build-rpm.sh $XS_PLUGIN_VERSION
 cd $QA_REPO_ROOT/xenserver-suppack/
 NEUTRON_RPMFILE=$(find -name "openstack-neutron-xen-plugins-*.noarch.rpm" -print)
 
@@ -109,15 +118,15 @@ xs = Requires(originator='xs', name='main', test='ge',
                product='XenServer', version='$XS_VERSION',
                build='$XS_BUILD')
 
-setup(originator='xs', name='$ISO_NAME', product='XenServer',
+setup(originator='xs', name='xenserverplugins-$OS_RELEASE', product='XenServer',
       version=options.product_version, build=options.build, vendor='Citrix Systems, Inc.',
       description="OpenStack XenServer Plugins", packages=args, requires=[xs],
       outdir=options.outdir, output=['iso'])
 EOF
 
 sudo chroot $DDKROOT python buildscript.py \
---pdn=xenserver-plugins \
---pdv="$NOVA_VER" \
+--pdn=xenserverplugins \
+--pdv=$OS_RELEASE \
 --bld=0 \
 --out=/mnt/host/suppack \
 /mnt/host/$RPMFILE \
@@ -126,9 +135,3 @@ sudo chroot $DDKROOT python buildscript.py \
 # Cleanup
 sudo umount $DDKROOT/mnt/host
 sudo rm -rf "$DDKROOT"
-
-
-# =============================================
-# copy the packet to fuel-plugin-xenserver repoistory
-# cp $QA_REPO_ROOT/xenserver-suppack/suppack/$ISO_NAME.iso \
-#    $QA_REPO_ROOT/fuel-plugin-xenserver/deployment_scripts/
