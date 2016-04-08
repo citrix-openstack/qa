@@ -113,6 +113,7 @@ OSLOUTILS_REPO openstack oslo.utils.git github
 OSLOVERSIONEDOBJECTS_REPO openstack oslo.versionedobjects.git github
 OSLOVMWARE_REPO openstack oslo.vmware.git github
 OSPROFILER_REPO openstack osprofiler.git github
+OS_VIF_REPO openstack os-vif.git github
 PBR_REPO openstack-dev pbr.git github
 PYCADF_REPO openstack pycadf.git github
 REQUIREMENTS_REPO openstack requirements.git github
