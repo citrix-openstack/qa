@@ -10,5 +10,6 @@ ACTION="$@"
 
 (
     cd .workspace
+    set +e
     with_all_repos "$@"
 )

@@ -12,5 +12,6 @@ ACTION="$@"
 
 (
     cd .workspace
+    set +e
     with_some_repos "$REPOS" "$ACTION"
 )
