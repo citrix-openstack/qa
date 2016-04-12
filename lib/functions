@@ -16,7 +16,7 @@ function git_retry {
             echo "Maximum of 3 git retries reached"
             return 1
         fi
-        sleep 5
+        sleep 1
     done
 }
 
