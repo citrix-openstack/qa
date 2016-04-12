@@ -14,7 +14,7 @@ function git_retry {
         echo "timeout ${count} for git call: [git $@]"
         if [ $count -eq 3 ]; then
             echo "Maximum of 3 git retries reached"
-            exit 1
+            return 1
         fi
         sleep 5
     done
