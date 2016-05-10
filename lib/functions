@@ -85,7 +85,6 @@ NEUTRON_FWAAS_REPO openstack neutron-fwaas.git github
 NEUTRON_LBAAS_REPO openstack neutron-lbaas.git github
 NEUTRON_LIB_REPO openstack neutron-lib.git github
 NEUTRON_REPO openstack neutron.git github
-NEUTRON_VPNAAS_REPO openstack neutron-vpnaas.git github
 NOVACLIENT_REPO openstack python-novaclient.git github
 NOVA_REPO openstack nova.git github
 NOVNC_REPO kanaka noVNC.git github
@@ -123,7 +122,6 @@ SWIFT3_REPO openstack swift3.git github
 SWIFTCLIENT_REPO openstack python-swiftclient.git github
 SWIFT_REPO openstack swift.git github
 TASKFLOW_REPO openstack taskflow.git github
-TEMPEST_LIB_REPO openstack tempest-lib.git github
 TEMPEST_REPO openstack tempest.git github
 TOOZ_REPO openstack tooz.git github
 EOF
