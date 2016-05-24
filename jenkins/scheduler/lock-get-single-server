@@ -1,27 +1,20 @@
-#!/usr/bin/env python
-
-from getters import wait_for_first
-import sys
-import argparse
-
-parser = argparse.ArgumentParser(description='Lock a single server')
-parser.add_argument('pool', nargs='?', help='The pool to lock from', default="")
-parser.add_argument('--reason', dest='reason', 
-                   help='Reason for the lock (optional)')
-
-args = parser.parse_args()
-
-pool = args.pool
-def is_server_in_pool(item):
-    try:
-        return bool(item.get("POOL", "") == pool)
-    except:
-        return False
+#!/bin/bash
+set -eux
 
 
-server_data, lock = wait_for_first(is_server_in_pool, args.reason)
+REASON=${1:-""}
+LOCK=`head -c100 /dev/urandom | tr -dc A-Za-z0-9 | head -c 8`
 
-for item in server_data.items():
-    print '%s=%s' % item
+virtualenv .env
+set +u
+. .env/bin/activate
+set -u
 
-print "LOCK=%s" % lock
+pip install -I http://core.xenrt.citrite.net/xenrtapi.tar.gz
+
+machine_entry=`xenrt mlist -s SJCLAB01 -o OPENSTACK -R "memory>12G/disk1>=120G" -n | tail -n+3 | shuf -n1`
+machine_name=${machine_entry%% *}
+xenrt borrow $machine_name -f -r "(LOCK=$LOCK) $REASON"
+
+echo "HOST=${machine_name}.xenrt.xs.citrite.net"
+echo "LOCK=$LOCK"
