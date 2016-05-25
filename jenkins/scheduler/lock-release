@@ -7,6 +7,8 @@ virtualenv .env
 set +u
 . .env/bin/activate
 set -u
+
+pip install requests
 pip install -I http://core.xenrt.citrite.net/xenrtapi.tar.gz
 
 machine_entry=`xenrt mlist -s SJCLAB01 -o OPENSTACK -m | grep "LOCK=$LOCK" | cat`
