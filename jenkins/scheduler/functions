@@ -1,0 +1,12 @@
+function setup_env {
+[ -e .env ] || virtualenv .env
+set +u
+. .env/bin/activate
+set -u
+
+if [ ! -e `which xenrt` ]; then
+  pip install requests
+  pip install -I http://core.xenrt.citrite.net/xenrtapi.tar.gz
+fi
+
+}
