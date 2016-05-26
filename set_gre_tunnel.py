@@ -59,17 +59,22 @@ def create_udev_script(ssh, local_ip, remote_ips, gre_net):
         "bridge=$(xe network-list name-label=%s params=bridge minimal=true)\n"
         "cat > /etc/udev/scripts/create-gre-tunnels.sh << CREATE_GRE_EOF\n"
         "#!/bin/bash\n"
-        "if ! ip link show $bridge > /dev/null 2>&1; then\n"
+        "if ! /sbin/ip link show $bridge > /dev/null 2>&1; then\n"
+        "# The bridge maybe will be appeared delay, wait a while\n"
         "sleep 1 \n"
         "fi\n"
+        "if /sbin/ip link show $bridge > /dev/null 2>&1; then\n"
+        "if ! /sbin/ip addr show $bridge|grep \"inet \" > /dev/null 2>&1; then\n"
+        "/sbin/ip addr add %s/255.255.255.0 dev $bridge\n"
         "for ip in %s;\n"
         "do\n"
         "ovs-vsctl add-port $bridge port\$ip -- set interface port\$ip type=gre options:remote_ip=\$ip\n"
         "done\n"
         "ovs-vsctl set bridge $bridge stp_enable=true\n"
-        "/sbin/ip addr add %s/255.255.255.0 dev $bridge\n"
+        "fi\n"
+        "fi\n"
         "CREATE_GRE_EOF\n"
-        "chmod +x /etc/udev/scripts/create-gre-tunnels.sh" % (gre_net, remote_ips, local_ip))
+        "chmod +x /etc/udev/scripts/create-gre-tunnels.sh" % (gre_net, local_ip, remote_ips))
 
 
 def create_gre_network(ssh, gre_net):
