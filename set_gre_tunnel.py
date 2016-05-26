@@ -2,6 +2,7 @@
 
 import copy
 import paramiko
+import re
 import sys
 
 
@@ -21,6 +22,9 @@ def delete_gre_connection(ssh, gre_net):
     try:
         print("==============================================================")
         print("delete gre connection\n")
+        # delete existing gre rules and scripts under udev
+        exec_command(ssh, "rm -f /etc/udev/rules.d/90-gre-tunnel.rules")
+        exec_command(ssh, "rm -f /etc/udev/scripts/create-gre-tunnels.sh")
         # delete gre bridge
         net_uuid = exec_command(ssh, "xe network-list name-label=%s params=uuid minimal=true" % gre_net)
         if not net_uuid:
@@ -35,7 +39,7 @@ def delete_gre_connection(ssh, gre_net):
 
 def create_ssh_connection(username, password, ip):
     print("==============================================================")
-    print("create ssh connection\n")
+    print("create ssh connection %s\n" % ip)
     # start ssh connection
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -83,17 +87,35 @@ def create_gre_network(ssh, gre_net):
     exec_command(ssh, "xe network-create name-label=%s" % gre_net)
 
 
+def validate_ips(ip_list):
+    pattern = re.compile(r'(?<![\.\d])(?:\d{1,3}\.){3}\d{1,3}(?![\.\d])')
+    for ip in ip_list:
+        if not pattern.match(ip):
+            print("Error:\n\tIp %s is not valid" % ip)
+            return False
+    return True
+
+
 if __name__=='__main__':
-    if len(sys.argv) < 3:
-        print("No enough information given, see the usage:")
-        print("python set_gre_tunnel.py root_passwd, ip1 ip2 ip3 ...")
+    if len(sys.argv) < 5:
+        print("Error: \n\tNo enough information given!\nUsage:")
+        print("\tpython set_gre_tunnel.py root_passwd gre_net_name ip1 ip2 ip3 ...\n")
         exit()
 
     password = sys.argv[1]
-    all_ips = sys.argv[2:]
-    gre_net = "gre_net"
+    gre_net = sys.argv[2] 
+    all_ips = sys.argv[3:]
     gre_ip_pre = "192.168.100.%s"
     gre_ip_start = 10
+    print("==============================================================")
+    print("Information:")
+    print("\tRoot password: %s" % password)
+    print("\tGRE network name: %s" % gre_net)
+    print("\tIP list: %s" % all_ips)
+    print("==============================================================")
+    result = validate_ips(all_ips)
+    if not result:
+        exit()
     for ip in all_ips:
         remote_ip_list = copy.deepcopy(all_ips)
         remote_ip_list.remove(ip)
@@ -109,3 +131,4 @@ if __name__=='__main__':
         create_udev_script(ssh, gre_ip, remote_ips, gre_net)
         # close ssh connection
         ssh.close()
+
