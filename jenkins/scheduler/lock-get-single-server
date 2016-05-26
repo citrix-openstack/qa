@@ -19,5 +19,5 @@ machine_entry=`xenrt mlist -s SJCLAB01 -o OPENSTACK -R "memory>12G/disk1>=120G" 
 machine_name=${machine_entry%% *}
 xenrt borrow $machine_name -f -r "(LOCK=$LOCK) $REASON"
 
-echo "HOST=${machine_name}.xenrt.xs.citrite.net"
+echo "HOST=${machine_name}.eng.hq.xensource.com"
 echo "LOCK=$LOCK"
