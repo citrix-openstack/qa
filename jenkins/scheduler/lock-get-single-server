@@ -1,10 +1,15 @@
 #!/bin/bash
-set -eux
+set -eu
 
 FUNC_DIR=$(cd $(dirname "${BASH_SOURCE:-$0}") && pwd)
 source ${FUNC_DIR}/functions
 
 REASON=${1:-""}
+if [ "$REASON" == "--reason" ]; then
+shift
+REASON=${1:-""}
+fi
+
 LOCK=`head -c100 /dev/urandom | tr -dc A-Za-z0-9 | head -c 8`
 
 # Redirect stdout for these commands
