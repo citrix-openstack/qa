@@ -3,6 +3,7 @@
 import copy
 import paramiko
 import re
+import socket
 import sys
 
 
@@ -89,11 +90,19 @@ def create_gre_network(ssh, gre_net):
 
 def validate_ips(ip_list):
     pattern = re.compile(r'(?<![\.\d])(?:\d{1,3}\.){3}\d{1,3}(?![\.\d])')
+    final_ip_list = []
     for ip in ip_list:
-        if not pattern.match(ip):
-            print("Error:\n\tIp %s is not valid" % ip)
-            return False
-    return True
+        try:
+            host_ip = socket.gethostbyname(ip)
+        except Exception as e:
+            print("Error:\n\tHostname %s is invalid" % ip)
+            return False, final_ip_list
+        if not pattern.match(host_ip):
+            print("Error:\n\t Ip or hostname %s is invalid" % ip)
+            return False, final_ip_list
+        else:
+            final_ip_list.append(host_ip)
+    return True, final_ip_list
 
 
 if __name__=='__main__':
@@ -112,12 +121,13 @@ if __name__=='__main__':
     print("\tRoot password: %s" % password)
     print("\tGRE network name: %s" % gre_net)
     print("\tIP list: %s" % all_ips)
-    print("==============================================================")
-    result = validate_ips(all_ips)
+    result, ip_list = validate_ips(all_ips)
     if not result:
         exit()
-    for ip in all_ips:
-        remote_ip_list = copy.deepcopy(all_ips)
+    print("\tIp list: %s" % ip_list)
+    print("==============================================================")
+    for ip in ip_list:
+        remote_ip_list = copy.deepcopy(ip_list)
         remote_ip_list.remove(ip)
         remote_ips = ""
         for temp_ip in remote_ip_list:
