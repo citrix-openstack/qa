@@ -46,7 +46,6 @@ function create_node {
 		virtual-size="${disk}GiB" \
 		sr-uuid=$localsr type=user)
 	vbd_uuid=$(xe vbd-create vm-uuid=$vm_uuid vdi-uuid=$extra_vdi device=0)
-	xe vm-cd-add vm=$vm_uuid device=1 cd-name="xs-tools.iso"
 
 	xe vm-memory-limits-set \
 		static-min=${mem}MiB \
@@ -157,18 +156,18 @@ function wait_for_nailgun {
 echo "Restoring Fuel Master.."
 restore_fm "$XS_HOST" "$FM_NAME" "$FM_SNAPSHOT"
 
-create_node "$XS_HOST" "Compute" 3072 60
-add_vif "$XS_HOST" "Compute" pxe 1
-add_vif "$XS_HOST" "Compute" "Network 1" 2
-add_vif "$XS_HOST" "Compute" br100 3
+create_node "$XS_HOST" "Compute" "$NODE_MEM_COMPUTE" "$NODE_DISK"
+add_vif "$XS_HOST" "Compute" "$NET1" 1
+add_vif "$XS_HOST" "Compute" "$NET2" 2
+add_vif "$XS_HOST" "Compute" "$NET3" 3
 echo "Compute Node is created"
 add_himn "$XS_HOST" "Compute"
 
 echo "HIMN is added to Compute Node"
-create_node "$XS_HOST" "Controller" 3072 60
-add_vif "$XS_HOST" "Controller" pxe 1
-add_vif "$XS_HOST" "Controller" "Network 1" 2
-add_vif "$XS_HOST" "Controller" br100 3
+create_node "$XS_HOST" "Controller" "$NODE_MEM_CONTROLLER" "$NODE_DISK"
+add_vif "$XS_HOST" "Controller" "$NET1" 1
+add_vif "$XS_HOST" "Controller" "$NET2" 2
+add_vif "$XS_HOST" "Controller" "$NET3" 3
 echo "Controller Node is created"
 
 FM_IP=$(wait_for_fm "$XS_HOST" "$FM_NAME" 60 10)

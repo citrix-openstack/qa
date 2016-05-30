@@ -26,13 +26,21 @@ function build_plugin {
 	ssh -qo StrictHostKeyChecking=no root@$fm_ip \
 	'
 set -ex
+
+yum install python-pip git createrepo dpkg-devel dpkg-dev rpm rpm-build -y
+
 pip install virtualenv
 cd /root/
-virtualenv fuel-devops-venv
+if [[ ! -d "fuel-devops-venv" ]]; then
+	virtualenv fuel-devops-venv
+fi
 . fuel-devops-venv/bin/activate
-pip install fuel-plugin-builder
-yum install git createrepo dpkg-devel dpkg-dev rpm rpm-build -y
-git clone https://review.openstack.org/openstack/fuel-plugin-xenserver
+
+pip install git+https://github.com/openstack/fuel-plugins
+
+if [[ ! -d "fuel-plugin-xenserver" ]]; then
+	git clone https://review.openstack.org/openstack/fuel-plugin-xenserver
+fi
 cd fuel-plugin-xenserver
 git fetch https://review.openstack.org/openstack/fuel-plugin-xenserver '"$refspec"'
 git checkout FETCH_HEAD
@@ -48,7 +56,7 @@ function install_plugin {
 	'
 	set -eux
 	export FUELCLIENT_CUSTOM_SETTINGS="/etc/fuel/client/config.yaml"
-	fuel plugins --install /root/fuel-plugin-xenserver/fuel-plugin-xenserver-2.0-2.0.0-1.noarch.rpm &> /dev/null
+	fuel plugins --install $(ls /root/fuel-plugin-xenserver/fuel-plugin-xenserver-*.noarch.rpm -t | head -n 1) &> /dev/null
 	'
 }
 
@@ -71,7 +79,7 @@ function create_env {
 	export FUELCLIENT_CUSTOM_SETTINGS="/etc/fuel/client/config.yaml"
 
 	rel_id=$(fuel rel | grep "'$rel_name'" | egrep ^[0-9]+ -o)
-	env_id=$(fuel env -c --name "'$env_name'" --rel $rel_id -n nova --nst vlan --yaml | grep ^id: | egrep [0-9]+ -o)
+	env_id=$(fuel env -c --name "'$env_name'" --rel $rel_id --yaml | grep ^id: | egrep [0-9]+ -o)
 
 	cd /tmp/
 
