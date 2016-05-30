@@ -1,7 +1,9 @@
 
 export XS_HOST=""
-export FM_NAME=""
-export FM_SNAPSHOT=""
+export FM_NAME="Fuel8"
+export FM_SNAPSHOT="fuel_ci"
+export FM_MNT=""
+export FM_XVA="fuel8.xva"
 export FUEL_PLUGIN_REFSPEC=""
 export ENV_NAME="TestEnv"
 

@@ -7,16 +7,30 @@ set -eu
 [ $DEBUG == "on" ] && set -x
 
 function restore_fm {
-	#Restore snapshot that has test machine's ssh public key
+	# Restore fuel master
 	local xs_host="$1"
 	local fm_name="$2"
 	local fm_snapshot="$3"
+	local fm_mnt="$4"
+	local fm_xva="$5"
 	ssh -qo StrictHostKeyChecking=no root@$xs_host \
 	'
 	set -eux
 	vm_uuid=$(xe vm-list name-label="'$fm_name'" --minimal)
 	snapshot_uuid=$(xe snapshot-list name-label="'$fm_snapshot'" snapshot-of="$vm_uuid" --minimal)
-	xe snapshot-revert snapshot-uuid="$snapshot_uuid"
+	if [ -z $snapshot_uuid ]; then
+		xe snapshot-revert snapshot-uuid="$snapshot_uuid"
+	else
+		mount "'$fm_mnt'" /mnt
+		xe vm-import filename="/mnt/'$fm_xva'" preserve=true
+		vm_uuid=$(xe vm-list name-label="'$fm_name'" --minimal)
+		vif=$(xe vif-list vm-uuid=$vm_uuid device=1 --minimal)
+		net=$(xe vif-list vm-uuid=$vm_uuid device=1 params=network-uuid --minimal)
+		xe vif-destroy uuid=$vif
+		mac=$(echo 00:60:2f$(od -txC -An -N3 /dev/random|tr \  :))
+		xe vif-create vm-uuid="$vm_uuid" device=1 network-uuid="$net" mac=$mac
+		xe vm-snapshot vm="'$fm_name'" new-name-label="'$fm_snapshot'"
+	fi
 	xe vm-start vm="'$fm_name'"
 	'
 }
@@ -154,7 +168,7 @@ function wait_for_nailgun {
 }
 
 echo "Restoring Fuel Master.."
-restore_fm "$XS_HOST" "$FM_NAME" "$FM_SNAPSHOT"
+restore_fm "$XS_HOST" "$FM_NAME" "$FM_SNAPSHOT" "$FM_MNT" "$FM_XVA"
 
 create_node "$XS_HOST" "Compute" "$NODE_MEM_COMPUTE" "$NODE_DISK"
 add_vif "$XS_HOST" "Compute" "$NET1" 1
