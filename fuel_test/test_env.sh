@@ -34,5 +34,9 @@ function health_check {
 }
 
 FM_IP=$(get_fm_ip "$XS_HOST" "$FM_NAME")
-RESULT=$(health_check "$FM_IP" "$ENV_NAME")
-echo $RESULT | grep -qv '[failure]'
+result=$(health_check "$FM_IP" "$ENV_NAME")
+RESULT=$(comm -3 \
+<(echo -e $result | egrep -o "\[failure\] '[^\']+'" | sed -e "s|\[failure\] ||g" | sed -e "s|'||g" | sort) \
+<(printf '%s\n' "${IGNORE_CHECKS[@]}" | sort))
+[[ -n $RESULT ]] && echo $RESULT && exit 1
+exit 0

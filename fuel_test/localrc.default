@@ -12,6 +12,10 @@ export REL_NAME="Liberty on Ubuntu 14.04"
 export ATTRIBUTES_YAML="env_attributes.yaml"
 export NETWORK_YAML="env_network.yaml"
 export INTERFACE_YAML="node_interfaces.yaml"
+export IGNORE_CHECKS=(
+	#"Typical stack actions: create, delete, show details, etc."
+	#"Check that required services are running"
+)
 
 export NODE_DISK="70"
 export NODE_MEM_CONTROLLER="4096"
