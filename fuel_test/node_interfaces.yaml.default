@@ -5,4 +5,4 @@ eth1:
 - management
 - storage
 eth2:
-- fixed
+- private

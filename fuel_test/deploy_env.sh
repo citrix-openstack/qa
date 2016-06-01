@@ -26,13 +26,21 @@ function build_plugin {
 	ssh -qo StrictHostKeyChecking=no root@$fm_ip \
 	'
 set -ex
+
+yum install python-pip git createrepo dpkg-devel dpkg-dev rpm rpm-build -y
+
 pip install virtualenv
 cd /root/
-virtualenv fuel-devops-venv
+if [[ ! -d "fuel-devops-venv" ]]; then
+	virtualenv fuel-devops-venv
+fi
 . fuel-devops-venv/bin/activate
-pip install fuel-plugin-builder
-yum install git createrepo dpkg-devel dpkg-dev rpm rpm-build -y
-git clone https://review.openstack.org/openstack/fuel-plugin-xenserver
+
+pip install git+https://github.com/openstack/fuel-plugins
+
+if [[ ! -d "fuel-plugin-xenserver" ]]; then
+	git clone https://review.openstack.org/openstack/fuel-plugin-xenserver
+fi
 cd fuel-plugin-xenserver
 git fetch https://review.openstack.org/openstack/fuel-plugin-xenserver '"$refspec"'
 git checkout FETCH_HEAD
@@ -48,7 +56,7 @@ function install_plugin {
 	'
 	set -eux
 	export FUELCLIENT_CUSTOM_SETTINGS="/etc/fuel/client/config.yaml"
-	fuel plugins --install /root/fuel-plugin-xenserver/fuel-plugin-xenserver-2.0-2.0.0-1.noarch.rpm &> /dev/null
+	fuel plugins --install $(ls /root/fuel-plugin-xenserver/fuel-plugin-xenserver-*.noarch.rpm -t | head -n 1) &> /dev/null
 	'
 }
 
@@ -71,7 +79,7 @@ function create_env {
 	export FUELCLIENT_CUSTOM_SETTINGS="/etc/fuel/client/config.yaml"
 
 	rel_id=$(fuel rel | grep "'$rel_name'" | egrep ^[0-9]+ -o)
-	env_id=$(fuel env -c --name "'$env_name'" --rel $rel_id -n nova --nst vlan --yaml | grep ^id: | egrep [0-9]+ -o)
+	env_id=$(fuel env -c --name "'$env_name'" --rel $rel_id --yaml | grep ^id: | egrep [0-9]+ -o)
 
 	cd /tmp/
 
@@ -107,12 +115,9 @@ function wait_for_node {
 	# Wait for node discovery
 	local fm_ip="$1"
 	local node_mac="$2"
-	local retry_count=$3
-	local retry_interval=$4
-
-	local counter=0
-	local discovered
-	while [ $counter -lt $retry_count ]; do
+	local reboot_timeout=$3
+	local discover_timeout=10
+	for i in {0..$reboot_timeout..$discover_timeout}; do
 		discovered=$(ssh -qo StrictHostKeyChecking=no root@$fm_ip \
 		'
 		set -eux
@@ -121,14 +126,26 @@ function wait_for_node {
 		fuel node | grep "'$node_mac'" -q
 		echo $?
 		')
-		if [ $discovered -eq 0 ]; then
-			echo 1
-			return
-		fi
-		let counter=counter+1
-		sleep $retry_interval
+		[ $discovered -eq 0 ] && echo true && return
+		sleep $discover_timeout
 	done
-	echo 0
+}
+
+function wait_for_node_reboot_and_retry {
+	local fm_ip="$1"
+	local node_mac="$2"
+	local reboot_timeout=$3
+	local retry_count=$4
+	local xs_host=$5
+	local vm=$6
+
+	local counter=0
+	local discovered
+	for i in {0..$retry_count}; do
+		discovered=$(wait_for_node $fm_ip $node_mac $reboot_timeout)
+		[ -n "$discovered" ] && echo $discovered && return
+		ssh -qo StrictHostKeyChecking=no root@$xs_host 'xe vm-reboot vm="'$vm'" force=true'
+	done
 }
 
 function add_env_node {
@@ -225,14 +242,14 @@ create_env "$FM_IP" "$ENV_NAME" "$REL_NAME" "$ATTRIBUTES_YAML" "$NETWORK_YAML"
 
 COMPUTE_MAC=$(get_node_mac "$XS_HOST" "Compute")
 [ -z $COMPUTE_MAC ] && echo "Compute node doesnot exist" && exit -1
-COMPUTE_DISCOVERED=$(wait_for_node "$FM_IP" "$COMPUTE_MAC" 60 10)
+COMPUTE_DISCOVERED=$(wait_for_node_reboot_and_retry "$FM_IP" "$COMPUTE_MAC" 60 10 "$XS_HOST" "Compute")
 [ -z $COMPUTE_DISCOVERED ] && echo "Compute node discovery timeout" && exit -1
 add_env_node "$FM_IP" "$ENV_NAME" "$COMPUTE_MAC" "compute,cinder" $INTERFACE_YAML
 echo "Compute Node added"
 
 CONTROLLER_MAC=$(get_node_mac "$XS_HOST" "Controller")
 [ -z $CONTROLLER_MAC ] && echo "Controller node doesnot exist" && exit -1
-CONTROLLER_DISCOVERED=$(wait_for_node "$FM_IP" "$CONTROLLER_MAC" 60 10)
+CONTROLLER_DISCOVERED=$(wait_for_node_reboot_and_retry "$FM_IP" "$CONTROLLER_MAC" 60 10 "$XS_HOST" "Controller")
 [ -z $CONTROLLER_DISCOVERED ] && echo "Controller node discovery timeout" && exit -1
 add_env_node "$FM_IP" "$ENV_NAME" "$CONTROLLER_MAC" "controller" $INTERFACE_YAML
 echo "Controller Node added"
