@@ -6,6 +6,59 @@ set -eu
 
 [ $DEBUG == "on" ] && set -x
 
+function create_networks {
+	local xs_host="$1"
+	ssh -qo StrictHostKeyChecking=no root@$xs_host \
+	'
+	set -eux
+	[ -z $(xe network-list name-label="'$2'" --minimal) ] && xe network-create name-label="'$2'"
+	[ -z $(xe network-list name-label="'$3'" --minimal) ] && xe network-create name-label="'$3'"
+	[ -z $(xe network-list name-label="'$4'" --minimal) ] && xe network-create name-label="'$4'"
+	echo "Network created"
+	'
+}
+
+function recreate_gateway {
+	local xs_host="$1"
+	ssh -qo StrictHostKeyChecking=no root@$xs_host \
+	'
+	set -eux
+	bridge=$(xe network-list name-label="'$2'" params=bridge minimal=true)
+	recreate_gateway_sh="/etc/udev/scripts/recreate-gateway.sh"
+	if [ ! -x $recreate_gateway_sh ]; then
+		cat > $recreate_gateway_sh << RECREATE_GATEWAY
+#!/bin/bash
+if /sbin/ip link show $bridge > /dev/null 2>&1; then
+  if !(/sbin/ip addr show $bridge | /bin/grep -q 172.16.1.1); then
+    /sbin/ip addr add dev $bridge 172.16.1.1
+  fi
+  if !(/sbin/route -n | /bin/grep -q 172.16.1.0); then
+    /sbin/route add -net 172.16.1.0 netmask 255.255.255.0 dev $bridge
+  fi
+  if !(/sbin/iptables -t nat -S | /bin/grep -q 192.168.111.0/24); then
+    /sbin/iptables -t nat -A POSTROUTING -d 192.168.111.0/24 -j RETURN
+  fi
+  if !(/sbin/iptables -t nat -S | /bin/grep -q 10.0.7.0/24); then
+    /sbin/iptables -t nat -A POSTROUTING -d 10.0.7.0/24 -j RETURN
+  fi
+  if !(/sbin/iptables -t nat -S | /bin/grep -q 10.1.7.0/24); then
+    /sbin/iptables -t nat -A POSTROUTING -d 10.1.7.0/24 -j RETURN
+  fi
+  if !(/sbin/iptables -t nat -S | /bin/grep -q 172.16.1.0/24); then
+    /sbin/iptables -t nat -A POSTROUTING -s 172.16.1.0/24 ! -d 172.16.1.0/24 -j MASQUERADE
+  fi
+fi
+RECREATE_GATEWAY
+		chmod +x $recreate_gateway_sh
+		# To skip the reboot, here explicitly run recreate-gateway.sh to activate for the first time
+		$recreate_gateway_sh
+		echo "SUBSYSTEM==net ACTION==add KERNEL==xapi* RUN+=$recreate_gateway_sh" > /etc/udev/rules.d/90-gateway.rules
+		sed -i -e "s/net.ipv4.ip_forward.*/net.ipv4.ip_forward = 1/" /etc/sysctl.conf
+		sysctl net.ipv4.ip_forward=1
+	fi
+	'
+}
+
 function restore_fm {
 	# Restore fuel master
 	local xs_host="$1"
@@ -167,6 +220,8 @@ function wait_for_nailgun {
 	echo 0
 }
 
+create_networks "$XS_HOST" "$NET1" "$NET2" "$NET3"
+
 echo "Restoring Fuel Master.."
 restore_fm "$XS_HOST" "$FM_NAME" "$FM_SNAPSHOT" "$FM_MNT" "$FM_XVA"
 
@@ -194,3 +249,5 @@ start_node "$XS_HOST" "Compute"
 echo "Compute Node is started"
 start_node "$XS_HOST" "Controller"
 echo "Controller Node is started"
+
+recreate_gateway "$XS_HOST" "$NET2"
