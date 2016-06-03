@@ -71,7 +71,7 @@ function restore_fm {
 	set -eux
 	vm_uuid=$(xe vm-list name-label="'$fm_name'" --minimal)
 	snapshot_uuid=$(xe snapshot-list name-label="'$fm_snapshot'" snapshot-of="$vm_uuid" --minimal)
-	if [ -z $snapshot_uuid ]; then
+	if [ -n "$snapshot_uuid" ]; then
 		xe snapshot-revert snapshot-uuid="$snapshot_uuid"
 	else
 		mount "'$fm_mnt'" /mnt
