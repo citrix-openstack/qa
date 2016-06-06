@@ -9,31 +9,38 @@ import sys
 
 def exec_command(ssh, cmd):
     print("cmd: %s" % cmd)
-    _, stdout, _ = ssh.exec_command(cmd)
+    _, stdout, stderr = ssh.exec_command(cmd)
+    ret_code = stdout.channel.recv_exit_status()
+    errs = stderr.readlines()
+    if errs and errs[0]:
+        err = errs[0].strip('\n')
+        print("err: %s" % err)
+
     outs = stdout.readlines()
+    out = ""
     if outs and outs[0]:
         out = outs[0].strip('\n')
         print("out: %s" % out)
+
+    print("ret_code: %d"%ret_code)
+
+    if ret_code > 0:
+        raise paramiko.ssh_exception.SSHException('Error running %s: Ret code %d'%(cmd, ret_code))
+
+    if len(out) > 0:
         return out
-    else:
-        return
+
+    return
 
 
 def delete_gre_connection(ssh, gre_net):
+    # Only delete the scripts, the network may be in use by VMs and therefore can't be deleted
     try:
         print("==============================================================")
         print("delete gre connection\n")
         # delete existing gre rules and scripts under udev
         exec_command(ssh, "rm -f /etc/udev/rules.d/90-gre-tunnel.rules")
         exec_command(ssh, "rm -f /etc/udev/scripts/create-gre-tunnels.sh")
-        # delete gre bridge
-        net_uuid = exec_command(ssh, "xe network-list name-label=%s params=uuid minimal=true" % gre_net)
-        if not net_uuid:
-            print("No gre network at the moment")
-            return
-        gre_bridge = exec_command(ssh, "xe network-param-get param-name=bridge uuid=%s" % net_uuid)
-        exec_command(ssh, "ovs-vsctl del-br %s" % gre_bridge)
-        exec_command(ssh, "xe network-destroy uuid=%s" % net_uuid)
     except Exception as e:
         print("Delete gre connection error, %s" % e)
 
@@ -64,12 +71,9 @@ def create_udev_script(ssh, local_ip, remote_ips, gre_net):
         "bridge=$(xe network-list name-label=%s params=bridge minimal=true)\n"
         "cat > /etc/udev/scripts/create-gre-tunnels.sh << CREATE_GRE_EOF\n"
         "#!/bin/bash\n"
-        "if ! /sbin/ip link show $bridge > /dev/null 2>&1; then\n"
-        "# The bridge maybe will be appeared delay, wait a while\n"
-        "sleep 1 \n"
-        "fi\n"
+        "sleep 5\n"
         "if /sbin/ip link show $bridge > /dev/null 2>&1; then\n"
-        "if ! /sbin/ip addr show $bridge|grep \"inet \" > /dev/null 2>&1; then\n"
+        "if ! /sbin/ip addr show $bridge|grep \"inet %s\" > /dev/null 2>&1; then\n"
         "/sbin/ip addr add %s/255.255.255.0 dev $bridge\n"
         "for ip in %s;\n"
         "do\n"
@@ -79,12 +83,18 @@ def create_udev_script(ssh, local_ip, remote_ips, gre_net):
         "fi\n"
         "fi\n"
         "CREATE_GRE_EOF\n"
-        "chmod +x /etc/udev/scripts/create-gre-tunnels.sh" % (gre_net, local_ip, remote_ips))
+        "chmod +x /etc/udev/scripts/create-gre-tunnels.sh" % (gre_net, local_ip, local_ip, remote_ips))
+    # Activate the GRE tunnel if the networks exist
+    exec_command(ssh, "/etc/udev/scripts/create-gre-tunnels.sh")
 
 
 def create_gre_network(ssh, gre_net):
     print("==============================================================")
     print("create gre network")
+    matching_networks = exec_command(ssh, "xe network-list name-label=%s minimal=true" % gre_net)
+    if len(matching_networks) > 0:
+        print("Not attempting to create GRE network; it already exists (delete failed?)")
+        return
     exec_command(ssh, "xe network-create name-label=%s" % gre_net)
 
 
@@ -126,6 +136,7 @@ if __name__=='__main__':
         exit()
     print("\tIp list: %s" % ip_list)
     print("==============================================================")
+    reboot_hosts = []
     for ip in ip_list:
         remote_ip_list = copy.deepcopy(ip_list)
         remote_ip_list.remove(ip)
@@ -133,7 +144,10 @@ if __name__=='__main__':
         for temp_ip in remote_ip_list:
             remote_ips = temp_ip + " " + remote_ips
         ssh = create_ssh_connection("root", password, ip)
-        delete_gre_connection(ssh, gre_net)
+        scripts_exist = exec_command(ssh, "[ ! -e /etc/udev/rules.d/90-gre-tunnel.rules ] || echo 'found'") == 'found'
+        if scripts_exist:
+            delete_gre_connection(ssh, gre_net)
+            reboot_hosts.append(ip)
         create_gre_network(ssh, gre_net)
         create_udev_rules(ssh)
         gre_ip_start += 1
@@ -141,4 +155,9 @@ if __name__=='__main__':
         create_udev_script(ssh, gre_ip, remote_ips, gre_net)
         # close ssh connection
         ssh.close()
+    print("==============================================================")
+    if len(reboot_hosts) > 0:
+        print("\tFollowing hosts had old GRE tunnels and may need rebooting: %s" % reboot_hosts)
+    else:
+        print("\tAdded GRE tunnel to all hosts.  Tried to activate, but if things don't work, try rebooting them")
 
