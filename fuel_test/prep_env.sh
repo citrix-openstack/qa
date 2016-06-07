@@ -234,6 +234,8 @@ echo "Controller Node is created"
 FM_IP=$(wait_for_fm "$XS_HOST" "$FM_NAME")
 [ -z "$FM_IP" ] && echo "Fuel Master IP obtaining timeout" && exit -1
 
+sshpass -p "$FM_PWD" ssh-copy-id -o StrictHostKeyChecking=no root@$FM_IP
+
 NAILGUN_READY=$(wait_for_nailgun "$FM_IP")
 [ $NAILGUN_READY -eq 0 ] && echo "Nailgun test connection timeout" && exit -1
 

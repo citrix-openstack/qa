@@ -4,6 +4,7 @@ export FM_NAME="Fuel8"
 export FM_SNAPSHOT="fuel_ci"
 export FM_MNT=""
 export FM_XVA="fuel8.xva"
+export FM_PWD=""
 export FUEL_PLUGIN_REFSPEC=""
 export ENV_NAME="TestEnv"
 
