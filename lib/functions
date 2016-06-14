@@ -55,6 +55,7 @@ function generate_repos() {
 function static_repos() {
 cat <<EOF
 AUTOMATON_REPO openstack automaton.git github
+BRICK_CINDERCLIENT_REPO openstack python-brick-cinderclient-ext.git github
 CEILOMETERMIDDLEWARE_REPO openstack ceilometermiddleware.git github
 CINDERCLIENT_REPO openstack python-cinderclient.git github
 CINDER_REPO openstack cinder.git github
