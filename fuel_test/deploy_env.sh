@@ -36,14 +36,17 @@ if [[ ! -d "fuel-devops-venv" ]]; then
 fi
 . fuel-devops-venv/bin/activate
 
-pip install git+https://github.com/openstack/fuel-plugins
-
 if [[ ! -d "fuel-plugin-xenserver" ]]; then
 	git clone https://review.openstack.org/openstack/fuel-plugin-xenserver
 fi
 cd fuel-plugin-xenserver
 git fetch https://review.openstack.org/openstack/fuel-plugin-xenserver '"$refspec"'
 git checkout FETCH_HEAD
+
+pip install bandit
+bandit deployment_scripts/compute_post_deployment.py
+
+pip install git+https://github.com/openstack/fuel-plugins
 fpb --check .
 fpb --build .
 	'
