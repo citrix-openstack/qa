@@ -115,9 +115,7 @@ function wait_for_node {
 	# Wait for node discovery
 	local fm_ip="$1"
 	local node_mac="$2"
-	local reboot_timeout=$3
-	local discover_timeout=10
-	for i in {0..$reboot_timeout..$discover_timeout}; do
+	for i in {0..60..10}; do
 		discovered=$(ssh -qo StrictHostKeyChecking=no root@$fm_ip \
 		'
 		set -eux
@@ -127,22 +125,19 @@ function wait_for_node {
 		echo $?
 		')
 		[ $discovered -eq 0 ] && echo true && return
-		sleep $discover_timeout
+		sleep 10
 	done
 }
 
 function wait_for_node_reboot_and_retry {
 	local fm_ip="$1"
 	local node_mac="$2"
-	local reboot_timeout=$3
-	local retry_count=$4
-	local xs_host=$5
-	local vm=$6
+	local xs_host="$3"
+	local vm="$4"
 
-	local counter=0
 	local discovered
-	for i in {0..$retry_count}; do
-		discovered=$(wait_for_node $fm_ip $node_mac $reboot_timeout)
+	for i in {0..10}; do
+		discovered=$(wait_for_node $fm_ip $node_mac)
 		[ -n "$discovered" ] && echo $discovered && return
 		ssh -qo StrictHostKeyChecking=no root@$xs_host 'xe vm-reboot vm="'$vm'" force=true'
 	done
@@ -180,8 +175,6 @@ function verify_network {
 	# return 1 when passes, return 0 when failed or retrial timeout
 	local fm_ip="$1"
 	local env_name="$2"
-	local retry_count=$3
-	local retry_interval=$4
 
 	ssh -qo stricthostkeychecking=no root@$fm_ip \
 	'
@@ -192,9 +185,8 @@ function verify_network {
 	fuel network --verify --env $env_id &> /dev/null
 	'
 
-	local counter=0
 	local ok
-	while [ $counter -lt $retry_count ]; do
+	for i in {0..60}; do
 		task=$(ssh -qo StrictHostKeyChecking=no root@$fm_ip \
 		'
 		export FUELCLIENT_CUSTOM_SETTINGS="/etc/fuel/client/config.yaml"
@@ -210,8 +202,7 @@ function verify_network {
 			echo 1
 			return
 		fi
-		let counter=counter+1
-		sleep $retry_interval
+		sleep 10
 	done
 	echo 0
 }
@@ -242,19 +233,19 @@ create_env "$FM_IP" "$ENV_NAME" "$REL_NAME" "$ATTRIBUTES_YAML" "$NETWORK_YAML"
 
 COMPUTE_MAC=$(get_node_mac "$XS_HOST" "Compute")
 [ -z $COMPUTE_MAC ] && echo "Compute node doesnot exist" && exit -1
-COMPUTE_DISCOVERED=$(wait_for_node_reboot_and_retry "$FM_IP" "$COMPUTE_MAC" 60 10 "$XS_HOST" "Compute")
+COMPUTE_DISCOVERED=$(wait_for_node_reboot_and_retry "$FM_IP" "$COMPUTE_MAC" "$XS_HOST" "Compute")
 [ -z $COMPUTE_DISCOVERED ] && echo "Compute node discovery timeout" && exit -1
 add_env_node "$FM_IP" "$ENV_NAME" "$COMPUTE_MAC" "compute,cinder" $INTERFACE_YAML
 echo "Compute Node added"
 
 CONTROLLER_MAC=$(get_node_mac "$XS_HOST" "Controller")
 [ -z $CONTROLLER_MAC ] && echo "Controller node doesnot exist" && exit -1
-CONTROLLER_DISCOVERED=$(wait_for_node_reboot_and_retry "$FM_IP" "$CONTROLLER_MAC" 60 10 "$XS_HOST" "Controller")
+CONTROLLER_DISCOVERED=$(wait_for_node_reboot_and_retry "$FM_IP" "$CONTROLLER_MAC" "$XS_HOST" "Controller")
 [ -z $CONTROLLER_DISCOVERED ] && echo "Controller node discovery timeout" && exit -1
 add_env_node "$FM_IP" "$ENV_NAME" "$CONTROLLER_MAC" "controller" $INTERFACE_YAML
 echo "Controller Node added"
 
-NETWORK_VERIFIED=$(verify_network "$FM_IP" "$ENV_NAME" 60 10)
+NETWORK_VERIFIED=$(verify_network "$FM_IP" "$ENV_NAME")
 [ $NETWORK_VERIFIED -eq 0 ] && echo "Network verification failed" && exit -1
 
 deploy_env "$FM_IP" "$ENV_NAME"

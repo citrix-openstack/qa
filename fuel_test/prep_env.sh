@@ -71,7 +71,7 @@ function restore_fm {
 	set -eux
 	vm_uuid=$(xe vm-list name-label="'$fm_name'" --minimal)
 	snapshot_uuid=$(xe snapshot-list name-label="'$fm_snapshot'" snapshot-of="$vm_uuid" --minimal)
-	if [ -z $snapshot_uuid ]; then
+	if [ -n "$snapshot_uuid" ]; then
 		xe snapshot-revert snapshot-uuid="$snapshot_uuid"
 	else
 		mount "'$fm_mnt'" /mnt
@@ -156,7 +156,7 @@ function add_himn {
 	vm_uuid=$(xe vm-list name-label="'$vm'" --minimal)
 
 	vif=$(xe vif-list network-uuid=$network vm-uuid=$vm_uuid --minimal)
-	if [ -z $vif ]; then
+	if [ -z "$vif" ]; then
 		vif=$(xe vif-create network-uuid=$network vm-uuid=$vm_uuid device=9 minimal=true)
 	fi
 
@@ -169,12 +169,9 @@ function wait_for_fm {
 	# Wait for fuel master booting and return its IP address
 	local xs_host="$1"
 	local fm_name="$2"
-	local retry_count=$3
-	local retry_interval=$4
 
 	local fm_ip
-	local counter=0
-	while [ $counter -lt $retry_count ]; do
+	for i in {0..60}; do
 		fm_networks=$(ssh -qo StrictHostKeyChecking=no root@$xs_host \
 		'xe vm-list name-label="'$fm_name'" params=networks --minimal')
 		fm_ip=$(echo $fm_networks | egrep -Eo "1/ip: ([0-9]+\.){3}[0-9]+")
@@ -182,8 +179,7 @@ function wait_for_fm {
 			echo ${fm_ip: 5}
 			return
 		fi
-		let counter=counter+1
-		sleep $retry_interval
+		sleep 10
 	done
 }
 
@@ -198,24 +194,20 @@ function start_node {
 function wait_for_nailgun {
 	# Wait for nailgun service started until the fuel plugin can be installed
 	local fm_ip="$1"
-	local retry_count=$2
-	local retry_interval=$3
 
-	local counter=0
 	local ready
-	while [ $counter -lt $retry_count ]; do
+	for i in {0..60}; do
 		ready=$(ssh -qo StrictHostKeyChecking=no root@$fm_ip \
 		'
 		export FUELCLIENT_CUSTOM_SETTINGS="/etc/fuel/client/config.yaml"
 		fuel plugins &> /dev/null
 		echo $?
 		')
-		if [ $ready -eq 0 ]; then
+		if [ "$ready" -eq 0 ]; then
 			echo 1
 			return
 		fi
-		let counter=counter+1
-		sleep $retry_interval
+		sleep 10
 	done
 	echo 0
 }
@@ -239,10 +231,12 @@ add_vif "$XS_HOST" "Controller" "$NET2" 2
 add_vif "$XS_HOST" "Controller" "$NET3" 3
 echo "Controller Node is created"
 
-FM_IP=$(wait_for_fm "$XS_HOST" "$FM_NAME" 60 10)
-[ -z $FM_IP ] && echo "Fuel Master IP obtaining timeout" && exit -1
+FM_IP=$(wait_for_fm "$XS_HOST" "$FM_NAME")
+[ -z "$FM_IP" ] && echo "Fuel Master IP obtaining timeout" && exit -1
 
-NAILGUN_READY=$(wait_for_nailgun "$FM_IP" 60 10)
+sshpass -p "$FM_PWD" ssh-copy-id -o StrictHostKeyChecking=no root@$FM_IP
+
+NAILGUN_READY=$(wait_for_nailgun "$FM_IP")
 [ $NAILGUN_READY -eq 0 ] && echo "Nailgun test connection timeout" && exit -1
 
 start_node "$XS_HOST" "Compute"
