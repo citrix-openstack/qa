@@ -25,8 +25,7 @@ function recreate_gateway {
 	set -eux
 	bridge=$(xe network-list name-label="'$2'" params=bridge minimal=true)
 	recreate_gateway_sh="/etc/udev/scripts/recreate-gateway.sh"
-	if [ ! -x $recreate_gateway_sh ]; then
-		cat > $recreate_gateway_sh << RECREATE_GATEWAY
+	cat > $recreate_gateway_sh << RECREATE_GATEWAY
 #!/bin/bash
 if /sbin/ip link show $bridge > /dev/null 2>&1; then
   if !(/sbin/ip addr show $bridge | /bin/grep -q 172.16.1.1); then
@@ -49,13 +48,13 @@ if /sbin/ip link show $bridge > /dev/null 2>&1; then
   fi
 fi
 RECREATE_GATEWAY
-		chmod +x $recreate_gateway_sh
-		# To skip the reboot, here explicitly run recreate-gateway.sh to activate for the first time
-		$recreate_gateway_sh
-		echo "SUBSYSTEM==net ACTION==add KERNEL==xapi* RUN+=$recreate_gateway_sh" > /etc/udev/rules.d/90-gateway.rules
-		sed -i -e "s/net.ipv4.ip_forward.*/net.ipv4.ip_forward = 1/" /etc/sysctl.conf
-		sysctl net.ipv4.ip_forward=1
-	fi
+
+	chmod +x $recreate_gateway_sh
+	# To skip the reboot, here explicitly run recreate-gateway.sh to activate for the first time
+	$recreate_gateway_sh
+	echo "SUBSYSTEM==net ACTION==add KERNEL==xapi* RUN+=$recreate_gateway_sh" > /etc/udev/rules.d/90-gateway.rules
+	sed -i -e "s/net.ipv4.ip_forward.*/net.ipv4.ip_forward = 1/" /etc/sysctl.conf
+	sysctl net.ipv4.ip_forward=1
 	'
 }
 
