@@ -76,6 +76,7 @@ function restore_fm {
 	else
 		mount "'$fm_mnt'" /mnt
 		xe vm-import filename="/mnt/'$fm_xva'" preserve=true
+		umount /mnt
 		vm_uuid=$(xe vm-list name-label="'$fm_name'" --minimal)
 		vif=$(xe vif-list vm-uuid=$vm_uuid device=1 --minimal)
 		net=$(xe vif-list vm-uuid=$vm_uuid device=1 params=network-uuid --minimal)
