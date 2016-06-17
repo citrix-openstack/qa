@@ -119,14 +119,16 @@ function wait_for_node {
 	local fm_ip="$1"
 	local node_mac="$2"
 	for i in {0..60..10}; do
+		set +x
 		discovered=$(ssh -qo StrictHostKeyChecking=no root@$fm_ip \
 		'
-		set -eux
+		set -ux
 
 		export FUELCLIENT_CUSTOM_SETTINGS="/etc/fuel/client/config.yaml"
 		fuel node | grep "'$node_mac'" -q
 		echo $?
 		')
+		set -x
 		[ $discovered -eq 0 ] && echo true && return
 		sleep 10
 	done
@@ -213,15 +215,16 @@ function verify_network {
 function deploy_env {
 	local fm_ip="$1"
 	local env_name="$2"
-
+	set +x
 	ssh -qo stricthostkeychecking=no root@$fm_ip \
 	'
 	set -eux
 
 	export fuelclient_custom_settings="/etc/fuel/client/config.yaml"
 	env_id=$(fuel env | grep "'$env_name'" | egrep -o "^[0-9]+")
-	fuel deploy-changes --env $env_id
+	fuel deploy-changes --env $env_id &> /dev/null
 	'
+	set -x
 }
 
 FM_IP=$(get_fm_ip "$XS_HOST" "$FM_NAME")
