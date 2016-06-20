@@ -29,14 +29,18 @@ function clear_xs {
 	do
 		power_state=$(xe vm-list params=power-state uuid=$uuid --minimal)
 		[ $power_state == "running" ] && xe vm-shutdown force=true uuid=$uuid
-		xe vm-destroy uuid=$uuid
+		vbd=$(xe vbd-list vm-uuid=$uuid type=Disk params=uuid --minimal)
+		[ -n "$vbd" ] && xe vbd-param-set uuid=$vbd other-config:owner
+		xe vm-uninstall uuid=$uuid force=true
 	done
 	CONTROLLER_UUIDS=$(xe vm-list name-label=Controller --minimal)
 	for uuid in $(echo $CONTROLLER_UUIDS | sed "s/,/ /g")
 	do
 		power_state=$(xe vm-list params=power-state uuid=$uuid --minimal)
 		[ $power_state == "running" ] && xe vm-shutdown force=true uuid=$uuid
-		xe vm-destroy uuid=$uuid
+		vbd=$(xe vbd-list vm-uuid=$uuid type=Disk params=uuid --minimal)
+		[ -n "$vbd" ] && xe vbd-param-set uuid=$vbd other-config:owner
+		xe vm-uninstall uuid=$uuid force=true
 	done
 	'
 }
