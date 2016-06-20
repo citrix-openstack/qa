@@ -67,7 +67,7 @@ while read change; do
             else
                 echo "[MERGE-CONFLICT] Removing commit ids from conflicting files"
                 git diff --name-only --diff-filter=U | while read conflicting_filename; do
-                    sed -ie 's/^\(>\+\) \([^ ]\+\) \(.*\)$/\1 \3/g' \
+                    sed -i -e 's/^\(>\+\) \([^ ]\+\) \(.*\)$/\1 \3/g' \
                       "$conflicting_filename"
                 done
                 echo "[MERGE-CONFLICT] Printing diff to standard output"

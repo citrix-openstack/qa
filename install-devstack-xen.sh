@@ -415,8 +415,8 @@ set -exu
 
 cd $TMPDIR
 
-wget -qO - "$DEVSTACK_SRC" |
-    tar -xzf -
+wget "$DEVSTACK_SRC" -O _devstack.tgz
+tar -xzf _devstack.tgz
 cd devstack*
 END_OF_XENSERVER_COMMANDS
 fi

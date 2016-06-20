@@ -67,7 +67,7 @@ APT_ASSUME_YES
 
 # If we're running on wheezy, upgrade to jessie automatically
 if \`grep -q wheezy /etc/apt/sources.list\`; then
-    sudo sed -ie 's/wheezy/jessie/g' /etc/apt/sources.list
+    sudo sed -i -e 's/wheezy/jessie/g' /etc/apt/sources.list
 fi
 
 sudo apt-get update
