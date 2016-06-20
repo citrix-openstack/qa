@@ -144,7 +144,14 @@ function wait_for_node_reboot_and_retry {
 	for i in {0..10}; do
 		discovered=$(wait_for_node $fm_ip $node_mac)
 		[ -n "$discovered" ] && echo $discovered && return
-		ssh -qo StrictHostKeyChecking=no root@$xs_host 'xe vm-reboot vm="'$vm'" force=true'
+		ssh -qo StrictHostKeyChecking=no root@$xs_host '
+		power_state=$(xe vm-list name-label="'$vm'" params=power-state --minimal)
+		if [ $power_state == "running" ]; then
+			xe vm-reboot vm="'$vm'" force=true
+		else
+			xe vm-start vm="'$vm'" force=true
+		fi
+		'
 	done
 }
 
