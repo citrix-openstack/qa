@@ -129,7 +129,7 @@ function wait_for_node {
 		echo $?
 		')
 		set -x
-		[ $discovered -eq 0 ] && echo true && return
+		[ "$discovered" -eq 0 ] && echo true && return
 		sleep 10
 	done
 }
@@ -146,7 +146,7 @@ function wait_for_node_reboot_and_retry {
 		[ -n "$discovered" ] && echo $discovered && return
 		ssh -qo StrictHostKeyChecking=no root@$xs_host '
 		power_state=$(xe vm-list name-label="'$vm'" params=power-state --minimal)
-		if [ $power_state == "running" ]; then
+		if [ "$power_state" == "running" ]; then
 			xe vm-reboot vm="'$vm'" force=true
 		else
 			xe vm-start vm="'$vm'" force=true
@@ -206,11 +206,11 @@ function verify_network {
 		')
 		status=$(echo $task | awk -F '|' '{print $2}')
 		progress=$(echo $task | awk -F '|' '{print $5}')
-		if [ $status == "error" ]; then
+		if [ "$status" == "error" ]; then
 			echo 0
 			return
 		fi
-		if [ $progress -eq "100" ]; then
+		if [ "$progress" -eq "100" ]; then
 			echo 1
 			return
 		fi
@@ -224,7 +224,7 @@ function verify_network_and_retry {
 	local env_name="$2"
 	for i in {0..3}; do
 		network_verified=$(verify_network "$fm_ip" "$env_name")
-		if [ $network_verified -eq 1 ]; then
+		if [ "$network_verified" -eq 1 ]; then
 			echo 1
 			return
 		fi
@@ -258,20 +258,20 @@ echo "Fuel plugin is installed"
 create_env "$FM_IP" "$ENV_NAME" "$REL_NAME" "$ATTRIBUTES_YAML" "$NETWORK_YAML"
 
 COMPUTE_MAC=$(get_node_mac "$XS_HOST" "Compute")
-[ -z $COMPUTE_MAC ] && echo "Compute node doesnot exist" && exit -1
+[ -z "$COMPUTE_MAC" ] && echo "Compute node doesnot exist" && exit -1
 COMPUTE_DISCOVERED=$(wait_for_node_reboot_and_retry "$FM_IP" "$COMPUTE_MAC" "$XS_HOST" "Compute")
-[ -z $COMPUTE_DISCOVERED ] && echo "Compute node discovery timeout" && exit -1
+[ -z "$COMPUTE_DISCOVERED" ] && echo "Compute node discovery timeout" && exit -1
 add_env_node "$FM_IP" "$ENV_NAME" "$COMPUTE_MAC" "compute,cinder" $INTERFACE_YAML
 echo "Compute Node added"
 
 CONTROLLER_MAC=$(get_node_mac "$XS_HOST" "Controller")
-[ -z $CONTROLLER_MAC ] && echo "Controller node doesnot exist" && exit -1
+[ -z "$CONTROLLER_MAC" ] && echo "Controller node doesnot exist" && exit -1
 CONTROLLER_DISCOVERED=$(wait_for_node_reboot_and_retry "$FM_IP" "$CONTROLLER_MAC" "$XS_HOST" "Controller")
-[ -z $CONTROLLER_DISCOVERED ] && echo "Controller node discovery timeout" && exit -1
+[ -z "$CONTROLLER_DISCOVERED" ] && echo "Controller node discovery timeout" && exit -1
 add_env_node "$FM_IP" "$ENV_NAME" "$CONTROLLER_MAC" "controller" $INTERFACE_YAML
 echo "Controller Node added"
 
 NETWORK_VERIFIED=$(verify_network_and_retry "$FM_IP" "$ENV_NAME")
-[ $NETWORK_VERIFIED -eq 0 ] && echo "Network verification failed" && exit -1
+[ "$NETWORK_VERIFIED" -eq 0 ] && echo "Network verification failed" && exit -1
 
 deploy_env "$FM_IP" "$ENV_NAME"

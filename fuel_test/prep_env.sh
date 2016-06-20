@@ -237,7 +237,7 @@ FM_IP=$(wait_for_fm "$XS_HOST" "$FM_NAME")
 sshpass -p "$FM_PWD" ssh-copy-id -o StrictHostKeyChecking=no root@$FM_IP
 
 NAILGUN_READY=$(wait_for_nailgun "$FM_IP")
-[ $NAILGUN_READY -eq 0 ] && echo "Nailgun test connection timeout" && exit -1
+[ "$NAILGUN_READY" -eq 0 ] && echo "Nailgun test connection timeout" && exit -1
 
 start_node "$XS_HOST" "Compute"
 echo "Compute Node is started"
