@@ -24,12 +24,20 @@ function clear_xs {
 	yum list installed openstack-neutron-xen-plugins.noarch && yum remove openstack-neutron-xen-plugins.noarch -y
 	yum list installed openstack-xen-plugins.noarch && yum remove openstack-xen-plugins.noarch -y
 
-	COMPUTE_UUID=$(xe vm-list name-label=Compute --minimal)
-	[ -n "$COMPUTE_UUID" ] && xe vm-shutdown force=true uuid=$COMPUTE_UUID
-	[ -n "$COMPUTE_UUID" ] && xe vm-destroy uuid=$COMPUTE_UUID
-	CONTROLLER_UUID=$(xe vm-list name-label=Controller --minimal)
-	[ -n "$COMPUTE_UUID" ] && xe vm-shutdown force=true uuid=$CONTROLLER_UUID
-	[ -n "$COMPUTE_UUID" ] && xe vm-destroy uuid=$CONTROLLER_UUID
+	COMPUTE_UUIDS=$(xe vm-list name-label=Compute --minimal)
+	for uuid in $(echo $COMPUTE_UUIDS | sed "s/,/ /g")
+	do
+		power_state=$(xe vm-list params=power-state uuid=$uuid --minimal)
+		[ $power_state == "running" ] && xe vm-shutdown force=true uuid=$uuid
+		xe vm-destroy uuid=$uuid
+	done
+	CONTROLLER_UUIDS=$(xe vm-list name-label=Controller --minimal)
+	for uuid in $(echo $CONTROLLER_UUIDS | sed "s/,/ /g")
+	do
+		power_state=$(xe vm-list params=power-state uuid=$uuid --minimal)
+		[ $power_state == "running" ] && xe vm-shutdown force=true uuid=$uuid
+		xe vm-destroy uuid=$uuid
+	done
 	'
 }
 
