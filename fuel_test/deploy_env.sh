@@ -222,12 +222,16 @@ function verify_network {
 function verify_network_and_retry {
 	local fm_ip="$1"
 	local env_name="$2"
+	local xs_host="$3"
 	for i in {0..3}; do
 		network_verified=$(verify_network "$fm_ip" "$env_name")
 		if [ "$network_verified" -eq 1 ]; then
 			echo 1
 			return
 		fi
+
+		# In case both nodes are disconnected
+		ssh -qo StrictHostKeyChecking=no root@$xs_host '/etc/udev/scripts/recreate-gateway.sh'
 	done
 	echo 0
 }
@@ -271,7 +275,7 @@ CONTROLLER_DISCOVERED=$(wait_for_node_reboot_and_retry "$FM_IP" "$CONTROLLER_MAC
 add_env_node "$FM_IP" "$ENV_NAME" "$CONTROLLER_MAC" "controller" $INTERFACE_YAML
 echo "Controller Node added"
 
-NETWORK_VERIFIED=$(verify_network_and_retry "$FM_IP" "$ENV_NAME")
+NETWORK_VERIFIED=$(verify_network_and_retry "$FM_IP" "$ENV_NAME" "$XS_HOST")
 [ "$NETWORK_VERIFIED" -eq 0 ] && echo "Network verification failed" && exit -1
 
 deploy_env "$FM_IP" "$ENV_NAME"
