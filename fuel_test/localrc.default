@@ -3,11 +3,11 @@ export XS_HOST=${XS_HOST:-""}
 export FM_MNT=${FM_MNT:-""}
 export FUEL_PLUGIN_REFSPEC=${FUEL_PLUGIN_REFSPEC:-""}
 export FM_PWD=${FM_PWD:-""}
+export FUEL_TEST_SUCCESS=${FUEL_TEST_SUCCESS:-"/opt/success_fuel_test"}
 export FM_NAME="Fuel8"
 export FM_SNAPSHOT="fuel_ci"
 export FM_XVA="fuel8.xva"
 export ENV_NAME="TestEnv"
-
 export REL_NAME="Liberty on Ubuntu 14.04"
 
 export ATTRIBUTES_YAML="env_attributes.yaml.default"

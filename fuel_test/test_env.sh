@@ -39,4 +39,4 @@ RESULT=$(comm -3 \
 <(echo -e $result | egrep -o "\[failure\] '[^\']+'" | sed -e "s|\[failure\] ||g" | sed -e "s|'||g" | sort) \
 <(printf '%s\n' "${IGNORE_CHECKS[@]}" | sort))
 [[ -n "$RESULT" ]] && echo "$RESULT" && exit 1
-exit 0
+touch "$FUEL_TEST_SUCCESS"

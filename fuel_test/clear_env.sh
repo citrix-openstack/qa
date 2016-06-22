@@ -6,6 +6,8 @@
 
 [ $DEBUG == "on" ] && set -x
 
+rm -f "$FUEL_TEST_SUCCESS"
+
 function clear_xs {
 	local xs_host="$1"
 	ssh -qo StrictHostKeyChecking=no root@$xs_host \
