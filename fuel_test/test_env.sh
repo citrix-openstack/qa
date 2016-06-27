@@ -28,7 +28,10 @@ function health_check {
 	set -eux
 	export fuelclient_custom_settings="/etc/fuel/client/config.yaml"
 	env_id=$(fuel env | grep "'$env_name'" | egrep -o "^[0-9]+")
-	fuel --env $env_id health --check smoke,sanity,tests_platform,cloudvalidation
+	fuel --env $env_id health --check smoke
+	fuel --env $env_id health --check sanity
+	fuel --env $env_id health --check tests_platform
+	fuel --env $env_id health --check cloudvalidation
 	')
 	echo $result
 }
