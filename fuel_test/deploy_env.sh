@@ -251,6 +251,22 @@ function deploy_env {
 	set -x
 }
 
+function check_env_status {
+	local fm_ip="$1"
+	local env_name="$2"
+
+	success=$(ssh -qo StrictHostKeyChecking=no root@$fm_ip \
+	'
+	set -eux
+
+	export fuelclient_custom_settings="/etc/fuel/client/config.yaml"
+	env_id=$(fuel env | grep "'$env_name'" | egrep -o "^[0-9]+")
+	fuel env --env $env_id | grep -q operational
+	echo $?
+	')
+	[ "$success" -eq 0 ] && echo 1
+}
+
 FM_IP=$(get_fm_ip "$XS_HOST" "$FM_NAME")
 
 build_plugin $FM_IP $FUEL_PLUGIN_REFSPEC
@@ -279,3 +295,7 @@ NETWORK_VERIFIED=$(verify_network_and_retry "$FM_IP" "$ENV_NAME" "$XS_HOST")
 [ "$NETWORK_VERIFIED" -eq 0 ] && echo "Network verification failed" && exit -1
 
 deploy_env "$FM_IP" "$ENV_NAME"
+SUCCESS=$(check_env_status "$FM_IP" "$ENV_NAME")
+[ "$SUCCESS" -eq 0 ] && echo "Deployment failed" && exit -1
+
+exit 0
