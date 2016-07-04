@@ -526,6 +526,8 @@ cat << LOCALCONF_CONTENT_ENDS_HERE > local.conf
 [DEFAULT]
 disk_allocation_ratio = 2.0
 
+# Additional localconf parameters here
+
 LOCALCONF_CONTENT_ENDS_HERE
 
 # XenServer doesn't have nproc by default - but it's used by stackrc.
