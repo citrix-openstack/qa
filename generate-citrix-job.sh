@@ -109,6 +109,9 @@ fi
 EXTENSION_POINT="^# Additional Localrc parameters here$"
 EXTENSIONS=$(mktemp)
 
+EXTENSION_LOCALCONF_POINT="^# Additional localconf parameters here$"
+EXTENSIONS_LOCALCONF=$(mktemp)
+
 # Set ubuntu install proxy for intenal script
 if [ "true" = "$INTERNAL" ]; then
     cat "$THIS_DIR/modifications/add-ubuntu-proxy-repos" >> $EXTENSIONS
@@ -148,6 +151,7 @@ fi
 # Configure neutron if needed
 if [ "$SETUP_TYPE" == "neutron" ]; then
     cat "$THIS_DIR/modifications/use-neutron" >> $EXTENSIONS
+    cat "$THIS_DIR/modifications/use-neutron-localconf" >> $EXTENSIONS_LOCALCONF
 fi
 
 # Configure VLAN Manager if needed
@@ -173,7 +177,9 @@ fi
 # Extend template
 sed \
     -e "/$EXTENSION_POINT/r  $EXTENSIONS" \
+    -e "/$EXTENSION_LOCALCONF_POINT/r  $EXTENSIONS_LOCALCONF" \
     -e "s,^\(DEVSTACK_SRC=\).*,\1http://$REPO_BASE/devstack/archive/$BRANCH_REF_NAME.tar.gz,g" \
     "$TEMPLATE_NAME"
 
 rm -f "$EXTENSIONS"
+rm -f "$EXTENSIONS_LOCALCONF"
