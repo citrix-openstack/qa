@@ -172,7 +172,7 @@ function add_env_node {
 
 	export fuelclient_custom_settings="/etc/fuel/client/config.yaml"
 	env_id=$(fuel env | grep "'$env_name'" | egrep -o "^[0-9]+")
-	node_id=$(fuel node --node-id "'$node_mac'" | grep "'$node_mac'" | egrep -o "^[0-9]+")
+	node_id=$(fuel node --node-id "'$node_mac'" | grep "'$node_mac'" | awk -F "|" "{print \$1}" | tr -d " ")
 	fuel node set --node $node_id --env $env_id --role "'$role'"
 
 	cd /tmp
