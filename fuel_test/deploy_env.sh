@@ -251,6 +251,12 @@ function deploy_env {
 	set -x
 }
 
+function print_env_messages {
+	local fm_ip="$1"
+
+	ssh -qo StrictHostKeyChecking=no root@$fm_ip 'fuel notifications'
+}
+
 function check_env_status {
 	local fm_ip="$1"
 	local env_name="$2"
@@ -295,6 +301,9 @@ NETWORK_VERIFIED=$(verify_network_and_retry "$FM_IP" "$ENV_NAME" "$XS_HOST")
 [ "$NETWORK_VERIFIED" -eq 0 ] && echo "Network verification failed" && exit -1
 
 deploy_env "$FM_IP" "$ENV_NAME"
+
+print_env_messages "$FM_IP"
+
 SUCCESS=$(check_env_status "$FM_IP" "$ENV_NAME")
 [ "$SUCCESS" -eq 0 ] && echo "Deployment failed" && exit -1
 
