@@ -27,6 +27,7 @@ function recreate_gateway {
 	recreate_gateway_sh="/etc/udev/scripts/recreate-gateway.sh"
 	cat > $recreate_gateway_sh << RECREATE_GATEWAY
 #!/bin/bash
+/bin/sleep 10
 if /sbin/ip link show $bridge > /dev/null 2>&1; then
   if !(/sbin/ip addr show $bridge | /bin/grep -q 172.16.1.1); then
     /sbin/ip addr add dev $bridge 172.16.1.1
