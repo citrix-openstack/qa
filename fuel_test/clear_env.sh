@@ -7,6 +7,7 @@
 [ $DEBUG == "on" ] && set -x
 
 rm -f "$FUEL_TEST_SUCCESS"
+mkdir -p "$FUEL_TEST_LOG_DIR"
 
 function clear_xs {
 	local xs_host="$1"
