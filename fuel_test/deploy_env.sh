@@ -223,7 +223,7 @@ function verify_network_and_retry {
 	local fm_ip="$1"
 	local env_name="$2"
 	local xs_host="$3"
-	for i in {0..3}; do
+	for i in {0..10}; do
 		network_verified=$(verify_network "$fm_ip" "$env_name")
 		if [ "$network_verified" -eq 1 ]; then
 			echo 1
