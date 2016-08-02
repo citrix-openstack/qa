@@ -1,8 +1,7 @@
 editable:
   external_ntp:
     ntp_list:
-      value:
-      - 10.20.0.2
+      value: 10.20.0.2
   fuel-plugin-xenserver:
     metadata:
       enabled: True

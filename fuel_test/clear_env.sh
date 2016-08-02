@@ -46,6 +46,11 @@ function clear_xs {
 		xe vm-uninstall uuid=$uuid force=true
 	done
 	'
+	for i in "${ALL_FM_VERSION[@]}"; do
+		ssh -qo StrictHostKeyChecking=no root@$xs_host '[ -n "$(xe vm-list name-label=Fuel'${i:0:1}' --minimal)" ] && xe vm-shutdown force=true vm="Fuel'${i:0:1}'"'
+	done
 }
 
 clear_xs "$XS_HOST"
+
+exit 0

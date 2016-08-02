@@ -57,9 +57,15 @@ function archive_log {
 	scp $controller_ip:/var/log/fuel-plugin-xenserver/controller_post_deployment.log /tmp/fuel-plugin-xenserver
 	scp $controller_ip:/var/log/neutron-all.log /tmp/fuel-plugin-xenserver
 
-	docker cp fuel-core-8.0-astute:/var/log/astute/astute.log /tmp/fuel-plugin-xenserver
-	docker cp fuel-core-8.0-ostf:/var/log/ostf.log /tmp/fuel-plugin-xenserver
-	docker cp fuel-core-8.0-mcollective:/var/log/mcollective.log /tmp/fuel-plugin-xenserver
+	if [ "'$FM_VERSION'" == "8.0" ]; then
+		docker cp fuel-core-8.0-astute:/var/log/astute/astute.log /tmp/fuel-plugin-xenserver
+		docker cp fuel-core-8.0-ostf:/var/log/ostf.log /tmp/fuel-plugin-xenserver
+		docker cp fuel-core-8.0-mcollective:/var/log/mcollective.log /tmp/fuel-plugin-xenserver
+	else
+		cp /var/log/astute/astute.log /tmp/fuel-plugin-xenserver
+		cp /var/log/ostf.log /tmp/fuel-plugin-xenserver
+		cp /var/log/mcollective.log /tmp/fuel-plugin-xenserver
+	fi
 	'
 
 	scp -rqo stricthostkeychecking=no root@$fm_ip:/tmp/fuel-plugin-xenserver/ "$FUEL_TEST_LOG_DIR"
