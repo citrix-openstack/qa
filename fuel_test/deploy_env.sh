@@ -118,7 +118,7 @@ function wait_for_node {
 	# Wait for node discovery
 	local fm_ip="$1"
 	local node_mac="$2"
-	for i in {0..60..10}; do
+	for i in {0..200..10}; do
 		set +x
 		discovered=$(ssh -qo StrictHostKeyChecking=no root@$fm_ip \
 		'
