@@ -1,0 +1,8 @@
+eth0:
+- fuelweb_admin
+eth1:
+- public
+- management
+- storage
+eth2:
+- private

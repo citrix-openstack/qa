@@ -8,40 +8,12 @@ export FUEL_TEST_LOG_DIR=${FUEL_TEST_LOG_DIR:-"fuel_test_logs"}
 export FM_SNAPSHOT="fuel_ci"
 export ENV_NAME="TestEnv"
 
-export ALL_FM_VERSION=("8.0" "9.0")
-if [ -z ${ZUUL_BRANCH+x} ] || [ "$ZUUL_BRANCH" == "master" ]; then
-	export FM_VERSION="9.0"
-else
-	export FM_VERSION="$ZUUL_BRANCH"
-fi
+export ALL_FUEL_VERSION=(8 9)
+export FUEL_VERSION=${FUEL_VERSION:-"9"}
 
-export FM_NAME="Fuel${FM_VERSION:0:1}"
-export FM_XVA="fuel${FM_VERSION:0:1}.xva"
-
-export ATTRIBUTES_YAML="env_attributes.yaml.default"
-export NETWORK_YAML="env_network.yaml.default"
-export INTERFACE_YAML="node_interfaces.yaml.default"
-export IGNORE_CHECKS=(
-	"Update stack actions: inplace, replace and update whole template"
-)
-
-case "$FM_VERSION" in
-    9.0)
-        export REL_NAME="Mitaka on Ubuntu 14.04"
-        ;;
-
-    8.0)
-        export REL_NAME="Liberty on Ubuntu 14.04"
-        export ATTRIBUTES_YAML="env_attributes.yaml.default8"
-        export IGNORE_CHECKS=()
-        ;;
-
-    *)
-        echo $"ZUUL_BRANCH should be master|8.0|9.0"
-        exit 1
-
-esac
-
+export ATTRIBUTES_YAML="env_attributes.yaml"
+export NETWORK_YAML="env_network.yaml"
+export INTERFACE_YAML="node_interfaces.yaml"
 
 export NODE_DISK="70"
 export NODE_MEM_CONTROLLER="4096"
@@ -52,3 +24,11 @@ export NET2="private"
 export NET3="neutron"
 
 export DEBUG=on
+
+export -A IGNORE_CHECKS
+IGNORE_CHECKS[8]=""
+IGNORE_CHECKS[9]="Update stack actions: inplace, replace and update whole template"
+
+export -A REL_NAME
+REL_NAME[8]="Liberty on Ubuntu 14.04"
+REL_NAME[9]="Mitaka on Ubuntu 14.04"

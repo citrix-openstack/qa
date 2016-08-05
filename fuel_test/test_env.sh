@@ -57,7 +57,7 @@ function archive_log {
 	scp $controller_ip:/var/log/fuel-plugin-xenserver/controller_post_deployment.log /tmp/fuel-plugin-xenserver
 	scp $controller_ip:/var/log/neutron-all.log /tmp/fuel-plugin-xenserver
 
-	if [ "'$FM_VERSION'" == "8.0" ]; then
+	if [ "'$FUEL_VERSION'" == "8" ]; then
 		docker cp fuel-core-8.0-astute:/var/log/astute/astute.log /tmp/fuel-plugin-xenserver
 		docker cp fuel-core-8.0-ostf:/var/log/ostf.log /tmp/fuel-plugin-xenserver
 		docker cp fuel-core-8.0-mcollective:/var/log/mcollective.log /tmp/fuel-plugin-xenserver
@@ -71,11 +71,11 @@ function archive_log {
 	scp -rqo stricthostkeychecking=no root@$fm_ip:/tmp/fuel-plugin-xenserver/ "$FUEL_TEST_LOG_DIR"
 }
 
-FM_IP=$(get_fm_ip "$XS_HOST" "$FM_NAME")
+FM_IP=$(get_fm_ip "$XS_HOST" "Fuel$FUEL_VERSION")
 result=$(health_check "$FM_IP" "$ENV_NAME")
 RESULT=$(comm -3 \
 <(echo -e $result | egrep -o "\[failure\] '[^\']+'" | sed -e "s|\[failure\] ||g" | sed -e "s|'||g" | sort) \
-<(printf '%s\n' "${IGNORE_CHECKS[@]}" | sort))
+<(printf "${IGNORE_CHECKS[$FUEL_VERSION]}" | sort))
 archive_log "$FM_IP" "$ENV_NAME"
 [[ -n "$RESULT" ]] && echo "$RESULT" && exit 1
 touch "$FUEL_TEST_SUCCESS"

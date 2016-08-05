@@ -47,8 +47,15 @@ pip install bandit
 bandit deployment_scripts/compute_post_deployment.py
 
 pip install git+https://github.com/openstack/fuel-plugins
-fpb --check .
-fpb --build .
+
+if [[ -f "branding.inc" ]]; then
+	make rpm
+else
+	fpb --check .
+	fpb --build .
+	mkdir -p output
+	mv fuel-plugin-xenserver-*.noarch.rpm output/
+fi
 	'
 }
 
@@ -59,7 +66,7 @@ function install_plugin {
 	'
 	set -eux
 	export FUELCLIENT_CUSTOM_SETTINGS="/etc/fuel/client/config.yaml"
-	fuel plugins --install $(ls /root/fuel-plugin-xenserver/fuel-plugin-xenserver-*.noarch.rpm -t | head -n 1) &> /dev/null
+	fuel plugins --install $(ls /root/fuel-plugin-xenserver/output/fuel-plugin-xenserver-*.noarch.rpm -t | head -n 1) &> /dev/null
 	'
 }
 
@@ -273,7 +280,7 @@ function check_env_status {
 	[ "$success" -eq 0 ] && echo 1
 }
 
-FM_IP=$(get_fm_ip "$XS_HOST" "$FM_NAME")
+FM_IP=$(get_fm_ip "$XS_HOST" "Fuel$FUEL_VERSION")
 
 build_plugin $FM_IP $FUEL_PLUGIN_REFSPEC
 echo "Fuel plugin with $FUEL_PLUGIN_REFSPEC is built"
@@ -281,20 +288,20 @@ echo "Fuel plugin with $FUEL_PLUGIN_REFSPEC is built"
 install_plugin "$FM_IP"
 echo "Fuel plugin is installed"
 
-create_env "$FM_IP" "$ENV_NAME" "$REL_NAME" "$ATTRIBUTES_YAML" "$NETWORK_YAML"
+create_env "$FM_IP" "$ENV_NAME" "${REL_NAME[$FUEL_VERSION]}" "$ATTRIBUTES_YAML$FUEL_VERSION" "$NETWORK_YAML$FUEL_VERSION"
 
 COMPUTE_MAC=$(get_node_mac "$XS_HOST" "Compute")
 [ -z "$COMPUTE_MAC" ] && echo "Compute node doesnot exist" && exit -1
 COMPUTE_DISCOVERED=$(wait_for_node_reboot_and_retry "$FM_IP" "$COMPUTE_MAC" "$XS_HOST" "Compute")
 [ -z "$COMPUTE_DISCOVERED" ] && echo "Compute node discovery timeout" && exit -1
-add_env_node "$FM_IP" "$ENV_NAME" "$COMPUTE_MAC" "compute,cinder" $INTERFACE_YAML
+add_env_node "$FM_IP" "$ENV_NAME" "$COMPUTE_MAC" "compute,cinder" "$INTERFACE_YAML$FUEL_VERSION"
 echo "Compute Node added"
 
 CONTROLLER_MAC=$(get_node_mac "$XS_HOST" "Controller")
 [ -z "$CONTROLLER_MAC" ] && echo "Controller node doesnot exist" && exit -1
 CONTROLLER_DISCOVERED=$(wait_for_node_reboot_and_retry "$FM_IP" "$CONTROLLER_MAC" "$XS_HOST" "Controller")
 [ -z "$CONTROLLER_DISCOVERED" ] && echo "Controller node discovery timeout" && exit -1
-add_env_node "$FM_IP" "$ENV_NAME" "$CONTROLLER_MAC" "controller" $INTERFACE_YAML
+add_env_node "$FM_IP" "$ENV_NAME" "$CONTROLLER_MAC" "controller" "$INTERFACE_YAML$FUEL_VERSION"
 echo "Controller Node added"
 
 NETWORK_VERIFIED=$(verify_network_and_retry "$FM_IP" "$ENV_NAME" "$XS_HOST")

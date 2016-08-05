@@ -216,7 +216,7 @@ function wait_for_nailgun {
 create_networks "$XS_HOST" "$NET1" "$NET2" "$NET3"
 
 echo "Restoring Fuel Master.."
-restore_fm "$XS_HOST" "$FM_NAME" "$FM_SNAPSHOT" "$FM_MNT" "$FM_XVA"
+restore_fm "$XS_HOST" "Fuel$FUEL_VERSION" "$FM_SNAPSHOT" "$FM_MNT" "fuel$FUEL_VERSION.xva"
 
 create_node "$XS_HOST" "Compute" "$NODE_MEM_COMPUTE" "$NODE_DISK"
 add_vif "$XS_HOST" "Compute" "$NET1" 1
@@ -232,7 +232,7 @@ add_vif "$XS_HOST" "Controller" "$NET2" 2
 add_vif "$XS_HOST" "Controller" "$NET3" 3
 echo "Controller Node is created"
 
-FM_IP=$(wait_for_fm "$XS_HOST" "$FM_NAME")
+FM_IP=$(wait_for_fm "$XS_HOST" "Fuel$FUEL_VERSION")
 [ -z "$FM_IP" ] && echo "Fuel Master IP obtaining timeout" && exit -1
 
 sshpass -p "$FM_PWD" ssh-copy-id -o StrictHostKeyChecking=no root@$FM_IP
