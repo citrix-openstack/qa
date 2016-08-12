@@ -25,9 +25,9 @@ function recreate_gateway {
 	set -eux
 	bridge=$(xe network-list name-label="'$2'" params=bridge minimal=true)
 	recreate_gateway_sh="/etc/udev/scripts/recreate-gateway.sh"
-	if [ ! -x $recreate_gateway_sh ]; then
-		cat > $recreate_gateway_sh << RECREATE_GATEWAY
+	cat > $recreate_gateway_sh << RECREATE_GATEWAY
 #!/bin/bash
+/bin/sleep 10
 if /sbin/ip link show $bridge > /dev/null 2>&1; then
   if !(/sbin/ip addr show $bridge | /bin/grep -q 172.16.1.1); then
     /sbin/ip addr add dev $bridge 172.16.1.1
@@ -49,13 +49,13 @@ if /sbin/ip link show $bridge > /dev/null 2>&1; then
   fi
 fi
 RECREATE_GATEWAY
-		chmod +x $recreate_gateway_sh
-		# To skip the reboot, here explicitly run recreate-gateway.sh to activate for the first time
-		$recreate_gateway_sh
-		echo "SUBSYSTEM==net ACTION==add KERNEL==xapi* RUN+=$recreate_gateway_sh" > /etc/udev/rules.d/90-gateway.rules
-		sed -i -e "s/net.ipv4.ip_forward.*/net.ipv4.ip_forward = 1/" /etc/sysctl.conf
-		sysctl net.ipv4.ip_forward=1
-	fi
+
+	chmod +x $recreate_gateway_sh
+	# To skip the reboot, here explicitly run recreate-gateway.sh to activate for the first time
+	$recreate_gateway_sh
+	echo "SUBSYSTEM==net ACTION==add KERNEL==xapi* RUN+=$recreate_gateway_sh" > /etc/udev/rules.d/90-gateway.rules
+	sed -i -e "s/net.ipv4.ip_forward.*/net.ipv4.ip_forward = 1/" /etc/sysctl.conf
+	sysctl net.ipv4.ip_forward=1
 	'
 }
 
@@ -76,6 +76,7 @@ function restore_fm {
 	else
 		mount "'$fm_mnt'" /mnt
 		xe vm-import filename="/mnt/'$fm_xva'" preserve=true
+		umount /mnt
 		vm_uuid=$(xe vm-list name-label="'$fm_name'" --minimal)
 		vif=$(xe vif-list vm-uuid=$vm_uuid device=1 --minimal)
 		net=$(xe vif-list vm-uuid=$vm_uuid device=1 params=network-uuid --minimal)
@@ -215,7 +216,7 @@ function wait_for_nailgun {
 create_networks "$XS_HOST" "$NET1" "$NET2" "$NET3"
 
 echo "Restoring Fuel Master.."
-restore_fm "$XS_HOST" "$FM_NAME" "$FM_SNAPSHOT" "$FM_MNT" "$FM_XVA"
+restore_fm "$XS_HOST" "Fuel$FUEL_VERSION" "$FM_SNAPSHOT" "$FM_MNT" "fuel$FUEL_VERSION.xva"
 
 create_node "$XS_HOST" "Compute" "$NODE_MEM_COMPUTE" "$NODE_DISK"
 add_vif "$XS_HOST" "Compute" "$NET1" 1
@@ -231,13 +232,13 @@ add_vif "$XS_HOST" "Controller" "$NET2" 2
 add_vif "$XS_HOST" "Controller" "$NET3" 3
 echo "Controller Node is created"
 
-FM_IP=$(wait_for_fm "$XS_HOST" "$FM_NAME")
+FM_IP=$(wait_for_fm "$XS_HOST" "Fuel$FUEL_VERSION")
 [ -z "$FM_IP" ] && echo "Fuel Master IP obtaining timeout" && exit -1
 
 sshpass -p "$FM_PWD" ssh-copy-id -o StrictHostKeyChecking=no root@$FM_IP
 
 NAILGUN_READY=$(wait_for_nailgun "$FM_IP")
-[ $NAILGUN_READY -eq 0 ] && echo "Nailgun test connection timeout" && exit -1
+[ "$NAILGUN_READY" -eq 0 ] && echo "Nailgun test connection timeout" && exit -1
 
 start_node "$XS_HOST" "Compute"
 echo "Compute Node is started"

@@ -6,6 +6,9 @@
 
 [ $DEBUG == "on" ] && set -x
 
+rm -f "$FUEL_TEST_SUCCESS"
+mkdir -p "$FUEL_TEST_LOG_DIR"
+
 function clear_xs {
 	local xs_host="$1"
 	ssh -qo StrictHostKeyChecking=no root@$xs_host \
@@ -24,13 +27,30 @@ function clear_xs {
 	yum list installed openstack-neutron-xen-plugins.noarch && yum remove openstack-neutron-xen-plugins.noarch -y
 	yum list installed openstack-xen-plugins.noarch && yum remove openstack-xen-plugins.noarch -y
 
-	COMPUTE_UUID=$(xe vm-list name-label=Compute --minimal)
-	[ -z COMPUTE_UUID ] && xe vm-shutdown force=true uuid=$COMPUTE_UUID
-	[ -z COMPUTE_UUID ] && xe vm-destroy uuid=$COMPUTE_UUID
-	CONTROLLER_UUID=$(xe vm-list name-label=Controller --minimal)
-	[ -z COMPUTE_UUID ] && xe vm-shutdown force=true uuid=$CONTROLLER_UUID
-	[ -z COMPUTE_UUID ] && xe vm-destroy uuid=$CONTROLLER_UUID
+	COMPUTE_UUIDS=$(xe vm-list name-label=Compute --minimal)
+	for uuid in $(echo $COMPUTE_UUIDS | sed "s/,/ /g")
+	do
+		power_state=$(xe vm-list params=power-state uuid=$uuid --minimal)
+		[ $power_state == "running" ] && xe vm-shutdown force=true uuid=$uuid
+		vbd=$(xe vbd-list vm-uuid=$uuid type=Disk params=uuid --minimal)
+		[ -n "$vbd" ] && xe vbd-param-set uuid=$vbd other-config:owner
+		xe vm-uninstall uuid=$uuid force=true
+	done
+	CONTROLLER_UUIDS=$(xe vm-list name-label=Controller --minimal)
+	for uuid in $(echo $CONTROLLER_UUIDS | sed "s/,/ /g")
+	do
+		power_state=$(xe vm-list params=power-state uuid=$uuid --minimal)
+		[ $power_state == "running" ] && xe vm-shutdown force=true uuid=$uuid
+		vbd=$(xe vbd-list vm-uuid=$uuid type=Disk params=uuid --minimal)
+		[ -n "$vbd" ] && xe vbd-param-set uuid=$vbd other-config:owner
+		xe vm-uninstall uuid=$uuid force=true
+	done
 	'
+	for i in "${ALL_FUEL_VERSION[@]}"; do
+		ssh -qo StrictHostKeyChecking=no root@$xs_host '[ -n "$(xe vm-list name-label=Fuel'$i' --minimal)" ] && xe vm-shutdown force=true vm="Fuel'$i'"'
+	done
 }
 
 clear_xs "$XS_HOST"
+
+exit 0

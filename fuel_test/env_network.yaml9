@@ -1,0 +1,17 @@
+networking_parameters:
+  floating_ranges:
+  - - 172.16.1.130
+    - 172.16.1.254
+networks:
+- cidr: 172.16.1.0/24
+  gateway: 172.16.1.1
+  ip_ranges:
+  - - 172.16.1.2
+    - 172.16.1.126
+  name: public
+- cidr: 192.168.0.0/24
+  name: management
+  vlan_start: 101
+- cidr: 192.168.1.0/24
+  name: storage
+  vlan_start: 102
