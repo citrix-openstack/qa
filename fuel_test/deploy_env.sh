@@ -29,12 +29,7 @@ set -ex
 
 yum install python-pip git createrepo dpkg-devel dpkg-dev rpm rpm-build -y
 
-pip install virtualenv
 cd /root/
-if [[ ! -d "fuel-devops-venv" ]]; then
-	virtualenv fuel-devops-venv
-fi
-. fuel-devops-venv/bin/activate
 
 if [[ ! -d "fuel-plugin-xenserver" ]]; then
 	git clone https://review.openstack.org/openstack/fuel-plugin-xenserver
