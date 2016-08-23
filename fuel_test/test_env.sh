@@ -50,7 +50,7 @@ function archive_log {
 	env_id=$(fuel env | grep "'$env_name'" | egrep -o "^[0-9]+")
 
 	compute_ip=$(fuel node --env "$env_id" | grep compute | egrep -o "10\\.20\\.0\\.([0-9])+")
-	scp $compute_ip:/var/log/fuel-plugin-xenserver/compute_post_deployment.log /tmp/fuel-plugin-xenserver
+	scp $compute_ip:/var/log/fuel-plugin-xenserver/*.log /tmp/fuel-plugin-xenserver
 	scp $compute_ip:/var/log/nova-all.log /tmp/fuel-plugin-xenserver
 
 	controller_ip=$(fuel node --env "$env_id" | grep controller | egrep -o "10\\.20\\.0\\.([0-9])+")
