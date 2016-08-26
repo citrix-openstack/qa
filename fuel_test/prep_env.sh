@@ -218,7 +218,7 @@ create_networks "$XS_HOST" "$NET1" "$NET2" "$NET3"
 echo "Restoring Fuel Master.."
 restore_fm "$XS_HOST" "Fuel$FUEL_VERSION" "$FM_SNAPSHOT" "$FM_MNT" "fuel$FUEL_VERSION.xva"
 
-create_node "$XS_HOST" "Compute" "$NODE_MEM_COMPUTE" "$NODE_DISK"
+create_node "$XS_HOST" "Compute" "$NODE_MEM_COMPUTE" "$NODE_DISK_COMPUTE"
 add_vif "$XS_HOST" "Compute" "$NET1" 1
 add_vif "$XS_HOST" "Compute" "$NET2" 2
 add_vif "$XS_HOST" "Compute" "$NET3" 3
@@ -226,7 +226,7 @@ echo "Compute Node is created"
 add_himn "$XS_HOST" "Compute"
 
 echo "HIMN is added to Compute Node"
-create_node "$XS_HOST" "Controller" "$NODE_MEM_CONTROLLER" "$NODE_DISK"
+create_node "$XS_HOST" "Controller" "$NODE_MEM_CONTROLLER" "$NODE_DISK_CONTROLLER"
 add_vif "$XS_HOST" "Controller" "$NET1" 1
 add_vif "$XS_HOST" "Controller" "$NET2" 2
 add_vif "$XS_HOST" "Controller" "$NET3" 3
