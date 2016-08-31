@@ -15,5 +15,5 @@ timeout 30m ./prep_env.sh
 [ $? -ne 0 ] && echo prep_env execution timeout && exit -1
 timeout 120m ./deploy_env.sh
 [ $? -ne 0 ] && echo deploy_env execution timeout && exit -1
-timeout 30m ./test_env.sh
+timeout 60m ./test_env.sh
 [ $? -ne 0 ] && echo test_env execution timeout && exit -1
