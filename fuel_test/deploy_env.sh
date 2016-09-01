@@ -206,8 +206,8 @@ function verify_network {
 		export FUELCLIENT_CUSTOM_SETTINGS="/etc/fuel/client/config.yaml"
 		fuel task | grep verify_networks
 		')
-		status=$(echo $task | awk -F '|' '{print $2}')
-		progress=$(echo $task | awk -F '|' '{print $5}')
+		status=$(echo $task | awk -F '|' '{print $2}' | tr -d " ")
+		progress=$(echo $task | awk -F '|' '{print $5}' | tr -d " ")
 		if [ "$status" == "error" ]; then
 			echo 0
 			return
