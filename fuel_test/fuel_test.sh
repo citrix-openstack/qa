@@ -11,6 +11,8 @@ if [[ -d "/tmp/fuel-plugin-xenserver" ]]; then
 	export FUEL_VERSION=$(grep "fuel_version:" /tmp/fuel-plugin-xenserver/plugin_source/metadata.yaml | egrep -o "[0-9]+\." | egrep -o "[0-9]+")
 fi
 
+trap ./archive_log.sh EXIT
+
 timeout 30m ./prep_env.sh
 [ $? -ne 0 ] && echo prep_env execution timeout && exit -1
 timeout 120m ./deploy_env.sh

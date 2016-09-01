@@ -209,16 +209,16 @@ function verify_network {
 		status=$(echo $task | awk -F '|' '{print $2}' | tr -d " ")
 		progress=$(echo $task | awk -F '|' '{print $5}' | tr -d " ")
 		if [ "$status" == "error" ]; then
-			echo 0
+			echo 1
 			return
 		fi
 		if [ "$progress" -eq "100" ]; then
-			echo 1
+			echo 0
 			return
 		fi
 		sleep 10
 	done
-	echo 0
+	echo 1
 }
 
 function verify_network_and_retry {
@@ -227,15 +227,15 @@ function verify_network_and_retry {
 	local xs_host="$3"
 	for i in {0..10}; do
 		network_verified=$(verify_network "$fm_ip" "$env_name")
-		if [ "$network_verified" -eq 1 ]; then
-			echo 1
+		if [ "$network_verified" -eq 0 ]; then
+			echo 0
 			return
 		fi
 
 		# In case both nodes are disconnected
 		ssh -qo StrictHostKeyChecking=no root@$xs_host '/etc/udev/scripts/recreate-gateway.sh'
 	done
-	echo 0
+	echo 1
 }
 
 function deploy_env {
@@ -272,7 +272,7 @@ function check_env_status {
 	fuel env --env $env_id | grep -q operational
 	echo $?
 	')
-	[ "$success" -eq 0 ] && echo 1
+	[ "$success" -eq 0 ] && echo 0
 }
 
 FM_IP=$(get_fm_ip "$XS_HOST" "Fuel$FUEL_VERSION")
@@ -300,13 +300,13 @@ add_env_node "$FM_IP" "$ENV_NAME" "$CONTROLLER_MAC" "controller,mongo" "$INTERFA
 echo "Controller Node added"
 
 NETWORK_VERIFIED=$(verify_network_and_retry "$FM_IP" "$ENV_NAME" "$XS_HOST")
-[ "$NETWORK_VERIFIED" -eq 0 ] && echo "Network verification failed" && exit -1
+[ "$NETWORK_VERIFIED" -ne 0 ] && echo "Network verification failed" && exit -1
 
 deploy_env "$FM_IP" "$ENV_NAME"
 
 print_env_messages "$FM_IP"
 
 SUCCESS=$(check_env_status "$FM_IP" "$ENV_NAME")
-[ "$SUCCESS" -eq 0 ] && echo "Deployment failed" && exit -1
+[ "$SUCCESS" -ne 0 ] && echo "Deployment failed" && exit -1
 
 exit 0

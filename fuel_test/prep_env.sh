@@ -209,12 +209,12 @@ function wait_for_nailgun {
 		echo $?
 		')
 		if [ "$ready" -eq 0 ]; then
-			echo 1
+			echo 0
 			return
 		fi
 		sleep 10
 	done
-	echo 0
+	echo 1
 }
 
 create_networks "$XS_HOST" "$NET1" "$NET2" "$NET3"
@@ -242,7 +242,7 @@ FM_IP=$(wait_for_fm "$XS_HOST" "Fuel$FUEL_VERSION")
 sshpass -p "$FM_PWD" ssh-copy-id -o StrictHostKeyChecking=no root@$FM_IP
 
 NAILGUN_READY=$(wait_for_nailgun "$FM_IP")
-[ "$NAILGUN_READY" -eq 0 ] && echo "Nailgun test connection timeout" && exit -1
+[ "$NAILGUN_READY" -ne 0 ] && echo "Nailgun test connection timeout" && exit -1
 
 start_node "$XS_HOST" "Compute"
 echo "Compute Node is started"
