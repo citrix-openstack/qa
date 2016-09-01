@@ -30,7 +30,8 @@ export DEBUG=on
 
 export -A IGNORE_CHECKS
 IGNORE_CHECKS[8]=""
-IGNORE_CHECKS[9]="Update stack actions: inplace, replace and update whole template"
+IGNORE_CHECKS[9]="Check stack autoscaling
+Update stack actions: inplace, replace and update whole template"
 
 export -A REL_NAME
 REL_NAME[8]="Liberty on Ubuntu 14.04"
