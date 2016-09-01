@@ -26,6 +26,7 @@ function clear_xs {
 
 	yum list installed openstack-neutron-xen-plugins.noarch && yum remove openstack-neutron-xen-plugins.noarch -y
 	yum list installed openstack-xen-plugins.noarch && yum remove openstack-xen-plugins.noarch -y
+	yum list installed conntrack-tools.x86_64 && yum remove conntrack-tools.x86_64 -y
 
 	COMPUTE_UUIDS=$(xe vm-list name-label=Compute --minimal)
 	for uuid in $(echo $COMPUTE_UUIDS | sed "s/,/ /g")
