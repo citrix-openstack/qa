@@ -299,8 +299,8 @@ CONTROLLER_DISCOVERED=$(wait_for_node_reboot_and_retry "$FM_IP" "$CONTROLLER_MAC
 add_env_node "$FM_IP" "$ENV_NAME" "$CONTROLLER_MAC" "controller,mongo" "$INTERFACE_YAML$FUEL_VERSION"
 echo "Controller Node added"
 
-NETWORK_VERIFIED=$(verify_network_and_retry "$FM_IP" "$ENV_NAME" "$XS_HOST")
-[ "$NETWORK_VERIFIED" -ne 0 ] && echo "Network verification failed" && exit -1
+# NETWORK_VERIFIED=$(verify_network_and_retry "$FM_IP" "$ENV_NAME" "$XS_HOST")
+# [ "$NETWORK_VERIFIED" -ne 0 ] && echo "Network verification failed" && exit -1
 
 deploy_env "$FM_IP" "$ENV_NAME"
 
