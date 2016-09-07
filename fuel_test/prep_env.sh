@@ -29,6 +29,9 @@ function recreate_gateway {
 #!/bin/bash
 /bin/sleep 10
 if /sbin/ip link show $bridge > /dev/null 2>&1; then
+  if !(/sbin/iptables -L FORWARD | /bin/head -n 3 | /bin/egrep -q "ACCEPT +udp +-- +anywhere +anywhere"); then
+    /sbin/iptables -I FORWARD 1 -p udp -j ACCEPT
+  fi
   if !(/sbin/ip addr show $bridge | /bin/grep -q 172.16.1.1); then
     /sbin/ip addr add dev $bridge 172.16.1.1
   fi

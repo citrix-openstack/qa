@@ -184,6 +184,11 @@ function add_env_node {
 	'
 }
 
+function check_dom0_iptables {
+	local xs_host="$1"
+	ssh -qo StrictHostKeyChecking=no root@$xs_host 'iptables-save'
+}
+
 function verify_network {
 	# Do network verification and wait for result
 	# return 1 when passes, return 0 when failed or retrial timeout
@@ -299,8 +304,9 @@ CONTROLLER_DISCOVERED=$(wait_for_node_reboot_and_retry "$FM_IP" "$CONTROLLER_MAC
 add_env_node "$FM_IP" "$ENV_NAME" "$CONTROLLER_MAC" "controller,mongo" "$INTERFACE_YAML$FUEL_VERSION"
 echo "Controller Node added"
 
-# NETWORK_VERIFIED=$(verify_network_and_retry "$FM_IP" "$ENV_NAME" "$XS_HOST")
-# [ "$NETWORK_VERIFIED" -ne 0 ] && echo "Network verification failed" && exit -1
+check_dom0_iptables "$XS_HOST"
+NETWORK_VERIFIED=$(verify_network_and_retry "$FM_IP" "$ENV_NAME" "$XS_HOST")
+[ "$NETWORK_VERIFIED" -ne 0 ] && echo "Network verification failed" && exit -1
 
 deploy_env "$FM_IP" "$ENV_NAME"
 
