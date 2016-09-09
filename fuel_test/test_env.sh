@@ -38,7 +38,7 @@ function health_check {
 
 FM_IP=$(get_fm_ip "$XS_HOST" "Fuel$FUEL_VERSION")
 result=$(health_check "$FM_IP" "$ENV_NAME")
-RESULT=$(comm -3 \
+RESULT=$(comm -23 \
 <(echo -e $result | egrep -o "\[failure\] '[^\']+'" | sed -e "s|\[failure\] ||g" | sed -e "s|'||g" | sort) \
 <(printf "${IGNORE_CHECKS[$FUEL_VERSION]}" | sort))
 [[ -n "$RESULT" ]] && echo "$RESULT" && exit 1
