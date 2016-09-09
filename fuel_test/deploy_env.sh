@@ -22,7 +22,9 @@ function build_plugin {
 	# Build plugin with given refspec
 	# refspec can be empty
 	local fm_ip="$1"
-	local refspec="${2:-''}"
+	local fuel_version="$2"
+	local refspec="${3:-''}"
+
 	ssh -qo StrictHostKeyChecking=no root@$fm_ip \
 	'
 set -ex
@@ -42,16 +44,32 @@ pip install bandit
 bandit deployment_scripts/compute_post_deployment.py
 
 pip install git+https://github.com/openstack/fuel-plugins
-
-if [[ -f "branding.inc" ]]; then
-	make rpm
-else
-	fpb --check .
-	fpb --build .
-	mkdir -p output
-	mv fuel-plugin-xenserver-*.noarch.rpm output/
-fi
 	'
+
+	if [ "$fuel_version" -eq 8 ]; then
+		ssh -qo StrictHostKeyChecking=no root@$fm_ip \
+		'
+set -ex
+cd /root/fuel-plugin-xenserver
+fpb --check .
+fpb --build .
+mkdir -p output
+mv *.noarch.rpm output/
+
+		'
+	else
+		if [ -f branding.inc ]; then
+			scp branding.inc root@$fm_ip:/root/fuel-plugin-xenserver
+		fi
+		ssh -qo StrictHostKeyChecking=no root@$fm_ip \
+		'
+set -ex
+cd /root/fuel-plugin-xenserver
+
+make rpm
+		'
+	fi
+
 }
 
 function install_plugin {
@@ -61,7 +79,7 @@ function install_plugin {
 	'
 	set -eux
 	export FUELCLIENT_CUSTOM_SETTINGS="/etc/fuel/client/config.yaml"
-	fuel plugins --install $(ls /root/fuel-plugin-xenserver/output/fuel-plugin-xenserver-*.noarch.rpm -t | head -n 1) &> /dev/null
+	fuel plugins --install $(ls /root/fuel-plugin-xenserver/output/*.noarch.rpm -t | head -n 1) &> /dev/null
 	'
 }
 
@@ -282,7 +300,7 @@ function check_env_status {
 
 FM_IP=$(get_fm_ip "$XS_HOST" "Fuel$FUEL_VERSION")
 
-build_plugin $FM_IP $FUEL_PLUGIN_REFSPEC
+build_plugin $FM_IP $FUEL_VERSION $FUEL_PLUGIN_REFSPEC
 echo "Fuel plugin with $FUEL_PLUGIN_REFSPEC is built"
 
 install_plugin "$FM_IP"
