@@ -8,7 +8,12 @@ timeout 5m ./check_version.sh
 [ $? -ne 0 ] && echo check_version execution timeout && exit -1
 
 if [[ -d "/tmp/fuel-plugin-xenserver" ]]; then
-	export FUEL_VERSION=$(grep "fuel_version:" /tmp/fuel-plugin-xenserver/plugin_source/metadata.yaml | egrep -o "[0-9]+\." | egrep -o "[0-9]+")
+	if [ -f "/tmp/fuel-plugin-xenserver/plugin_source/metadata.yaml" ]; then
+		export FUEL_VERSION=$(grep "fuel_version:" /tmp/fuel-plugin-xenserver/plugin_source/metadata.yaml | egrep -o "[0-9]+\." | egrep -o "[0-9]+")
+	else
+		export FUEL_VERSION=$(grep "fuel_version:" /tmp/fuel-plugin-xenserver/metadata.yaml | egrep -o "[0-9]+\." | egrep -o "[0-9]+")
+	fi
+
 fi
 
 trap ./archive_log.sh EXIT
