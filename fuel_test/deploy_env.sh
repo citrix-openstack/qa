@@ -40,9 +40,6 @@ cd fuel-plugin-xenserver
 git fetch https://review.openstack.org/openstack/fuel-plugin-xenserver '"$refspec"'
 git checkout FETCH_HEAD
 
-pip install bandit
-bandit deployment_scripts/compute_post_deployment.py
-
 pip install git+https://github.com/openstack/fuel-plugins
 	'
 
@@ -65,7 +62,8 @@ mv *.noarch.rpm output/
 		'
 set -ex
 cd /root/fuel-plugin-xenserver
-
+pip install bandit
+bandit deployment_scripts/compute_post_deployment.py
 make rpm
 		'
 	fi
