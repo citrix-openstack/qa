@@ -83,7 +83,6 @@ KEYSTONEMIDDLEWARE_REPO openstack keystonemiddleware.git github
 KEYSTONE_REPO openstack keystone.git github
 NEUTRONCLIENT_REPO openstack python-neutronclient.git github
 NEUTRON_FWAAS_REPO openstack neutron-fwaas.git github
-NEUTRON_LBAAS_REPO openstack neutron-lbaas.git github
 NEUTRON_LIB_REPO openstack neutron-lib.git github
 NEUTRON_REPO openstack neutron.git github
 NOVACLIENT_REPO openstack python-novaclient.git github
@@ -94,6 +93,8 @@ OCC_REPO openstack os-collect-config.git github
 OPENSTACKCLIENT_REPO openstack python-openstackclient.git github
 ORC_REPO openstack os-refresh-config.git github
 OS_BRICK_REPO openstack os-brick.git github
+OSC_LIB_REPO openstack osc-lib.git github
+OS_CLIENT_CONFIG_REPO openstack os-client-config.git github
 OSLOCACHE_REPO openstack oslo.cache.git github
 OSLOCFG_REPO openstack oslo.config.git github
 OSLOCON_REPO openstack oslo.concurrency.git github
