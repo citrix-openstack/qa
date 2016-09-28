@@ -311,13 +311,19 @@ COMPUTE_MAC=$(get_node_mac "$XS_HOST" "Compute")
 COMPUTE_DISCOVERED=$(wait_for_node_reboot_and_retry "$FM_IP" "$COMPUTE_MAC" "$XS_HOST" "Compute")
 [ -z "$COMPUTE_DISCOVERED" ] && echo "Compute node discovery timeout" && exit -1
 add_env_node "$FM_IP" "$ENV_NAME" "$COMPUTE_MAC" "compute,cinder" "$INTERFACE_YAML$FUEL_VERSION"
+
 echo "Compute Node added"
 
 CONTROLLER_MAC=$(get_node_mac "$XS_HOST" "Controller")
 [ -z "$CONTROLLER_MAC" ] && echo "Controller node doesnot exist" && exit -1
 CONTROLLER_DISCOVERED=$(wait_for_node_reboot_and_retry "$FM_IP" "$CONTROLLER_MAC" "$XS_HOST" "Controller")
 [ -z "$CONTROLLER_DISCOVERED" ] && echo "Controller node discovery timeout" && exit -1
-add_env_node "$FM_IP" "$ENV_NAME" "$CONTROLLER_MAC" "controller" "$INTERFACE_YAML$FUEL_VERSION"
+
+if [ -n "$IS_CEILOMETER_SUPPORTED" ]; then
+    add_env_node "$FM_IP" "$ENV_NAME" "$CONTROLLER_MAC" "controller,mongo" "$INTERFACE_YAML$FUEL_VERSION"
+else
+    add_env_node "$FM_IP" "$ENV_NAME" "$CONTROLLER_MAC" "controller" "$INTERFACE_YAML$FUEL_VERSION"
+fi
 echo "Controller Node added"
 
 check_dom0_iptables "$XS_HOST"

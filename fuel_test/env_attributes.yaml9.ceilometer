@@ -3,6 +3,9 @@ editable:
     ntp_list:
       value:
       - 10.20.0.2
+  additional_components:
+    ceilometer:
+      value: true
   fuel-plugin-xenserver:
     metadata:
       enabled: True

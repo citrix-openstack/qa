@@ -8,12 +8,22 @@ timeout 5m ./check_version.sh
 [ $? -ne 0 ] && echo check_version execution timeout && exit -1
 
 if [[ -d "/tmp/fuel-plugin-xenserver" ]]; then
+    # determine FUEL_VERSION
 	if [ -f "/tmp/fuel-plugin-xenserver/plugin_source/metadata.yaml" ]; then
 		export FUEL_VERSION=$(grep "fuel_version:" /tmp/fuel-plugin-xenserver/plugin_source/metadata.yaml | egrep -o "[0-9]+\." | egrep -o "[0-9]+")
 	else
 		export FUEL_VERSION=$(grep "fuel_version:" /tmp/fuel-plugin-xenserver/metadata.yaml | egrep -o "[0-9]+\." | egrep -o "[0-9]+")
 	fi
 
+    # determine if ceilomter is supported in this version of plugin.
+    if [ -f "/tmp/fuel-plugin-xenserver/plugin_source/components.yaml ]; then
+        grep "additional_service:ceilometer" /tmp/fuel-plugin-xenserver/plugin_source/components.yaml
+        if [ $? -ne 0 ]; then
+            echo "INFO: Will enable ceilomter."
+            export IS_CEILOMETER_SUPPORTED="YES"
+            cp env_attributes.yaml9.ceilomter env_attributes.yaml9
+        fi
+    fi
 fi
 
 trap ./archive_log.sh EXIT
