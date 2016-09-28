@@ -16,12 +16,12 @@ if [[ -d "/tmp/fuel-plugin-xenserver" ]]; then
 	fi
 
     # determine if ceilomter is supported in this version of plugin.
-    if [ -f "/tmp/fuel-plugin-xenserver/plugin_source/components.yaml ]; then
-        grep "additional_service:ceilometer" /tmp/fuel-plugin-xenserver/plugin_source/components.yaml
-        if [ $? -ne 0 ]; then
+    export IS_CEILOMETER_SUPPORTED=""
+    if [ -z "$FORCE_DISABLE_CEILOMETER" -a -f "/tmp/fuel-plugin-xenserver/plugin_source/components.yaml" ]; then
+        if ! grep "additional_service:ceilometer" /tmp/fuel-plugin-xenserver/plugin_source/components.yaml >/dev/null; then
             echo "INFO: Will enable ceilomter."
             export IS_CEILOMETER_SUPPORTED="YES"
-            cp env_attributes.yaml9.ceilomter env_attributes.yaml9
+            cp env_attributes.yaml9.ceilometer env_attributes.yaml9
         fi
     fi
 fi
