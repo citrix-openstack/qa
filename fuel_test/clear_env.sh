@@ -21,6 +21,19 @@ function clear_xs {
 		route del -net 192.168.1.0 gw 169.254.0.2 netmask 255.255.255.0 dev xenapi
 	> /etc/sysconfig/static-routes
 
+	if (/sbin/iptables -t nat -S | /bin/grep -q 192.168.111.0/24); then
+		/sbin/iptables -t nat -D POSTROUTING -d 192.168.111.0/24 -j RETURN
+	fi
+	if (/sbin/iptables -t nat -S | /bin/grep -q 10.0.7.0/24); then
+		/sbin/iptables -t nat -D POSTROUTING -d 10.0.7.0/24 -j RETURN
+	fi
+	if (/sbin/iptables -t nat -S | /bin/grep -q 10.1.7.0/24); then
+		/sbin/iptables -t nat -D POSTROUTING -d 10.1.7.0/24 -j RETURN
+	fi
+	if (/sbin/iptables -t nat -S | /bin/grep -q 172.16.1.0/24); then
+		/sbin/iptables -t nat -D POSTROUTING -s 172.16.1.0/24 ! -d 172.16.1.0/24 -j MASQUERADE
+	fi
+
 	crontab -l && crontab -r
 	[ -f /root/rotate_xen_guest_logs.sh ] && rm /root/rotate_xen_guest_logs.sh
 
