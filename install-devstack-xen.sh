@@ -176,28 +176,24 @@ function assert_tool_exists() {
 }
 
 if [ -z "$JEOS_FILENAME" ]; then
-    echo "Setup ssh keys on XenServer..."
-    tmp_dir="$(mktemp -d --suffix=OpenStack)"
-    echo "Use $tmp_dir for public/private keys..."
-    COPY_KEY=""
     if [ "$PRIVKEY" != "-" ]; then
+      echo "Setup ssh keys on XenServer..."
+      tmp_dir="$(mktemp -d --suffix=OpenStack)"
+      echo "Use $tmp_dir for public/private keys..."
       cp $PRIVKEY "$tmp_dir/devstack"
       ssh-keygen -y -f $PRIVKEY > "$tmp_dir/devstack.pub"
-      COPY_KEY="$tmp_dir/devstack.pub"
-    fi
-    assert_tool_exists sshpass
-    echo "ssh-copy-id to XenServer..."
-    sshpass -p "$XENSERVER_PASS" \
-        ssh-copy-id -i $COPY_KEY \
-            -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o PermitLocalCommand=no root@$XENSERVER
-    if [ "$PRIVKEY" != "-" ]; then
-      echo "Copy public/private keys to XenServer..."
+      assert_tool_exists sshpass
+      echo "Setup public key to XenServer..."
+      DEVSTACK_PUB=$(cat $tmp_dir/devstack.pub)
+      sshpass -p "$XENSERVER_PASS" \
+        ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
+            root@$XENSERVER "echo $DEVSTACK_PUB >> ~/.ssh/authorized_keys"
       scp $_SSH_OPTIONS $PRIVKEY "root@$XENSERVER:.ssh/id_rsa"
       scp $_SSH_OPTIONS $tmp_dir/devstack.pub "root@$XENSERVER:.ssh/id_rsa.pub"
+      rm -rf "$tmp_dir"
+      unset tmp_dir
+      echo "OK"
     fi
-    rm -rf "$tmp_dir"
-    unset tmp_dir
-    echo "OK"
 else
     echo -n "Exporting JeOS template..."
     on_xenserver << END_OF_EXPORT_COMMANDS
@@ -419,6 +415,9 @@ cd devstack*
 END_OF_XENSERVER_COMMANDS
 fi
 
+# set nounset for $NOVA_CONF
+set +u
+
 copy_logs_on_failure on_xenserver << END_OF_XENSERVER_COMMANDS
 set -exu
 
@@ -459,10 +458,8 @@ VIRT_DRIVER=xenserver
 OSDOMU_VDI_GB=30
 OSDOMU_MEM_MB=8192
 
-# Exercise settings
-ACTIVE_TIMEOUT=300
 TERMINATE_TIMEOUT=90
-BUILD_TIMEOUT=300
+BUILD_TIMEOUT=600
 
 # DevStack settings
 LOGFILE=${SCREEN_LOGDIR}/stack.log
@@ -497,11 +494,14 @@ PUBLIC_INTERFACE=eth2
 
 # Nova user specific configuration
 # --------------------------------
-[[post-config|/etc/nova/nova.conf]]
+[[post-config|\\\$NOVA_CONF]]
 [DEFAULT]
-disk_allocation_ratio = 3.0
+disk_allocation_ratio = 2.0
 
 LOCALCONF_CONTENT_ENDS_HERE
+
+# unset nounset for $NOVA_CONF
+set -u
 
 # XenServer doesn't have nproc by default - but it's used by stackrc.
 # Fake it up if one doesn't exist
@@ -515,7 +515,7 @@ END_OF_NPROC
   chmod +x /usr/local/bin/nproc
 fi
 
-# TODO: Will remove these
+# TODO: Will remove these when the reverted problem got fix, see https://review.openstack.org/#/c/405085/
 sed -i 's\Q_PLUGIN_CONF_FILE ovs ovsdb_connection\Q_PLUGIN_CONF_FILE.domU ovs ovsdb_connection\g' lib/neutron_plugins/openvswitch_agent
 sed -i 's\Q_PLUGIN_CONF_FILE ovs of_listen_address\Q_PLUGIN_CONF_FILE.domU ovs of_listen_address\g' lib/neutron_plugins/openvswitch_agent
 sed -i 's\physnet-ex\public\g' lib/neutron_plugins/openvswitch_agent

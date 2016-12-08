@@ -1,3 +1,0 @@
-# Volume scenario testcases are not stable and we also comment them in external CI
-.*tempest.scenario.test_volume_boot_pattern.TestVolumeBootPattern.test_volume_boot_pattern.*
-.*tempest.scenario.test_volume_boot_pattern.TestVolumeBootPatternV2.test_volume_boot_pattern.*
