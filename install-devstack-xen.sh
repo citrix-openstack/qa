@@ -52,9 +52,6 @@ An example run:
   # Create a passwordless ssh key
   ssh-keygen -t rsa -N "" -f devstack_key.priv
 
-  # Cache the XenServer's host key:
-  ssh-keyscan XENSERVER >> ~/.ssh/known_hosts
-
   # Install devstack
   $0 XENSERVER mypassword devstack_key.priv
 
@@ -73,7 +70,6 @@ JEOS_URL=""
 JEOS_FILENAME=""
 SUPP_PACK_URL=""
 SCREEN_LOGDIR="/opt/stack/devstack_logs"
-NOVA_CONF="/etc/nova/nova.conf"
 
 # Get Positional arguments
 set +u
@@ -180,26 +176,24 @@ function assert_tool_exists() {
 }
 
 if [ -z "$JEOS_FILENAME" ]; then
-    echo -n "Setup ssh keys on XenServer..."
-    tmp_dir="$(mktemp -d)"
-    COPY_KEY=""
     if [ "$PRIVKEY" != "-" ]; then
+      echo "Setup ssh keys on XenServer..."
+      tmp_dir="$(mktemp -d --suffix=OpenStack)"
+      echo "Use $tmp_dir for public/private keys..."
       cp $PRIVKEY "$tmp_dir/devstack"
       ssh-keygen -y -f $PRIVKEY > "$tmp_dir/devstack.pub"
-      COPY_KEY="$tmp_dir/devstack.pub"
-    fi
-    assert_tool_exists sshpass
-    sshpass -p "$XENSERVER_PASS" \
-        ssh-copy-id \
-            -i $COPY_KEY \
-            root@$XENSERVER > /dev/null 2>&1
-    if [ "$PRIVKEY" != "-" ]; then
+      assert_tool_exists sshpass
+      echo "Setup public key to XenServer..."
+      DEVSTACK_PUB=$(cat $tmp_dir/devstack.pub)
+      sshpass -p "$XENSERVER_PASS" \
+        ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
+            root@$XENSERVER "echo $DEVSTACK_PUB >> ~/.ssh/authorized_keys"
       scp $_SSH_OPTIONS $PRIVKEY "root@$XENSERVER:.ssh/id_rsa"
       scp $_SSH_OPTIONS $tmp_dir/devstack.pub "root@$XENSERVER:.ssh/id_rsa.pub"
+      rm -rf "$tmp_dir"
+      unset tmp_dir
+      echo "OK"
     fi
-    rm -rf "$tmp_dir"
-    unset tmp_dir
-    echo "OK"
 else
     echo -n "Exporting JeOS template..."
     on_xenserver << END_OF_EXPORT_COMMANDS
@@ -269,7 +263,7 @@ END_OF_XENSERVER_COMMANDS
         mkdir -p $LOG_FILE_DIRECTORY
         scp $_SSH_OPTIONS $XENSERVER:artifacts/* $LOG_FILE_DIRECTORY
         tar -xzf $LOG_FILE_DIRECTORY/domU.tgz opt/stack/tempest/tempest-full.xml -O \
-	    > $LOG_FILE_DIRECTORY/tempest-full.xml || true
+           > $LOG_FILE_DIRECTORY/tempest-full.xml || true
     fi
 }
 
@@ -421,6 +415,9 @@ cd devstack*
 END_OF_XENSERVER_COMMANDS
 fi
 
+# set nounset for $NOVA_CONF
+set +u
+
 copy_logs_on_failure on_xenserver << END_OF_XENSERVER_COMMANDS
 set -exu
 
@@ -428,7 +425,14 @@ cd $TMPDIR
 
 cd devstack*
 
-cat << LOCALRC_CONTENT_ENDS_HERE > localrc
+cat << LOCALCONF_CONTENT_ENDS_HERE > local.conf
+# ``local.conf`` is a user-maintained settings file that is sourced from ``stackrc``.
+# This gives it the ability to override any variables set in ``stackrc``.
+# The ``localrc`` section replaces the old ``localrc`` configuration file.
+# Note that if ``localrc`` is present it will be used in favor of this section.
+# --------------------------------
+[[local|localrc]]
+
 # Passwords
 MYSQL_PASSWORD=citrix
 SERVICE_TOKEN=citrix
@@ -444,36 +448,25 @@ VM_BRIDGE_OR_NET_NAME="osvmnet"
 PUB_BRIDGE_OR_NET_NAME="ospubnet"
 XEN_INT_BRIDGE_OR_NET_NAME="osintnet"
 
-# As we have nice names, specify FLAT_NETWORK_BRIDGE
-# This requires https://review.openstack.org/48296 to land
-# FLAT_NETWORK_BRIDGE="osvmnet"
-
 # Do not use secure delete
 CINDER_SECURE_DELETE=False
 
 # Compute settings
-EXTRA_OPTS=("xenapi_disable_agent=True")
-API_RATE_LIMIT=False
 VIRT_DRIVER=xenserver
 
-# Use a XenServer Image
-#DOWNLOAD_DEFAULT_IMAGES=False
-#IMAGE_URLS="http://ca.downloads.xensource.com/OpenStack/cirros-0.3.4-x86_64-disk.vhd.tgz"
-#DEFAULT_IMAGE_NAME="cirros-0.3.4-x86_64-disk"
-
 # OpenStack VM settings
-OSDOMU_VDI_GB=40
+OSDOMU_VDI_GB=30
+OSDOMU_MEM_MB=8192
 
-# Exercise settings
-ACTIVE_TIMEOUT=500
-TERMINATE_TIMEOUT=500
-
-# Increase boot timeout for neutron tests:
-BOOT_TIMEOUT=500
+TERMINATE_TIMEOUT=90
+BUILD_TIMEOUT=600
 
 # DevStack settings
 LOGFILE=${SCREEN_LOGDIR}/stack.log
 SCREEN_LOGDIR=${SCREEN_LOGDIR}
+
+UBUNTU_INST_HTTP_HOSTNAME=apt-cacher.xenrt.citrite.net
+UBUNTU_INST_HTTP_DIRECTORY=/ubuntu
 
 # Turn on verbosity (password input does not work otherwise)
 VERBOSE=True
@@ -482,53 +475,33 @@ VERBOSE=True
 XENAPI_CONNECTION_URL="http://$XENSERVER_IP"
 VNCSERVER_PROXYCLIENT_ADDRESS="$XENSERVER_IP"
 
-MULTI_HOST=1
+# Neutron specific part
+ENABLED_SERVICES+=neutron,q-domua
+Q_ML2_PLUGIN_MECHANISM_DRIVERS=openvswitch
 
-# Skip boot from volume exercise
-# See https://bugs.launchpad.net/openstack-ci/+bug/1263824 for euca and bundle
-SKIP_EXERCISES="boot_from_volume,bundle,euca"
+Q_ML2_PLUGIN_TYPE_DRIVERS=vlan,flat
+ENABLE_TENANT_TUNNELS=False
+ENABLE_TENANT_VLANS=True
+Q_ML2_TENANT_NETWORK_TYPE=vlan
+ML2_VLAN_RANGES="physnet1:1100:1200"
 
-ENABLED_SERVICES=g-api,g-reg,key,n-api,n-crt,n-cpu,n-sch,horizon,mysql,rabbit,sysstat,tempest,s-proxy,s-account,s-container,s-object,cinder,c-api,c-vol,c-sch,n-cond,heat,h-api,h-api-cfn,h-api-cw,h-eng,n-net,n-novnc,n-cauth
+PUB_IP=172.24.4.1
+SUBNETPOOL_PREFIX_V4=192.168.10.0/24
+NETWORK_GATEWAY=192.168.10.1
 
-# Set instance build timeout to 300s in tempest.conf
-BUILD_TIMEOUT=300
-
-# XEN_FIREWALL_DRIVER=nova.virt.xenapi.firewall.Dom0IptablesFirewallDriver
-XEN_FIREWALL_DRIVER=nova.virt.firewall.NoopFirewallDriver
-
-# 9 Gigabyte for object store
-SWIFT_LOOPBACK_DISK_SIZE=9663676416
-
-# Additional Localrc parameters here
-INSTALL_TESTONLY_PACKAGES=True
-
-UBUNTU_INST_HTTP_HOSTNAME=us.archive.ubuntu.com
-UBUNTU_INST_HTTP_DIRECTORY=/ubuntu
-
-LOCALRC_CONTENT_ENDS_HERE
-
-cat << LOCALCONF_CONTENT_ENDS_HERE > local.conf
-# ``local.conf`` is a user-maintained settings file that is sourced from ``stackrc``.
-# This gives it the ability to override any variables set in ``stackrc``.
-# Also, most of the settings in ``stack.sh`` are written to only be set if no
-# value has already been set; this lets ``local.conf`` effectively override the
-# default values.
-
-# The ``localrc`` section replaces the old ``localrc`` configuration file.
-# Note that if ``localrc`` is present it will be used in favor of this section.
-# --------------------------------
-[[local|localrc]]
+VLAN_INTERFACE=eth1
+PUBLIC_INTERFACE=eth2
 
 # Nova user specific configuration
 # --------------------------------
-
-[[post-config|$NOVA_CONF]]
+[[post-config|\\\$NOVA_CONF]]
 [DEFAULT]
 disk_allocation_ratio = 2.0
 
-# Additional localconf parameters here
-
 LOCALCONF_CONTENT_ENDS_HERE
+
+# unset nounset for $NOVA_CONF
+set -u
 
 # XenServer doesn't have nproc by default - but it's used by stackrc.
 # Fake it up if one doesn't exist
@@ -542,8 +515,11 @@ END_OF_NPROC
   chmod +x /usr/local/bin/nproc
 fi
 
-# remove the blacklist of linux bridge in Dom0
-rm -f /etc/modprobe.d/blacklist-bridge
+# TODO: Will remove these when the reverted problem got fix, see https://review.openstack.org/#/c/405085/
+sed -i 's\Q_PLUGIN_CONF_FILE ovs ovsdb_connection\Q_PLUGIN_CONF_FILE.domU ovs ovsdb_connection\g' lib/neutron_plugins/openvswitch_agent
+sed -i 's\Q_PLUGIN_CONF_FILE ovs of_listen_address\Q_PLUGIN_CONF_FILE.domU ovs of_listen_address\g' lib/neutron_plugins/openvswitch_agent
+sed -i 's\physnet-ex\public\g' lib/neutron_plugins/openvswitch_agent
+# End(TODO)
 
 cd tools/xen
 EXIT_AFTER_JEOS_INSTALLATION="$EXIT_AFTER_JEOS_INSTALLATION" ./install_os_domU.sh
