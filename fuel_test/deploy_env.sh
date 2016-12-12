@@ -22,41 +22,52 @@ function build_plugin {
 	# Build plugin with given refspec
 	# refspec can be empty
 	local fm_ip="$1"
-	local refspec="${2:-''}"
+	local fuel_version="$2"
+	local refspec="${3:-''}"
+
 	ssh -qo StrictHostKeyChecking=no root@$fm_ip \
 	'
 set -ex
 
 yum install python-pip git createrepo dpkg-devel dpkg-dev rpm rpm-build -y
 
-pip install virtualenv
 cd /root/
-if [[ ! -d "fuel-devops-venv" ]]; then
-	virtualenv fuel-devops-venv
-fi
-. fuel-devops-venv/bin/activate
 
 if [[ ! -d "fuel-plugin-xenserver" ]]; then
-	git clone https://review.openstack.org/openstack/fuel-plugin-xenserver
+	git clone '${REPO_URL}'/openstack/fuel-plugin-xenserver -b '${REPO_BRANCH}'
 fi
 cd fuel-plugin-xenserver
-git fetch https://review.openstack.org/openstack/fuel-plugin-xenserver '"$refspec"'
+git fetch '${FETCH_URL}'/openstack/fuel-plugin-xenserver '"$refspec"'
 git checkout FETCH_HEAD
 
+pip install git+https://github.com/openstack/fuel-plugins
+	'
+
+	if [ "$fuel_version" -eq 8 ]; then
+		ssh -qo StrictHostKeyChecking=no root@$fm_ip \
+		'
+set -ex
+cd /root/fuel-plugin-xenserver
+fpb --check .
+fpb --build .
+mkdir -p output
+mv *.noarch.rpm output/
+
+		'
+	else
+		if [ -f branding.inc ]; then
+			scp branding.inc root@$fm_ip:/root/fuel-plugin-xenserver
+		fi
+		ssh -qo StrictHostKeyChecking=no root@$fm_ip \
+		'
+set -ex
+cd /root/fuel-plugin-xenserver
 pip install bandit
 bandit deployment_scripts/compute_post_deployment.py
+make rpm
+		'
+	fi
 
-pip install git+https://github.com/openstack/fuel-plugins
-
-if [[ -f "branding.inc" ]]; then
-	make rpm
-else
-	fpb --check .
-	fpb --build .
-	mkdir -p output
-	mv fuel-plugin-xenserver-*.noarch.rpm output/
-fi
-	'
 }
 
 function install_plugin {
@@ -66,7 +77,7 @@ function install_plugin {
 	'
 	set -eux
 	export FUELCLIENT_CUSTOM_SETTINGS="/etc/fuel/client/config.yaml"
-	fuel plugins --install $(ls /root/fuel-plugin-xenserver/output/fuel-plugin-xenserver-*.noarch.rpm -t | head -n 1) &> /dev/null
+	fuel plugins --install $(ls /root/fuel-plugin-xenserver/output/*.noarch.rpm -t | head -n 1) &> /dev/null
 	'
 }
 
@@ -189,6 +200,11 @@ function add_env_node {
 	'
 }
 
+function check_dom0_iptables {
+	local xs_host="$1"
+	ssh -qo StrictHostKeyChecking=no root@$xs_host 'iptables-save'
+}
+
 function verify_network {
 	# Do network verification and wait for result
 	# return 1 when passes, return 0 when failed or retrial timeout
@@ -211,19 +227,19 @@ function verify_network {
 		export FUELCLIENT_CUSTOM_SETTINGS="/etc/fuel/client/config.yaml"
 		fuel task | grep verify_networks
 		')
-		status=$(echo $task | awk -F '|' '{print $2}')
-		progress=$(echo $task | awk -F '|' '{print $5}')
+		status=$(echo $task | awk -F '|' '{print $2}' | tr -d " ")
+		progress=$(echo $task | awk -F '|' '{print $5}' | tr -d " ")
 		if [ "$status" == "error" ]; then
-			echo 0
+			echo 1
 			return
 		fi
 		if [ "$progress" -eq "100" ]; then
-			echo 1
+			echo 0
 			return
 		fi
 		sleep 10
 	done
-	echo 0
+	echo 1
 }
 
 function verify_network_and_retry {
@@ -232,15 +248,15 @@ function verify_network_and_retry {
 	local xs_host="$3"
 	for i in {0..10}; do
 		network_verified=$(verify_network "$fm_ip" "$env_name")
-		if [ "$network_verified" -eq 1 ]; then
-			echo 1
+		if [ "$network_verified" -eq 0 ]; then
+			echo 0
 			return
 		fi
 
 		# In case both nodes are disconnected
 		ssh -qo StrictHostKeyChecking=no root@$xs_host '/etc/udev/scripts/recreate-gateway.sh'
 	done
-	echo 0
+	echo 1
 }
 
 function deploy_env {
@@ -277,12 +293,12 @@ function check_env_status {
 	fuel env --env $env_id | grep -q operational
 	echo $?
 	')
-	[ "$success" -eq 0 ] && echo 1
+	[ "$success" -eq 0 ] && echo 0
 }
 
 FM_IP=$(get_fm_ip "$XS_HOST" "Fuel$FUEL_VERSION")
 
-build_plugin $FM_IP $FUEL_PLUGIN_REFSPEC
+build_plugin $FM_IP $FUEL_VERSION $FUEL_PLUGIN_REFSPEC
 echo "Fuel plugin with $FUEL_PLUGIN_REFSPEC is built"
 
 install_plugin "$FM_IP"
@@ -295,23 +311,30 @@ COMPUTE_MAC=$(get_node_mac "$XS_HOST" "Compute")
 COMPUTE_DISCOVERED=$(wait_for_node_reboot_and_retry "$FM_IP" "$COMPUTE_MAC" "$XS_HOST" "Compute")
 [ -z "$COMPUTE_DISCOVERED" ] && echo "Compute node discovery timeout" && exit -1
 add_env_node "$FM_IP" "$ENV_NAME" "$COMPUTE_MAC" "compute,cinder" "$INTERFACE_YAML$FUEL_VERSION"
+
 echo "Compute Node added"
 
 CONTROLLER_MAC=$(get_node_mac "$XS_HOST" "Controller")
 [ -z "$CONTROLLER_MAC" ] && echo "Controller node doesnot exist" && exit -1
 CONTROLLER_DISCOVERED=$(wait_for_node_reboot_and_retry "$FM_IP" "$CONTROLLER_MAC" "$XS_HOST" "Controller")
 [ -z "$CONTROLLER_DISCOVERED" ] && echo "Controller node discovery timeout" && exit -1
-add_env_node "$FM_IP" "$ENV_NAME" "$CONTROLLER_MAC" "controller" "$INTERFACE_YAML$FUEL_VERSION"
+
+if [ -n "$IS_CEILOMETER_SUPPORTED" ]; then
+    add_env_node "$FM_IP" "$ENV_NAME" "$CONTROLLER_MAC" "controller,mongo" "$INTERFACE_YAML$FUEL_VERSION"
+else
+    add_env_node "$FM_IP" "$ENV_NAME" "$CONTROLLER_MAC" "controller" "$INTERFACE_YAML$FUEL_VERSION"
+fi
 echo "Controller Node added"
 
+check_dom0_iptables "$XS_HOST"
 NETWORK_VERIFIED=$(verify_network_and_retry "$FM_IP" "$ENV_NAME" "$XS_HOST")
-[ "$NETWORK_VERIFIED" -eq 0 ] && echo "Network verification failed" && exit -1
+[ "$NETWORK_VERIFIED" -ne 0 ] && echo "Network verification failed" && exit -1
 
 deploy_env "$FM_IP" "$ENV_NAME"
 
 print_env_messages "$FM_IP"
 
 SUCCESS=$(check_env_status "$FM_IP" "$ENV_NAME")
-[ "$SUCCESS" -eq 0 ] && echo "Deployment failed" && exit -1
+[ "$SUCCESS" -ne 0 ] && echo "Deployment failed" && exit -1
 
 exit 0

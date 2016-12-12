@@ -1,12 +1,20 @@
 
 export XS_HOST=${XS_HOST:-""}
 export FM_MNT=${FM_MNT:-""}
-export FUEL_PLUGIN_REFSPEC=${FUEL_PLUGIN_REFSPEC:-""}
 export FM_PWD=${FM_PWD:-""}
+export IXE_NFS=${IXE_NFS:-""}
+export IXE_ISO=${IXE_ISO:-""}
 export FUEL_TEST_SUCCESS=${FUEL_TEST_SUCCESS:-"/opt/success_fuel_test"}
 export FUEL_TEST_LOG_DIR=${FUEL_TEST_LOG_DIR:-"fuel_test_logs"}
 export FM_SNAPSHOT="fuel_ci"
 export ENV_NAME="TestEnv"
+
+export REPO_URL=${REPO_URL:-"https://git.openstack.org"}
+export REPO_BRANCH=${ZUUL_BRANCH:-"master"}
+
+# use this default value to allow this set of scripts can run without ZUUL env.
+export FETCH_URL=${ZUUL_URL:-"https://review.openstack.org/p"}
+export FUEL_PLUGIN_REFSPEC=${ZUUL_REF:-""}
 
 export ALL_FUEL_VERSION=(8 9)
 export FUEL_VERSION=${FUEL_VERSION:-"9"}
@@ -15,9 +23,12 @@ export ATTRIBUTES_YAML="env_attributes.yaml"
 export NETWORK_YAML="env_network.yaml"
 export INTERFACE_YAML="node_interfaces.yaml"
 
-export NODE_DISK="70"
-export NODE_MEM_CONTROLLER="4096"
+export NODE_DISK_CONTROLLER="100"
+export NODE_DISK_COMPUTE="70"
+export NODE_MEM_CONTROLLER="12288"
 export NODE_MEM_COMPUTE="1024"
+export NODE_CPU_CONTROLLER="4"
+export NODE_CPU_COMPUTE="2"
 
 export NET1="pxe"
 export NET2="private"

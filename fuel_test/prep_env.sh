@@ -29,6 +29,9 @@ function recreate_gateway {
 #!/bin/bash
 /bin/sleep 10
 if /sbin/ip link show $bridge > /dev/null 2>&1; then
+  if !(/sbin/iptables -L FORWARD | /bin/head -n 3 | /bin/egrep -q "ACCEPT +udp +-- +anywhere +anywhere"); then
+    /sbin/iptables -I FORWARD 1 -p udp -j ACCEPT
+  fi
   if !(/sbin/ip addr show $bridge | /bin/grep -q 172.16.1.1); then
     /sbin/ip addr add dev $bridge 172.16.1.1
   fi
@@ -95,6 +98,9 @@ function create_node {
 	local vm="$2"
 	local mem="$3"
 	local disk="$4"
+	local cpu="$5"
+	local ixe_nfs="$6"
+	local ixe_iso="$7"
 
 	ssh -qo StrictHostKeyChecking=no root@$xs_host \
 	'
@@ -103,6 +109,15 @@ function create_node {
 	vm="'$vm'"
 	mem="'$mem'"
 	disk="'$disk'"
+	cpu="'$cpu'"
+	ixe_nfs="'$ixe_nfs'"
+	ixe_iso="'$ixe_iso'"
+
+	ipxe_sr=$(xe sr-list name-label=ipxe --minimal)
+	if [ -z "$ipxe_sr" ]; then
+		ipxe_sr=$(xe sr-create type=iso content-type=iso device-config:location=$ixe_nfs name-label=ipxe)
+		sleep 5
+	fi
 
 	template="Other install media"
 
@@ -122,7 +137,10 @@ function create_node {
 		dynamic-max=${mem}MiB \
 		uuid=$vm_uuid
 
-	xe vm-param-set uuid=$vm_uuid HVM-boot-params:order=ndc
+	xe vm-cd-add uuid=$vm_uuid device=1 cd-name=$ixe_iso
+	xe vm-param-set uuid=$vm_uuid VCPUs-max=$cpu
+	xe vm-param-set uuid=$vm_uuid VCPUs-at-startup=$cpu
+	xe vm-param-set uuid=$vm_uuid HVM-boot-params:order=dc
 	'
 }
 
@@ -205,12 +223,12 @@ function wait_for_nailgun {
 		echo $?
 		')
 		if [ "$ready" -eq 0 ]; then
-			echo 1
+			echo 0
 			return
 		fi
 		sleep 10
 	done
-	echo 0
+	echo 1
 }
 
 create_networks "$XS_HOST" "$NET1" "$NET2" "$NET3"
@@ -218,7 +236,7 @@ create_networks "$XS_HOST" "$NET1" "$NET2" "$NET3"
 echo "Restoring Fuel Master.."
 restore_fm "$XS_HOST" "Fuel$FUEL_VERSION" "$FM_SNAPSHOT" "$FM_MNT" "fuel$FUEL_VERSION.xva"
 
-create_node "$XS_HOST" "Compute" "$NODE_MEM_COMPUTE" "$NODE_DISK"
+create_node "$XS_HOST" "Compute" "$NODE_MEM_COMPUTE" "$NODE_DISK_COMPUTE" "$NODE_CPU_COMPUTE" "$IXE_NFS" "$IXE_ISO"
 add_vif "$XS_HOST" "Compute" "$NET1" 1
 add_vif "$XS_HOST" "Compute" "$NET2" 2
 add_vif "$XS_HOST" "Compute" "$NET3" 3
@@ -226,7 +244,7 @@ echo "Compute Node is created"
 add_himn "$XS_HOST" "Compute"
 
 echo "HIMN is added to Compute Node"
-create_node "$XS_HOST" "Controller" "$NODE_MEM_CONTROLLER" "$NODE_DISK"
+create_node "$XS_HOST" "Controller" "$NODE_MEM_CONTROLLER" "$NODE_DISK_CONTROLLER" "$NODE_CPU_CONTROLLER" "$IXE_NFS" "$IXE_ISO"
 add_vif "$XS_HOST" "Controller" "$NET1" 1
 add_vif "$XS_HOST" "Controller" "$NET2" 2
 add_vif "$XS_HOST" "Controller" "$NET3" 3
@@ -238,7 +256,7 @@ FM_IP=$(wait_for_fm "$XS_HOST" "Fuel$FUEL_VERSION")
 sshpass -p "$FM_PWD" ssh-copy-id -o StrictHostKeyChecking=no root@$FM_IP
 
 NAILGUN_READY=$(wait_for_nailgun "$FM_IP")
-[ "$NAILGUN_READY" -eq 0 ] && echo "Nailgun test connection timeout" && exit -1
+[ "$NAILGUN_READY" -ne 0 ] && echo "Nailgun test connection timeout" && exit -1
 
 start_node "$XS_HOST" "Compute"
 echo "Compute Node is started"
