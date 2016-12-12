@@ -34,10 +34,10 @@ yum install python-pip git createrepo dpkg-devel dpkg-dev rpm rpm-build -y
 cd /root/
 
 if [[ ! -d "fuel-plugin-xenserver" ]]; then
-	git clone https://review.openstack.org/openstack/fuel-plugin-xenserver
+	git clone '${REPO_URL}'/openstack/fuel-plugin-xenserver -b '${REPO_BRANCH}'
 fi
 cd fuel-plugin-xenserver
-git fetch https://review.openstack.org/openstack/fuel-plugin-xenserver '"$refspec"'
+git fetch '${FETCH_URL}'/openstack/fuel-plugin-xenserver '"$refspec"'
 git checkout FETCH_HEAD
 
 pip install git+https://github.com/openstack/fuel-plugins
