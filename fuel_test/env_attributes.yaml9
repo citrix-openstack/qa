@@ -9,3 +9,102 @@ editable:
       versions:
       - password:
           value: xenroot
+  provision:
+    packages:
+      label: Initial packages
+      type: textarea
+      value: 'acl
+
+        anacron
+
+        bash-completion
+
+        bridge-utils
+
+        bsdmainutils
+
+        build-essential
+
+        cloud-init
+
+        curl
+
+        daemonize
+
+        debconf-utils
+
+        gdisk
+
+        grub-pc
+
+        hpsa-dkms
+
+        hwloc
+
+        i40e-dkms
+
+        linux-firmware
+
+        linux-firmware-nonfree
+
+        linux-headers-generic-lts-trusty
+
+        linux-image-generic-lts-trusty
+
+        lvm2
+
+        mcollective
+
+        mdadm
+
+        multipath-tools
+
+        multipath-tools-boot
+
+        nailgun-agent
+
+        nailgun-mcagents
+
+        network-checker
+
+        ntp
+
+        openssh-client
+
+        openssh-server
+
+        puppet
+
+        python-amqp
+
+        ruby-augeas
+
+        ruby-ipaddress
+
+        ruby-json
+
+        ruby-netaddr
+
+        ruby-openstack
+
+        ruby-shadow
+
+        ruby-stomp
+
+        systemd-shim
+
+        telnet
+
+        ubuntu-minimal
+
+        ubuntu-standard
+
+        uuid-runtime
+
+        vim
+
+        virt-what
+
+        vlan
+
+        '
