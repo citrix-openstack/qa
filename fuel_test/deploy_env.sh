@@ -64,6 +64,7 @@ set -ex
 cd /root/fuel-plugin-xenserver
 pip install bandit
 bandit deployment_scripts/compute_post_deployment.py
+make clean
 make rpm
 		'
 	fi
