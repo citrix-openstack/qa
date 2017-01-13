@@ -433,6 +433,8 @@ cat << LOCALCONF_CONTENT_ENDS_HERE > local.conf
 # --------------------------------
 [[local|localrc]]
 
+enable_plugin os-xenapi https://github.com/openstack/os-xenapi.git
+
 # Passwords
 MYSQL_PASSWORD=citrix
 SERVICE_TOKEN=citrix
