@@ -500,6 +500,11 @@ PUBLIC_INTERFACE=eth2
 [DEFAULT]
 disk_allocation_ratio = 2.0
 
+# Neutron ovs bridge mapping
+[[post-config|\\\$NEUTRON_CORE_PLUGIN_CONF]]
+[ovs]
+bridge_mappings = physnet1:br-eth1,public:br-ex
+
 LOCALCONF_CONTENT_ENDS_HERE
 
 # unset nounset for $NOVA_CONF
@@ -517,10 +522,8 @@ END_OF_NPROC
   chmod +x /usr/local/bin/nproc
 fi
 
-# TODO: Will remove these when the reverted problem got fix, see https://review.openstack.org/#/c/405085/
-sed -i 's\Q_PLUGIN_CONF_FILE ovs ovsdb_connection\Q_PLUGIN_CONF_FILE.domU ovs ovsdb_connection\g' lib/neutron_plugins/openvswitch_agent
-sed -i 's\Q_PLUGIN_CONF_FILE ovs of_listen_address\Q_PLUGIN_CONF_FILE.domU ovs of_listen_address\g' lib/neutron_plugins/openvswitch_agent
-sed -i 's\physnet-ex\public\g' lib/neutron_plugins/openvswitch_agent
+# TODO: Will remove the below when https://review.openstack.org/#/c/420495/ merged
+sed -i "s\cut -d'.' -f1-2 | tr '-' '.'\cut -d'/' -f 1 | cut -d'-' -f 1\g" tools/xen/functions
 # End(TODO)
 
 cd tools/xen
