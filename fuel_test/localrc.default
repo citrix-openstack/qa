@@ -4,6 +4,7 @@ export FM_MNT=${FM_MNT:-""}
 export FM_PWD=${FM_PWD:-""}
 export IXE_NFS=${IXE_NFS:-""}
 export IXE_ISO=${IXE_ISO:-""}
+export GPG_SECRET_KEY_URL=${GPG_SECRET_KEY_URL:-""}
 export FUEL_TEST_SUCCESS=${FUEL_TEST_SUCCESS:-"/opt/success_fuel_test"}
 export FUEL_TEST_LOG_DIR=${FUEL_TEST_LOG_DIR:-"fuel_test_logs"}
 export FM_SNAPSHOT="fuel_ci"

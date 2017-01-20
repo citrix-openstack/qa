@@ -202,6 +202,34 @@ function wait_for_fm {
 	done
 }
 
+function prepare_centos_repo_and_secret_key {
+    # Create CentOS base repo and import secret key for building supplemental packages
+    local fm_ip="$1"
+    local gpg_secret_key_url="$2"
+
+    ssh -qo StrictHostKeyChecking=no root@$fm_ip \
+    '
+    set -e
+    mkdir -p /tmp/secret_keys
+    wget "'$gpg_secret_key_url'" -O /tmp/secret_keys/openstack.secret
+    gpg --import /tmp/secret_keys/openstack.secret
+    rm -rf /tmp/secret_keys
+
+    rm -f /etc/yum.repos.d/centos-base.repo
+    touch /etc/yum.repos.d/centos-base.repo
+    cat <<EOF >"/etc/yum.repos.d/centos-base.repo"
+[base]
+name=CentOSBase
+mirrorlist=http://mirrorlist.centos.org/?release=\$releasever&arch=\$basearch&repo=os&infra=\$infra
+baseurl=http://mirror.centos.org/centos/\$releasever/os/\$basearch/
+enabled=0
+exclude=kernel kernel-abi-whitelists kernel-debug kernel-debug-devel kernel-devel kernel-doc kernel-tools kernel-tools-libs kernel-tools-libs-devel linux-firmware biosdevname centos-release systemd* stunnel kexec-tools ocaml*
+gpgcheck=1
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-7
+EOF
+    '
+}
+
 function start_node {
 	# Boot up given node
 	local xs_host="$1"
@@ -255,6 +283,9 @@ FM_IP=$(wait_for_fm "$XS_HOST" "Fuel$FUEL_VERSION")
 
 sshpass -p "$FM_PWD" ssh-copy-id -o StrictHostKeyChecking=no root@$FM_IP
 
+echo "Begin to create centos repo and import secret key in FM"
+prepare_centos_repo_and_secret_key "$FM_IP" "$GPG_SECRET_KEY_URL"
+
 NAILGUN_READY=$(wait_for_nailgun "$FM_IP")
 [ "$NAILGUN_READY" -ne 0 ] && echo "Nailgun test connection timeout" && exit -1
 
@@ -264,3 +295,4 @@ start_node "$XS_HOST" "Controller"
 echo "Controller Node is started"
 
 recreate_gateway "$XS_HOST" "$NET2"
+
