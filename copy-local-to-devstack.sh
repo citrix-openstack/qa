@@ -1,16 +1,23 @@
 #!/bin/bash
 set -e
 
+SERVICES="n-cond n-sch n-novnc n-cauth n-cpu"
+
 function usage(){
-    echo "Usage: $0 <NOVA_DIR> <XS_HOST> <DEVSTACK_VM>"
+    echo "Usage: $0 <BASE_DIR> <XS_HOST> [<DEVSTACK_VM>]"
     echo
-    echo "Copies NOVA_DIR to the specific devstack setup (plugins to XS_HOST, nova to DEVSTACK_VM)"
+    echo "Copies local changes to the specific devstack setup (plugins to XS_HOST, nova to DEVSTACK_VM)"
+    echo "dom0 Plugins collected from os-xenapi (falling back to Nova)"
+    echo ""
+    echo "Projects updated: nova (os-xenapi)"
+    echo ""
+    echo "Processes restarted: $SERVICES"
     echo
     echo "Passwordless authentication needed for both root@XS_HOST and stack@DEVSTACK_VM"
     exit 1
 }
 
-NOVA_DIR=$1
+BASE_DIR=$1
 XS_HOST=$2
 DS_VM=${3:-auto}
 
@@ -25,8 +32,8 @@ if [ -n "$PRIVKEY" ]; then
 fi
 
 
-[ -e $NOVA_DIR/nova ] || usage
-ssh $_SSH_OPTIONS root@$XS_HOST /bin/true || usage
+[ -e $BASE_DIR/nova/nova ] || ( echo "*** Cannot find $BASE_DIR/nova/nova"; usage)
+ssh $_SSH_OPTIONS root@$XS_HOST /bin/true || ( echo "*** Cannot SSH to host"; usage)
 
 set -eu
 
@@ -36,23 +43,42 @@ if [ "$DS_VM" == "auto" ]; then
     DS_VM=`echo $ds_pub_net | cut -d':' -f2 | tr -d '[[:space:]]'`
 fi
 
-ssh $_SSH_OPTIONS stack@$DS_VM /bin/true || usage
+ssh $_SSH_OPTIONS stack@$DS_VM /bin/true || ( echo "*** Cannot SSH to DSVM"; usage)
 
-echo "*** Stopping nova-compute"
-ssh $_SSH_OPTIONS stack@$DS_VM "killall -s INT nova-compute || /bin/true"
+SCREEN_NAME="stack"
+for service in $SERVICES; do
+    echo "*** Stopping $service"
+    cmd="screen -S $SCREEN_NAME -p $service -X stuff \"\""
+    ssh $_SSH_OPTIONS stack@$DS_VM $cmd || /bin/true
+done
 
-echo "*** Updating plugins on $XS_HOST"
-rsync -arp $NOVA_DIR/plugins/xenserver/xenapi/etc/xapi.d/plugins/ -e "ssh $_SSH_OPTIONS" root@$XS_HOST:/etc/xapi.d/plugins
+NOVA_PLUGIN_DIR=$BASE_DIR/nova/plugins/xenserver/xenapi/etc/xapi.d/plugins/
+OS_XENAPI_PLUGIN_DIR=$BASE_DIR/os-xenapi/os_xenapi/dom0/etc/xapi.d/plugins/
+if [ -e $OS_XENAPI_PLUGIN_DIR ]; then
+    echo "*** Updating plugins on $XS_HOST (from os-xenapi)"
+    rsync -arp $OS_XENAPI_PLUGIN_DIR/* -e "ssh $_SSH_OPTIONS" root@$XS_HOST:/etc/xapi.d/plugins
+elif [ -e $NOVA_PLUGIN_DIR ]; then
+    echo "*** Updating plugins on $XS_HOST (from nova)"
+    rsync -arp $NOVA_PLUGIN_DIR/* -e "ssh $_SSH_OPTIONS" root@$XS_HOST:/etc/xapi.d/plugins
+else
+    echo "*** Cannot find plugins in nova or os-xenapi ($NOVA_PLUGIN_DIR, $OS_XENAPI_PLUGIN_DIR)"
+    exit 1
+fi
+ssh $_SSH_OPTIONS root@$XS_HOST "chmod +x /etc/xapi.d/plugins/*"
 
 echo "*** Updating Nova on $DS_VM"
-rsync -arp $NOVA_DIR/* -e "ssh $_SSH_OPTIONS" stack@$DS_VM:/opt/stack/nova
+rsync -arp $BASE_DIR/nova/* -e "ssh $_SSH_OPTIONS" stack@$DS_VM:/opt/stack/nova
 
-echo "*** Restarting nova-compute"
-command="/usr/local/bin/nova-compute --config-file /etc/nova/nova.conf"
-SERVICE_DIR="/opt/stack/status"
+if [ -e $BASE_DIR/os-xenapi ]; then
+    echo "*** Updating os-xenapi on $DS_VM"
+    rsync -arp $BASE_DIR/os-xenapi/* -e "ssh $_SSH_OPTIONS" stack@$DS_VM:/opt/stack/os-xenapi
+fi
+
 SCREEN_NAME="stack"
-name=n-cpu
 NL=`echo -ne '\015'`
-cmd="screen -S $SCREEN_NAME -p $name -X stuff \"$command & echo \$! >$SERVICE_DIR/$SCREEN_NAME/${name}.pid; fg || echo \\\"$name failed to start\\\" | tee \\\"$SERVICE_DIR/$SCREEN_NAME/${name}.failure\\\"$NL\""
-ssh $_SSH_OPTIONS stack@$DS_VM $cmd
+for service in $SERVICES; do
+    echo "*** Restarting $service"
+    cmd="screen -S $SCREEN_NAME -p $service -X stuff \"!?$service?$NL\""
+    ssh $_SSH_OPTIONS stack@$DS_VM $cmd
+done
 
