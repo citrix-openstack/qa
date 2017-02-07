@@ -234,7 +234,7 @@ function verify_network {
 			echo 1
 			return
 		fi
-		if [ "$progress" -eq "100" ]; then
+		if [ "${progress:-0}" -eq "100" ]; then
 			echo 0
 			return
 		fi
