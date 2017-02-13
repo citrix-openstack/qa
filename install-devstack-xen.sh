@@ -467,7 +467,7 @@ BUILD_TIMEOUT=600
 LOGFILE=${SCREEN_LOGDIR}/stack.log
 SCREEN_LOGDIR=${SCREEN_LOGDIR}
 
-UBUNTU_INST_HTTP_HOSTNAME=us.archive.ubuntu.com
+UBUNTU_INST_HTTP_HOSTNAME=archive.ubuntu.com
 UBUNTU_INST_HTTP_DIRECTORY=/ubuntu
 
 # Turn on verbosity (password input does not work otherwise)
