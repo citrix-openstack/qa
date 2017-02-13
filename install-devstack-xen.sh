@@ -522,10 +522,6 @@ END_OF_NPROC
   chmod +x /usr/local/bin/nproc
 fi
 
-# TODO: Will remove the below when https://review.openstack.org/#/c/420495/ merged
-sed -i "s\cut -d'.' -f1-2 | tr '-' '.'\cut -d'/' -f 1 | cut -d'-' -f 1\g" tools/xen/functions
-# End(TODO)
-
 cd tools/xen
 EXIT_AFTER_JEOS_INSTALLATION="$EXIT_AFTER_JEOS_INSTALLATION" ./install_os_domU.sh
 END_OF_XENSERVER_COMMANDS
