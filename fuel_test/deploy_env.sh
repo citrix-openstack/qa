@@ -31,6 +31,9 @@ set -ex
 
 yum install python-pip git createrepo dpkg-devel dpkg-dev rpm rpm-build -y
 
+# install RPMs for building supplemental packages
+yum install -y --enablerepo=base expect rpm-sign libarchive
+
 cd /root/
 
 if [[ ! -d "fuel-plugin-xenserver" ]]; then
