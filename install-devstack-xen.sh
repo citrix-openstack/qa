@@ -494,16 +494,24 @@ NETWORK_GATEWAY=192.168.10.1
 VLAN_INTERFACE=eth1
 PUBLIC_INTERFACE=eth2
 
+# TODO(huanxie): change this when upgrade to new version
+CIRROS_VERSION=0.3.4
+
 # Nova user specific configuration
 # --------------------------------
 [[post-config|\\\$NOVA_CONF]]
 [DEFAULT]
 disk_allocation_ratio = 2.0
+host = Dom0_DevStackOS
 
 # Neutron ovs bridge mapping
 [[post-config|\\\$NEUTRON_CORE_PLUGIN_CONF]]
 [ovs]
 bridge_mappings = physnet1:br-eth1,public:br-ex
+
+[[post-config|\\\$NEUTRON_CORE_PLUGIN_CONF.domU]]
+[DEFAULT]
+host = Dom0_DevStackOS
 
 LOCALCONF_CONTENT_ENDS_HERE
 
