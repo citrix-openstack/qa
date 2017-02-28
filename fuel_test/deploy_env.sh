@@ -51,6 +51,7 @@ pip install git+https://github.com/openstack/fuel-plugins
 		'
 set -ex
 cd /root/fuel-plugin-xenserver
+wget "'$GPG_KEYFILE_URL'" -O /root/fuel-plugin-xenserver/suppack/RPM-GPG-KEY-XS-OPENSTACK
 fpb --check .
 fpb --build .
 mkdir -p output
