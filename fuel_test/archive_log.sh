@@ -33,11 +33,11 @@ function archive_log {
 
 	compute_ip=$(fuel node --env "$env_id" | grep compute | egrep -o "10\\.20\\.0\\.([0-9])+")
 	scp $compute_ip:/var/log/fuel-plugin-xenserver/*.log /tmp/fuel-plugin-xenserver
-	scp $compute_ip:/var/log/nova-all.log /tmp/fuel-plugin-xenserver
+	scp $compute_ip:/var/log/*-all.log /tmp/fuel-plugin-xenserver
 
 	controller_ip=$(fuel node --env "$env_id" | grep controller | egrep -o "10\\.20\\.0\\.([0-9])+")
-	scp $controller_ip:/var/log/fuel-plugin-xenserver/controller_post_deployment.log /tmp/fuel-plugin-xenserver
-	scp $controller_ip:/var/log/neutron-all.log /tmp/fuel-plugin-xenserver
+	scp $controller_ip:/var/log/fuel-plugin-xenserver/*.log /tmp/fuel-plugin-xenserver
+	scp $controller_ip:/var/log/*-all.log /tmp/fuel-plugin-xenserver
 
 	if [ "'$FUEL_VERSION'" == "8" ]; then
 		docker cp fuel-core-8.0-astute:/var/log/astute/astute.log /tmp/fuel-plugin-xenserver
