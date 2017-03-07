@@ -303,8 +303,20 @@ function check_env_status {
 
 FM_IP=$(get_fm_ip "$XS_HOST" "Fuel$FUEL_VERSION")
 
-build_plugin $FM_IP $FUEL_VERSION $FUEL_PLUGIN_REFSPEC
-echo "Fuel plugin with $FUEL_PLUGIN_REFSPEC is built"
+if [ -z "$FUEL_PLUGIN_FILE" ]; then
+    # if not specify FUEL_PLUGIN_FILE, let's build it.
+    build_plugin $FM_IP $FUEL_VERSION $FUEL_PLUGIN_REFSPEC
+    echo "Fuel plugin with $FUEL_PLUGIN_REFSPEC is built"
+else
+    # copy file to FM
+    ssh -qo StrictHostKeyChecking=no root@$FM_IP \
+        '
+set -ex
+mkdir -p /root/fuel-plugin-xenserver/output/
+'
+    scp -qo StrictHostKeyChecking=no $FUEL_PLUGIN_FILE root@$FM_IP:/root/fuel-plugin-xenserver/output/
+    
+fi
 
 install_plugin "$FM_IP"
 echo "Fuel plugin is installed"
