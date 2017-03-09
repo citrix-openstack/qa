@@ -1,9 +1,13 @@
 #!/bin/bash
 
-set -eu
+set -eux
 
 timeout 5m ./clear_env.sh
 [ $? -ne 0 ] && echo clear_env execution timeout && exit -1
+
+# basing on hypervisor version to customize env_attributes yaml files
+hypervisor=${hypervisor:-xenserver}
+sed -i "s/{hypervisor}/$hypervisor/g" env_attributes.yaml*
 
 # only check version when FUEL_VERSION is not set.
 if [ -n "$FUEL_VERSION" ]; then

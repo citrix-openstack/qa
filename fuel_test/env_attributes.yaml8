@@ -2,7 +2,7 @@ editable:
   external_ntp:
     ntp_list:
       value: 10.20.0.2
-  fuel-plugin-xenserver:
+  fuel-plugin-{hypervisor}:
     metadata:
       enabled: True
       versions:
