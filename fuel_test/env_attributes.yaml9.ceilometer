@@ -6,7 +6,7 @@ editable:
   additional_components:
     ceilometer:
       value: true
-  fuel-plugin-xenserver:
+  fuel-plugin-{hypervisor}:
     metadata:
       enabled: True
       versions:
