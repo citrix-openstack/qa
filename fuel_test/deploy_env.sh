@@ -298,7 +298,7 @@ function check_env_status {
 	fuel env --env $env_id | grep -q operational
 	echo $?
 	')
-	[ "$success" -eq 0 ] && echo 0
+	[ "$success" = "0" ] && echo 0
 }
 
 FM_IP=$(get_fm_ip "$XS_HOST" "Fuel$FUEL_VERSION")
@@ -340,6 +340,6 @@ deploy_env "$FM_IP" "$ENV_NAME"
 print_env_messages "$FM_IP"
 
 SUCCESS=$(check_env_status "$FM_IP" "$ENV_NAME")
-[ "$SUCCESS" -ne 0 ] && echo "Deployment failed" && exit -1
+[ "$SUCCESS" != "0" ] && echo "Deployment failed" && exit -1
 
 exit 0
