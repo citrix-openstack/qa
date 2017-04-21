@@ -2,6 +2,17 @@
 
 set -eux
 
+# If XCP is 1.9.0 (XS6.54) and branch is master, no need test
+. localrc
+xcp_ver=$(ssh -qo StrictHostKeyChecking=no root@$XS_HOST \
+          'xe host-param-get uuid=$(xe host-list --minimal) \
+          param-name=software-version param-key=platform_version')
+if [ "$xcp_ver" = "1.9.0" ] && [ "$REPO_BRANCH" = "master" ]; then
+    echo "XS6.5 is deprecated on master branch (MOS10)"
+    touch "$FUEL_TEST_SUCCESS"
+    exit 0
+fi
+
 timeout 5m ./clear_env.sh
 [ $? -ne 0 ] && echo clear_env execution timeout && exit -1
 
