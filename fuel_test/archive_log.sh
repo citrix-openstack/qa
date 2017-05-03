@@ -54,4 +54,6 @@ function archive_log {
 }
 
 FM_IP=$(get_fm_ip "$XS_HOST" "Fuel$FUEL_VERSION")
+
+echo -e "\n\n******Start archiving log..."
 archive_log "$FM_IP" "$ENV_NAME"

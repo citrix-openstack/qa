@@ -47,9 +47,17 @@ fi
 
 trap ./archive_log.sh EXIT
 
-timeout 30m ./prep_env.sh
+echo -e "\n\n******Start preparing environment..."
+timeout 40m ./prep_env.sh
 [ $? -ne 0 ] && echo prep_env execution timeout && exit -1
+echo -e "******Done preparing environment.\n\n"
+
+echo -e "\n\n******Start deploying environment..."
 timeout 120m ./deploy_env.sh
 [ $? -ne 0 ] && echo deploy_env execution timeout && exit -1
+echo -e "******Done deploying environment.\n\n"
+
+echo -e "\n\n******Start testing environment..."
 timeout 60m ./test_env.sh
 [ $? -ne 0 ] && echo test_env execution timeout && exit -1
+echo -e "******Done testing environment.\n\n"

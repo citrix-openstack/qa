@@ -6,6 +6,14 @@ set -eu
 
 [ $DEBUG == "on" ] && set -x
 
+function run_in_domzero {
+    ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$XS_HOST "$@"
+}
+
+function run_in_fm {
+    ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@$FM_IP "$@"
+}
+
 function create_networks {
 	local xs_host="$1"
 	ssh -qo StrictHostKeyChecking=no root@$xs_host \
@@ -63,33 +71,127 @@ RECREATE_GATEWAY
 }
 
 function restore_fm {
-	# Restore fuel master
-	local xs_host="$1"
-	local fm_name="$2"
-	local fm_snapshot="$3"
-	local fm_mnt="$4"
-	local fm_xva="$5"
-	ssh -qo StrictHostKeyChecking=no root@$xs_host \
-	'
-	set -eux
-	vm_uuid=$(xe vm-list name-label="'$fm_name'" --minimal)
-	snapshot_uuid=$(xe snapshot-list name-label="'$fm_snapshot'" snapshot-of="$vm_uuid" --minimal)
-	if [ -n "$snapshot_uuid" ]; then
-		xe snapshot-revert snapshot-uuid="$snapshot_uuid"
-	else
-		mount "'$fm_mnt'" /mnt
-		xe vm-import filename="/mnt/'$fm_xva'" preserve=true
-		umount /mnt
-		vm_uuid=$(xe vm-list name-label="'$fm_name'" --minimal)
-		vif=$(xe vif-list vm-uuid=$vm_uuid device=1 --minimal)
-		net=$(xe vif-list vm-uuid=$vm_uuid device=1 params=network-uuid --minimal)
-		xe vif-destroy uuid=$vif
-		mac=$(echo 00:60:2f$(od -txC -An -N3 /dev/random|tr \  :))
-		xe vif-create vm-uuid="$vm_uuid" device=1 network-uuid="$net" mac=$mac
-		xe vm-snapshot vm="'$fm_name'" new-name-label="'$fm_snapshot'"
-	fi
-	xe vm-start vm="'$fm_name'"
-	'
+    # Restore fuel master
+    local __restored_from="$1"
+    local fm_name="$2"
+    local fm_snapshot="$3"
+    local fm_mnt="$4"
+    local fm_xva="$5"
+    snapshot_uuid=$(run_in_domzero '
+        set -eux
+        vm_uuid=$(xe vm-list name-label="'$fm_name'" --minimal)
+        snapshot_uuid=$(xe snapshot-list name-label="'$fm_snapshot'" snapshot-of="$vm_uuid" --minimal)
+        if [ -n "$snapshot_uuid" ]; then
+            echo $snapshot_uuid
+        fi
+        ')
+    if [ -n "$snapshot_uuid" ]; then
+        run_in_domzero '
+            set -eux
+            xe snapshot-revert snapshot-uuid="'$snapshot_uuid'"
+            xe vm-start vm="'$fm_name'"
+            '
+        eval $__restored_from="SNAPSHOT"
+    else
+        run_in_domzero '
+            set -eux
+            MNT_POINT=/mnt
+            # just in case the mount point mounted already.
+            is_mount=YES
+            mount | grep -w $MNT_POINT || is_mount=NO
+            if [ "$is_mount" != "NO" ]; then
+                umount $MNT_POINT
+                sleep 5
+            fi
+            mount "'$fm_mnt'" $MNT_POINT
+            xe vm-import filename="$MNT_POINT/'$fm_xva'" preserve=true
+            umount $MNT_POINT
+            vm_uuid=$(xe vm-list name-label="'$fm_name'" --minimal)
+            vif=$(xe vif-list vm-uuid=$vm_uuid device=1 --minimal)
+            net=$(xe vif-list vm-uuid=$vm_uuid device=1 params=network-uuid --minimal)
+            xe vif-destroy uuid=$vif
+            mac=$(echo 00:60:2f$(od -txC -An -N3 /dev/random|tr \  :))
+            xe vif-create vm-uuid="$vm_uuid" device=1 network-uuid="$net" mac=$mac
+            xe vm-start vm="'$fm_name'"
+            '
+        eval $__restored_from="XVA"
+    fi
+}
+
+function create_snapshot {
+    local vm_name="$1"
+    local snapshot_name="$2"
+    run_in_domzero xe vm-snapshot vm=$vm_name new-name-label=$snapshot_name
+}
+
+function fresh_fm {
+    NEED_BOOTSTRAP=no
+
+    # check DNS: Use dom0's DNS as FM's upstream DNS
+    dom0_dns_list=$(run_in_domzero grep nameserver /etc/resolv.conf | awk '{print $2}')
+    new_fm_dns=""
+    for dns in $dom0_dns_list
+    do
+        if [ -n "$new_fm_dns" ]; then
+            new_fm_dns="$new_fm_dns,$dns"
+        else
+            new_fm_dns=$dns
+        fi
+    done
+    new_fm_dns="\"$new_fm_dns\""
+    fm_dns=$(run_in_fm grep DNS_UPSTREAM /etc/fuel/astute.yaml | cut -d':' -f2)
+    if [ "$new_fm_dns" != "${fm_dns//[[:space:]]}" ]; then
+        run_in_fm '
+            set -eux
+            # update DNS
+            ASTUTE_CFG=/etc/fuel/astute.yaml
+            cp -p $ASTUTE_CFG ${ASTUTE_CFG}.old
+            sed -i "s/\"DNS_UPSTREAM\":.*$/\"DNS_UPSTREAM\": '$new_fm_dns'/g" $ASTUTE_CFG
+            '
+        echo "Updated FM's upstream DNS"
+        NEED_BOOTSTRAP=yes
+    fi
+
+    if [ "$NEED_BOOTSTRAP" = "yes" ]; then
+        echo "$(date) - Start bootstrap admin node..."
+        run_in_fm '
+            BOOTSTRAP_CFG=/etc/fuel/bootstrap_admin_node.conf
+            cp -p $BOOTSTRAP_CFG ${BOOTSTRAP_CFG}.backup
+            # not show fuel menu so that accept the existing default settings.
+            echo "showmenu=no">> $BOOTSTRAP_CFG
+            # bootstrap admin node to ensure the change to take effective.
+            /usr/sbin/bootstrap_admin_node.sh
+            mv ${BOOTSTRAP_CFG}.backup $BOOTSTRAP_CFG
+
+            # Force allowing SSH from eth1; 
+            iptables -A INPUT -i eth1 -p tcp --dport 22 -j ACCEPT
+            /usr/libexec/iptables/iptables.init save
+            sync
+            '
+        echo "$(date) - Done bootstrap admin node."
+    fi
+}
+
+function ensure_fm {
+	local fm_name="$1"
+	local fm_snapshot="$2"
+	local fm_mnt="$3"
+	local fm_xva="$4"
+    echo "Restoring Fuel Master..."
+    restored_from=""
+    restore_fm "restored_from" "$fm_name" "$fm_snapshot" "$fm_mnt" "$fm_xva"
+
+    echo "Waiting for Fuel Master to bootup and get IP..."
+    FM_IP=$(wait_for_fm "$XS_HOST" "Fuel$FUEL_VERSION")
+    [ -z "$FM_IP" ] && echo "Fuel Master IP obtaining timeout" && exit -1
+
+    sshpass -p "$FM_PWD" ssh-copy-id -o StrictHostKeyChecking=no root@$FM_IP
+
+    # if FM was restored from XVA, let's make need change and create snapshot.
+    if [ "$restored_from" = "XVA" ]; then
+        fresh_fm
+        create_snapshot "$fm_name" "$fm_snapshot"
+    fi
 }
 
 function create_node {
@@ -261,8 +363,7 @@ function wait_for_nailgun {
 
 create_networks "$XS_HOST" "$NET1" "$NET2" "$NET3"
 
-echo "Restoring Fuel Master.."
-restore_fm "$XS_HOST" "Fuel$FUEL_VERSION" "$FM_SNAPSHOT" "$FM_MNT" "fuel$FUEL_VERSION.xva"
+ensure_fm "Fuel$FUEL_VERSION" "$FM_SNAPSHOT" "$FM_MNT" "fuel$FUEL_VERSION.xva"
 
 create_node "$XS_HOST" "Compute" "$NODE_MEM_COMPUTE" "$NODE_DISK_COMPUTE" "$NODE_CPU_COMPUTE" "$IXE_NFS" "$IXE_ISO"
 add_vif "$XS_HOST" "Compute" "$NET1" 1
@@ -277,11 +378,6 @@ add_vif "$XS_HOST" "Controller" "$NET1" 1
 add_vif "$XS_HOST" "Controller" "$NET2" 2
 add_vif "$XS_HOST" "Controller" "$NET3" 3
 echo "Controller Node is created"
-
-FM_IP=$(wait_for_fm "$XS_HOST" "Fuel$FUEL_VERSION")
-[ -z "$FM_IP" ] && echo "Fuel Master IP obtaining timeout" && exit -1
-
-sshpass -p "$FM_PWD" ssh-copy-id -o StrictHostKeyChecking=no root@$FM_IP
 
 echo "Begin to create centos repo and import secret key in FM"
 prepare_centos_repo_and_secret_key "$FM_IP" "$GPG_SECRET_KEY_URL"
