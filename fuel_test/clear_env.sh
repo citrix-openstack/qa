@@ -37,10 +37,6 @@ function clear_xs {
 	crontab -l && crontab -r
 	[ -f /root/rotate_xen_guest_logs.sh ] && rm /root/rotate_xen_guest_logs.sh
 
-	yum list installed openstack-neutron-xen-plugins.noarch && yum remove openstack-neutron-xen-plugins.noarch -y
-	yum list installed openstack-xen-plugins.noarch && yum remove openstack-xen-plugins.noarch -y
-	yum list installed conntrack-tools.x86_64 && yum remove conntrack-tools.x86_64 -y
-
 	COMPUTE_UUIDS=$(xe vm-list name-label=Compute --minimal)
 	for uuid in $(echo $COMPUTE_UUIDS | sed "s/,/ /g")
 	do
@@ -63,6 +59,10 @@ function clear_xs {
 	for i in "${ALL_FUEL_VERSION[@]}"; do
 		ssh -qo StrictHostKeyChecking=no root@$xs_host '[ -n "$(xe vm-list name-label=Fuel'$i' --minimal)" ] && xe vm-shutdown force=true vm="Fuel'$i'"'
 	done
+
+	ssh -qo StrictHostKeyChecking=no root@$xs_host 'mkdir -p /tmp/fuel_clean'
+	scp -qo StrictHostKeyChecking=no uninstall-suppack.sh root@$xs_host:/tmp/fuel_clean/
+	ssh -qo StrictHostKeyChecking=no root@$xs_host '/tmp/fuel_clean/uninstall-suppack.sh'
 }
 
 clear_xs "$XS_HOST"
