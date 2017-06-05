@@ -9,6 +9,7 @@ usage: $0 XENSERVER XENSERVER_PASS PRIVKEY <optional arguments>
 A simple script to use devstack to setup an OpenStack, and optionally
 run tests on it. This script should be executed on an operator machine, and
 it will execute commands through ssh on the remote XenServer specified.
+You can use this script to install aio OpenStack env or multi-hosts env.
 
 positional arguments:
  XENSERVER          The address of the XenServer
@@ -37,6 +38,9 @@ optional arguments:
                        before running any tests.  The host will not be rebooted after
                        installing the supplemental pack, so new kernels will not be
                        picked up.
+ -a NODE_TYPE          OpenStack node type [all, compute]
+ -m NODE_NAME          DomU name for installing OpenStack
+ -i CONTROLLER_IP      IP address of controller node, must set it when installing compute node
 
 flags:
  -f                 Force SR replacement. If your XenServer has an LVM type SR,
@@ -52,8 +56,13 @@ An example run:
   # Create a passwordless ssh key
   ssh-keygen -t rsa -N "" -f devstack_key.priv
 
-  # Install devstack
+  # Install devstack all-in-one (controller and compute node together)
   $0 XENSERVER mypassword devstack_key.priv
+  or
+  $0 XENSERVER mypassword devstack_key.priv -a all -m <node_name>
+
+  # Install devstack compute node
+  $0 XENSERVER mypassword devstack_key.priv -a compute -m <node_name> -i <controller_IP>
 
 $@
 EOF
@@ -69,7 +78,10 @@ LOG_FILE_DIRECTORY=""
 JEOS_URL=""
 JEOS_FILENAME=""
 SUPP_PACK_URL=""
-SCREEN_LOGDIR="/opt/stack/devstack_logs"
+UBUNTU_REPO_URL="archive.ubuntu.com"
+NODE_TYPE="all"
+NODE_NAME=""
+CONTROLLER_IP=""
 
 # Get Positional arguments
 set +u
@@ -86,7 +98,7 @@ REMAINING_OPTIONS="$#"
 
 # Get optional parameters
 set +e
-while getopts ":t:d:fnl:j:e:s:" flag; do
+while getopts ":t:d:fnl:j:e:s:a:i:m:" flag; do
     REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
     case "$flag" in
         t)
@@ -122,6 +134,21 @@ while getopts ":t:d:fnl:j:e:s:" flag; do
             SUPP_PACK_URL="$OPTARG"
             REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
             ;;
+        a)
+            NODE_TYPE="$OPTARG"
+            REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
+            if [ $NODE_TYPE != "all" ] && [ $NODE_TYPE != "compute" ]; then
+                print_usage_and_die "$NODE_TYPE - Invalid value for NODE_TYPE"
+            fi
+            ;;
+        i)
+            CONTROLLER_IP="$OPTARG"
+            REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
+            ;;
+        m)
+            HOST_NAME="$OPTARG"
+            REMAINING_OPTIONS=$(expr "$REMAINING_OPTIONS" - 1)
+            ;;
         \?)
             print_usage_and_die "Invalid option -$OPTARG"
             ;;
@@ -132,6 +159,16 @@ set -e
 # Make sure that all options processed
 if [ "0" != "$REMAINING_OPTIONS" ]; then
     print_usage_and_die "ERROR: some arguments were not recognised!"
+fi
+
+# Give DomU a default name when installing all-in-one
+if [[ "$NODE_TYPE" = "all" && "$NODE_NAME" = "" ]]; then
+    NODE_NAME="DevStackOSDomU"
+fi
+
+# Check CONTROLLER_IP is set when installing a compute node
+if [[ "$NODE_TYPE" = "compute" ]] && [[ "$CONTROLLER_IP" = "" || "NODE_NAME" = "" ]]; then
+    print_usage_and_die "ERROR: CONTROLLER_IP or NODE_NAME not specified when installing compute node!"
 fi
 
 # Set up internal variables
@@ -151,6 +188,9 @@ XENSERVER:      $XENSERVER
 XENSERVER_PASS: $XENSERVER_PASS
 PRIVKEY:        $PRIVKEY
 TEST_TYPE:      $TEST_TYPE
+NODE_TYPE:      $NODE_TYPE
+NODE_NAME:      $NODE_NAME
+CONTROLLER_IP:  $CONTROLLER_IP
 DEVSTACK_SRC:   $DEVSTACK_SRC
 
 FORCE_SR_REPLACEMENT: $FORCE_SR_REPLACEMENT
@@ -241,6 +281,7 @@ function copy_logs_on_failure() {
 
 function copy_logs() {
     if [ -n "$LOG_FILE_DIRECTORY" ]; then
+        LOGDIR=$(grep -w "LOGDIR=" local.conf|cut -d'=' -f 2)
         on_xenserver << END_OF_XENSERVER_COMMANDS
 set -xu
 cd $TMPDIR
@@ -248,13 +289,13 @@ cd devstack*
 
 mkdir -p /root/artifacts
 
-GUEST_IP=\$(. "tools/xen/functions" && find_ip_by_name DevStackOSDomU 0)
+GUEST_IP=\$(. "tools/xen/functions" && find_ip_by_name $NODE_NAME 0)
 if [ -n \$GUEST_IP ]; then
 ssh -q \
     -o Batchmode=yes \
     -o StrictHostKeyChecking=no \
     -o UserKnownHostsFile=/dev/null \
-    stack@\$GUEST_IP "tar --ignore-failed-read -czf - ${SCREEN_LOGDIR}/* /opt/stack/tempest/*.xml" > \
+    stack@\$GUEST_IP "tar --ignore-failed-read -czf - ${LOGDIR}/* /opt/stack/tempest/*.xml" > \
     /root/artifacts/domU.tgz < /dev/null || true
 fi
 tar --ignore-failed-read -czf /root/artifacts/dom0.tgz /var/log/messages* /var/log/xensource* /var/log/SM* || true
@@ -349,24 +390,6 @@ SUPP_PACK
     sleep 10m
 fi
 
-echo -n "Hack ISCSISR.py on XenServer (original saved to /root/ISCSISR.py.orig)..."
-on_xenserver << HACK_ISCSI_SR
-set -eu
-
-iscsi_target_file=""
-for candidate_file in "/opt/xensource/sm/ISCSISR.py" "/usr/lib64/xcp-sm/ISCSISR.py"; do
-    if [ -e "\$candidate_file" ]; then
-        iscsi_target_file=\$candidate_file
-    fi
-done
-if [ -n "\$iscsi_target_file" ]; then
-    if ! [ -e "/root/ISCSISR.py.orig" ]; then
-        cp \$iscsi_target_file /root/ISCSISR.py.orig
-    fi
-    sed -e "s/'phy'/'aio'/g" /root/ISCSISR.py.orig > \$iscsi_target_file
-fi
-HACK_ISCSI_SR
-echo "OK"
 
 if [ -n "$JEOS_URL" ]; then
     echo "(re-)importing JeOS template"
@@ -415,9 +438,6 @@ cd devstack*
 END_OF_XENSERVER_COMMANDS
 fi
 
-# set nounset for $NOVA_CONF
-set +u
-
 copy_logs_on_failure on_xenserver << END_OF_XENSERVER_COMMANDS
 set -exu
 
@@ -425,90 +445,25 @@ cd $TMPDIR
 
 cd devstack*
 
-cat << LOCALCONF_CONTENT_ENDS_HERE > local.conf
-# ``local.conf`` is a user-maintained settings file that is sourced from ``stackrc``.
-# This gives it the ability to override any variables set in ``stackrc``.
-# The ``localrc`` section replaces the old ``localrc`` configuration file.
-# Note that if ``localrc`` is present it will be used in favor of this section.
-# --------------------------------
-[[local|localrc]]
+# Configure local.conf
+wget https://raw.githubusercontent.com/citrix-openstack/qa/install-multihost-os/local.conf.sample
+cp local.conf.sample local.conf
 
-enable_plugin os-xenapi https://github.com/openstack/os-xenapi.git
+# Common part
+sed -i "s/@HOST_IP@/$XENSERVER/g" local.conf
+sed -i "s/@PASSWORD@/$XENSERVER_PASS/g" local.conf
+sed -i "s/@DOMU_NAME@/$NODE_NAME/g" local.conf
+sed -i "/enable_plugin/a UBUNTU_INST_HTTP_HOSTNAME=$UBUNTU_REPO_URL" local.conf
 
-# Passwords
-MYSQL_PASSWORD=citrix
-SERVICE_TOKEN=citrix
-ADMIN_PASSWORD=citrix
-SERVICE_PASSWORD=citrix
-RABBIT_PASSWORD=citrix
-GUEST_PASSWORD=citrix
-XENAPI_PASSWORD="$XENSERVER_PASS"
-SWIFT_HASH="66a3d6b56c1f479c8b4e70ab5c2000f5"
-
-# Nice short names, so we could export an XVA
-VM_BRIDGE_OR_NET_NAME="osvmnet"
-PUB_BRIDGE_OR_NET_NAME="ospubnet"
-XEN_INT_BRIDGE_OR_NET_NAME="osintnet"
-
-# Do not use secure delete
-CINDER_SECURE_DELETE=False
-
-# Compute settings
-VIRT_DRIVER=xenserver
-
-# OpenStack VM settings
-OSDOMU_VDI_GB=30
-OSDOMU_MEM_MB=8192
-
-TERMINATE_TIMEOUT=90
-BUILD_TIMEOUT=600
-
-# DevStack settings
-LOGFILE=${SCREEN_LOGDIR}/stack.log
-SCREEN_LOGDIR=${SCREEN_LOGDIR}
-
-UBUNTU_INST_HTTP_HOSTNAME=archive.ubuntu.com
-UBUNTU_INST_HTTP_DIRECTORY=/ubuntu
-
-# Turn on verbosity (password input does not work otherwise)
-VERBOSE=True
-
-# XenAPI specific
-XENAPI_CONNECTION_URL="http://$XENSERVER_IP"
-VNCSERVER_PROXYCLIENT_ADDRESS="$XENSERVER_IP"
-
-# Neutron specific part
-ENABLED_SERVICES+=neutron,q-domua
-Q_ML2_PLUGIN_MECHANISM_DRIVERS=openvswitch
-
-Q_ML2_PLUGIN_TYPE_DRIVERS=vlan,flat
-ENABLE_TENANT_TUNNELS=False
-ENABLE_TENANT_VLANS=True
-Q_ML2_TENANT_NETWORK_TYPE=vlan
-ML2_VLAN_RANGES="physnet1:1100:1200"
-
-PUB_IP=172.24.4.1
-SUBNETPOOL_PREFIX_V4=192.168.10.0/24
-NETWORK_GATEWAY=192.168.10.1
-
-VLAN_INTERFACE=eth1
-PUBLIC_INTERFACE=eth2
-
-# Nova user specific configuration
-# --------------------------------
-[[post-config|\\\$NOVA_CONF]]
-[DEFAULT]
-disk_allocation_ratio = 2.0
-
-# Neutron ovs bridge mapping
-[[post-config|\\\$NEUTRON_CORE_PLUGIN_CONF]]
-[ovs]
-bridge_mappings = physnet1:br-eth1,public:br-ex
-
-LOCALCONF_CONTENT_ENDS_HERE
-
-# unset nounset for $NOVA_CONF
-set -u
+# compute-only specific part
+if [ "$NODE_TYPE" = "compute" ]; then
+    sed -i "s/ENABLED_SERVICES+=neutron,q-domua/ENABLED_SERVICES=neutron,q-agt,q-domua,n-cpu,placement-client/g" local.conf
+    sed -i "/enable_plugin/a SERVICE_HOST=$CONTROLLER_IP" local.conf
+    sed -i "/enable_plugin/a MYSQL_HOST=$CONTROLLER_IP" local.conf
+    sed -i "/enable_plugin/a GLANCE_HOST=$CONTROLLER_IP" local.conf
+    sed -i "/enable_plugin/a RABBIT_HOST=$CONTROLLER_IP" local.conf
+    sed -i "/enable_plugin/a KEYSTONE_AUTH_HOST=$CONTROLLER_IP" local.conf
+fi
 
 # XenServer doesn't have nproc by default - but it's used by stackrc.
 # Fake it up if one doesn't exist
@@ -526,6 +481,20 @@ cd tools/xen
 EXIT_AFTER_JEOS_INSTALLATION="$EXIT_AFTER_JEOS_INSTALLATION" ./install_os_domU.sh
 END_OF_XENSERVER_COMMANDS
 
+# Sync compute node info in controller node
+if [ "$NODE_TYPE" = "compute" ]; then
+    set +x
+    echo "################################################################################"
+    echo ""
+    echo "Sync compute node info in controller node!"
+
+    ssh $_SSH_OPTIONS stack@$CONTROLLER_IP bash -s -- << END_OF_SYNC_COMPUTE_COMMANDS
+set -exu
+cd /opt/stack/devstack/tools/
+. discover_hosts.sh
+END_OF_SYNC_COMPUTE_COMMANDS
+fi
+
 if [ "$TEST_TYPE" == "none" ]; then
     exit 0
 fi
@@ -536,7 +505,7 @@ set -exu
 cd $TMPDIR
 cd devstack*
 
-GUEST_IP=\$(. "tools/xen/functions" && find_ip_by_name DevStackOSDomU 0)
+GUEST_IP=\$(. "tools/xen/functions" && find_ip_by_name $NODE_NAME 0)
 ssh -q \
     -o Batchmode=yes \
     -o StrictHostKeyChecking=no \

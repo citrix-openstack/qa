@@ -1,0 +1,50 @@
+[[local|localrc]]
+
+enable_plugin os-xenapi https://github.com/openstack/os-xenapi.git
+
+# VNC address is the Dom0 IP
+VNCSERVER_PROXYCLIENT_ADDRESS=@HOST_IP@
+XENAPI_PASSWORD=@PASSWORD@
+GUEST_NAME=@DOMU_NAME@
+
+# Passwords
+MYSQL_PASSWORD=citrix
+SERVICE_TOKEN=citrix
+ADMIN_PASSWORD=citrix
+SERVICE_PASSWORD=citrix
+RABBIT_PASSWORD=citrix
+GUEST_PASSWORD=citrix
+SWIFT_HASH="66a3d6b56c1f479c8b4e70ab5c2000f5"
+
+# OpenStack VM settings
+OSDOMU_VDI_GB=30
+OSDOMU_MEM_MB=8192
+VM_BRIDGE_OR_NET_NAME="osvmnet"
+PUB_BRIDGE_OR_NET_NAME="ospubnet"
+
+# DevStack settings
+GIT_BASE=https://github.com
+LOGDIR=/opt/stack/devstack_logs
+LOGFILE=${LOGDIR}/stack.log
+# Deprecated, https://github.com/openstack-dev/devstack/blob/899616290cf54fe12f835bd8e3c43b8829ff9fd1/stackrc#L882
+SCREEN_LOGDIR=${LOGDIR}
+USE_SCREEN=True
+ENABLED_SERVICES+=neutron,q-domua
+
+# Compute settings
+VIRT_DRIVER=xenserver
+XENAPI_CONNECTION_URL="http://$VNCSERVER_PROXYCLIENT_ADDRESS"
+
+# Neutron settings
+Q_ML2_PLUGIN_MECHANISM_DRIVERS=openvswitch
+Q_ML2_PLUGIN_TYPE_DRIVERS=vxlan,flat
+Q_ML2_TENANT_NETWORK_TYPE=vxlan
+VLAN_INTERFACE=eth1
+PUBLIC_INTERFACE=eth2
+PUB_IP=172.24.4.1
+
+# Nova user specific configuration
+# --------------------------------
+[[post-config|$NOVA_CONF]]
+[DEFAULT]
+disk_allocation_ratio = 2.0
