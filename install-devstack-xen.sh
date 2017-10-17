@@ -61,7 +61,7 @@ exit 1
 }
 
 # Defaults for optional arguments
-DEVSTACK_SRC="https://github.com/openstack-dev/devstack/archive/master.tar.gz"
+DEVSTACK_SRC="https://github.com/openstack-dev/devstack/archive/stable/newton.tar.gz"
 TEST_TYPE="none"
 FORCE_SR_REPLACEMENT="false"
 EXIT_AFTER_JEOS_INSTALLATION=""
@@ -425,6 +425,16 @@ cd $TMPDIR
 
 cd devstack*
 
+# Workaround: skip "--releasever".
+sed -i 's/--releasever=\$centos_ver conntrack-tools/conntrack-tools/g' tools/xen/functions
+
+# get dom0's hostname
+DOM0_HOSTNAME=\$(hostname)
+
+# Remove restriction on linux bridge in Dom0 so security groups
+# can be applied to the interim bridge-based network.
+rm -f /etc/modprobe.d/blacklist-bridge*
+
 cat << LOCALCONF_CONTENT_ENDS_HERE > local.conf
 # ``local.conf`` is a user-maintained settings file that is sourced from ``stackrc``.
 # This gives it the ability to override any variables set in ``stackrc``.
@@ -432,8 +442,6 @@ cat << LOCALCONF_CONTENT_ENDS_HERE > local.conf
 # Note that if ``localrc`` is present it will be used in favor of this section.
 # --------------------------------
 [[local|localrc]]
-
-enable_plugin os-xenapi https://github.com/openstack/os-xenapi.git
 
 # Passwords
 MYSQL_PASSWORD=citrix
@@ -487,10 +495,6 @@ ENABLE_TENANT_VLANS=True
 Q_ML2_TENANT_NETWORK_TYPE=vlan
 ML2_VLAN_RANGES="physnet1:1100:1200"
 
-PUB_IP=172.24.4.1
-SUBNETPOOL_PREFIX_V4=192.168.10.0/24
-NETWORK_GATEWAY=192.168.10.1
-
 VLAN_INTERFACE=eth1
 PUBLIC_INTERFACE=eth2
 
@@ -501,9 +505,12 @@ PUBLIC_INTERFACE=eth2
 disk_allocation_ratio = 2.0
 
 # Neutron ovs bridge mapping
-[[post-config|\\\$NEUTRON_CORE_PLUGIN_CONF]]
+[[post-config|\\\$NEUTRON_PLUGIN_CONF]]
+[DEFAULT]
+hostname = ${DOM0_HOSTNAME}
 [ovs]
-bridge_mappings = physnet1:br-eth1,public:br-ex
+ovsdb_interface = vsctl
+of_interface = ovs-ofctl
 
 LOCALCONF_CONTENT_ENDS_HERE
 
