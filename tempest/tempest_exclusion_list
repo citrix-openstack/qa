@@ -29,10 +29,11 @@ COMMON_TEMPEST_REGEX="$COMMON_TEMPEST_REGEX|.*tempest.scenario.test_volume_boot_
 
 
 # Add exclusion list for tests in multiple nodes.
+MULTI_NODES_TEMPEST_REGEX=$COMMON_TEMPEST_REGEX
 
 # Exclude these tests before fixing this bug: https://bugs.launchpad.net/nova/+bug/1704071
-MULTI_NODES_TEMPEST_REGEX="MULTI_NODES_TEMPEST_REGEX|.*tempest.api.compute.admin.test_live_migration.LiveAutoBlockMigrationV225Test.*"
-MULTI_NODES_TEMPEST_REGEX="MULTI_NODES_TEMPEST_REGEX|.*tempest.api.compute.admin.test_live_migration.LiveMigrationRemoteConsolesV26Test.*"
-MULTI_NODES_TEMPEST_REGEX="MULTI_NODES_TEMPEST_REGEX|.*tempest.api.compute.admin.test_live_migration.LiveMigrationTest.*"
+MULTI_NODES_TEMPEST_REGEX="$MULTI_NODES_TEMPEST_REGEX|.*tempest.api.compute.admin.test_live_migration.LiveAutoBlockMigrationV225Test.*"
+MULTI_NODES_TEMPEST_REGEX="$MULTI_NODES_TEMPEST_REGEX|.*tempest.api.compute.admin.test_live_migration.LiveMigrationRemoteConsolesV26Test.*"
+MULTI_NODES_TEMPEST_REGEX="$MULTI_NODES_TEMPEST_REGEX|.*tempest.api.compute.admin.test_live_migration.LiveMigrationTest.*"
 
-MULTI_NODES_TEMPEST_REGEX="MULTI_NODES_TEMPEST_REGEX)(^tempest\.(api|scenario|thirdparty))"
+MULTI_NODES_TEMPEST_REGEX="$MULTI_NODES_TEMPEST_REGEX)(^tempest\.(api|scenario|thirdparty))"
