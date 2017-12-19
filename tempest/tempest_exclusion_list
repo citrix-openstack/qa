@@ -36,4 +36,6 @@ MULTI_NODES_TEMPEST_REGEX="$MULTI_NODES_TEMPEST_REGEX|.*tempest.api.compute.admi
 MULTI_NODES_TEMPEST_REGEX="$MULTI_NODES_TEMPEST_REGEX|.*tempest.api.compute.admin.test_live_migration.LiveMigrationRemoteConsolesV26Test.*"
 MULTI_NODES_TEMPEST_REGEX="$MULTI_NODES_TEMPEST_REGEX|.*tempest.api.compute.admin.test_live_migration.LiveMigrationTest.*"
 
+MULTI_NODES_TEMPEST_REGEX="$MULTI_NODES_TEMPEST_REGEX|.*tempest.api.compute.servers.test_server_actions.ServerActionsTestJSON.test_resize_volume_backed_server_confirm.*"
+
 MULTI_NODES_TEMPEST_REGEX="$MULTI_NODES_TEMPEST_REGEX)(^tempest\.(api|scenario|thirdparty))"
