@@ -25,9 +25,9 @@ fi
 FETCH_URL=${FETCH_URL:-"http://10.71.212.50/p/"}
 ROOT_DIR=/opt/stack/
 DEVSTACK_PATH=/opt/stack/devstack
-TEMPEST_DIR=/opt/stack/tempest
 TEST_BRANCH=$ZUUL_CHANGE
 DEST=${DEST:-"/opt/stack/openstack"}
+TEMPEST_DIR=$DEST/tempest
 NOVA_CONF=/etc/nova/nova.conf
 IMAGE_NAME=${IMAGE_NAME:-"cirros-0.3.5-x86_64-disk"}
 VM_NAME=${VM_NAME:-"testVM"}
