@@ -157,7 +157,7 @@ END_OF_REQ_VGPU_TYPE
 
 echo "###################Devstack start stack#####################"
 pushd $DEVSTACK_PATH/
-if ! grep "enabled_vgpu_types=" ${DEVSTACK_PATH}/local.conf; then
+if ! grep "enabled_vgpu_types =" ${DEVSTACK_PATH}/local.conf; then
     echo "[devices]" >> ${DEVSTACK_PATH}/local.conf
     echo "enabled_vgpu_types = $first_vgpu_type" >> ${DEVSTACK_PATH}/local.conf
 fi
