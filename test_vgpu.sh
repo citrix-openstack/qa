@@ -31,10 +31,11 @@ TEMPEST_DIR=$DEST/tempest
 NOVA_CONF=/etc/nova/nova.conf
 IMAGE_NAME=${IMAGE_NAME:-"cirros-0.3.5-x86_64-disk"}
 VM_NAME=${VM_NAME:-"testVM"}
+SNAPSHOT_NAME=${SNAPSHOT_NAME:-"testSnapshot"}
+SNAPSHOT_VM_NAME=${SNAPSHOT_VM_NAME:-"testSnapshot_VM"}
 JOURNAL_DIR=/var/log/journal
-VGPU_TEST_LOG_DIR=${VGPU_TEST_LOG_DIR:-"/opt/stack/workspace/test_vgpu/logs"}
+OPENSTACK_LOGS=${OPENSTACK_LOGS:-"/opt/stack/workspace/test_vgpu/logs"}
 TMP_LOG_DIR=/tmp/openstack
-
 
 SLEEP_TIME_GAP=3
 SLEEP_MAX_TRIES=40
@@ -56,15 +57,40 @@ on_exit()
     do
         sudo journalctl --unit $service > $TMP_LOG_DIR/$service".log";
     done
-    cp $TMP_LOG_DIR/* $VGPU_TEST_LOG_DIR/
+    cp $TMP_LOG_DIR/* $OPENSTACK_LOGS/
     echo "###################Clean environment if requested#####################"
     if [ $keep_env != "true" ]; then
         pushd $DEVSTACK_PATH/
-        nova delete $VM_NAME
+        nova delete $VM_NAME $SNAPSHOT_VM_NAME
+        openstack image delete $SNAPSHOT_NAME
         ./clean.sh
         popd
+        rm $DEVSTACK_PATH -rf
+
     fi
     set +x
+}
+
+waiting_vm_active ()
+{
+    count=0
+    vm_name=$1
+    while :
+    do
+        echo "Waitting to VM active"
+        sleep $SLEEP_TIME_GAP
+        count=$((count + 1))
+        vm_state=$(nova show $vm_name | grep -w 'status' | awk '{print $4}')
+        if [ $vm_state = "ERROR" ]; then
+            error_log=$error_log"\n\tVM create failed"
+            exit 1
+        elif [ $vm_state = "ACTIVE" ]; then
+            break
+        elif [ $count -gt $SLEEP_MAX_TRIES ]; then
+            error_log=$error_log"\n\tVM can not reach active status"
+            exit 1
+        fi
+    done
 }
 
 trap on_exit EXIT
@@ -76,6 +102,13 @@ _SSH_OPTIONS="\
     -o StrictHostKeyChecking=no \
     -o UserKnownHostsFile=/dev/null \
     -i /opt/stack/.ssh/id_rsa"
+
+pushd $ROOT_DIR
+rm $DEVSTACK_PATH -rf
+git clone https://github.com/openstack-dev/devstack.git
+popd
+
+cp $ROOT_DIR/local.conf $DEVSTACK_PATH
 
 DOM0_IP=$(grep XENAPI_CONNECTION_URL ${DEVSTACK_PATH}/local.conf | cut -d'=' -f2 | sed 's/[^0-9,.]*//g')
 
@@ -107,6 +140,10 @@ echo "###################Update openstack repositories#####################"
 PROJECT_LIST=$(echo $ZUUL_CHANGES | tr '^' '\n' | cut -d: -f1 | cut -d/ -f2 | sort | uniq)
 
 pushd ${DEST}
+
+# remove requirements folder because it contains run time modifications
+rm requirements -rf
+
 for dir in ${DEST}/*
 do
     if [ -d "${dir}" ] ; then
@@ -114,9 +151,10 @@ do
         pushd ${dir}
         if [ -d .git ]; then
             echo "update repository ${dir}"
-            git checkout master
-            if ! git diff-index --quiet HEAD --; then
-                git checkout *
+            cur_branch=$(git branch | grep \* | cut -d ' ' -f2)
+            if [ $cur_branch != 'master' ]; then
+                git checkout master
+                git branch -D $cur_branch
             fi
             git pull --ff origin master
 
@@ -155,14 +193,20 @@ done
 END_OF_REQ_VGPU_TYPE
 )
 
-echo "###################Devstack start stack#####################"
 pushd $DEVSTACK_PATH/
 if ! grep "enabled_vgpu_types=" ${DEVSTACK_PATH}/local.conf; then
     echo "[devices]" >> ${DEVSTACK_PATH}/local.conf
     echo "enabled_vgpu_types = $first_vgpu_type" >> ${DEVSTACK_PATH}/local.conf
 fi
+echo "###################Set image handler to remote stream#####################"
+if ! grep "image_handler = vdi_remote_stream" ${DEVSTACK_PATH}/local.conf; then
+    echo "[xenserver]" >> ${DEVSTACK_PATH}/local.conf
+    echo "image_handler = vdi_remote_stream" >> ${DEVSTACK_PATH}/local.conf
+fi
+
 sudo find $JOURNAL_DIR -name "*.journal" -exec rm {} \;
 sudo systemctl restart systemd-journald
+echo "###################Devstack start stack#####################"
 ./stack.sh
 popd
 
@@ -182,23 +226,7 @@ prv_net=$(openstack network list | grep "private" | awk '{print $2}')
 nova boot --image $IMAGE_NAME --flavor 1 --nic net-id=$prv_net $VM_NAME
 
 nova_vm_id=$(nova show $VM_NAME | grep -w 'id' | awk '{print $4}')
-count=0
-while :
-do
-    echo "Waitting to VM active"
-    sleep $SLEEP_TIME_GAP
-    count=$((count + 1))
-    vm_state=$(nova show $VM_NAME | grep -w 'status' | awk '{print $4}')
-    if [ $vm_state = "ERROR" ]; then
-        error_log=$error_log"\n\tVM create failed"
-        break
-    elif [ $vm_state = "ACTIVE" ]; then
-        break
-    elif [ $count -gt $SLEEP_MAX_TRIES ]; then
-        error_log=$error_log"\n\tVM can not reach active status"
-        break
-    fi
-done
+waiting_vm_active $VM_NAME
 
 echo "###################Check VGPU create status#####################"
 if [ $vm_state = "ACTIVE" ]; then
@@ -215,10 +243,22 @@ END_OF_VGPU_CONFIRM
 fi
 
 if [ -n "$result" ]; then
-    echo "VGPU create success"
+    echo $VGPU_CREATE_SUCCESS_FLAG
+    echo "###################Check LVM image upload status#####################"
+    nova image-create --poll $VM_NAME $SNAPSHOT_NAME
+    if ! openstack image show $SNAPSHOT_NAME; then
+        error_log=$error_log"\n\tImage create failed!"
+        echo $error_log
+        exit 1
+    fi
+    nova boot --image $SNAPSHOT_NAME --flavor 1 --nic net-id=$prv_net $SNAPSHOT_VM_NAME
+    waiting_vm_active $SNAPSHOT_VM_NAME
 else
-    error_log=$error_log"\n\tVGPU create failed"
+    error_log=$error_log"\n\tVGPU create failed!"
     echo $error_log
+    exit 1
 fi
+
+
 
 set +ex
