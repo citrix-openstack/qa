@@ -37,7 +37,7 @@ TMP_LOG_DIR=/tmp/openstack
 
 
 SLEEP_TIME_GAP=3
-SLEEP_MAX_TRIES=40
+SLEEP_MAX_TRIES=100
 
 
 echo "###################Test VGPU Begin#####################"
